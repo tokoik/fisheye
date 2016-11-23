@@ -1,0 +1,33 @@
+#
+# for Linux
+#
+a.out
+core
+*.o
+*.dep
+#
+# for Mac
+#
+.DS_Store
+xcuserdata/
+DerivedData/
+#
+# for Windows
+#
+Debug/
+Release/
+/x64/
+/packages/
+Thumbs.db
+*.com
+*.exe
+*.VC.VC.opendb
+*.VC.db
+#
+# anothre stuff
+#
+/.vs/
+*~
+*.bak
+*.tmp
+*.swp
