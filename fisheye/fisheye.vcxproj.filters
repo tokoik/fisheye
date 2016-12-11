@@ -67,5 +67,11 @@
     <None Include="panorama.frag">
       <Filter>シェーダー ファイル</Filter>
     </None>
+    <None Include="simple.frag">
+      <Filter>シェーダー ファイル</Filter>
+    </None>
+    <None Include="simple.vert">
+      <Filter>シェーダー ファイル</Filter>
+    </None>
   </ItemGroup>
 </Project>

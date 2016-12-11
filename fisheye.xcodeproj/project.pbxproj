@@ -32,6 +32,8 @@
 		7D33F7651DE52EF80094FE12 /* CamCv.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; path = CamCv.h; sourceTree = "<group>"; };
 		7D33F7671DE52EF80094FE12 /* Camera.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; path = Camera.h; sourceTree = "<group>"; };
 		7D33F76B1DE5B9B70094FE12 /* Window.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; path = Window.h; sourceTree = "<group>"; };
+		7D9F40BC1DFD53510048331D /* simple.frag */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.glsl; path = simple.frag; sourceTree = "<group>"; };
+		7D9F40BD1DFD53510048331D /* simple.vert */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.glsl; path = simple.vert; sourceTree = "<group>"; };
 		7DEBC5341DEA7CB8003AFDF7 /* fisheye.vert */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.glsl; path = fisheye.vert; sourceTree = "<group>"; };
 		7DEBC5351DEA7CB8003AFDF7 /* fixed.vert */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.glsl; path = fixed.vert; sourceTree = "<group>"; };
 		7DEBC5361DEA7CBE003AFDF7 /* normal.frag */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.glsl; path = normal.frag; sourceTree = "<group>"; };
@@ -87,6 +89,8 @@
 				7D1828451DF98D7800C66A44 /* panorama.frag */,
 				7DEBC53A1DEA7CC8003AFDF7 /* theta.vert */,
 				7DEBC5391DEA7CC8003AFDF7 /* theta.frag */,
+				7D9F40BD1DFD53510048331D /* simple.vert */,
+				7D9F40BC1DFD53510048331D /* simple.frag */,
 			);
 			path = fisheye;
 			sourceTree = "<group>";

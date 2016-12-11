@@ -171,6 +171,8 @@
     <None Include="panorama.frag" />
     <None Include="panorama.vert" />
     <None Include="rectangle.vert" />
+    <None Include="simple.frag" />
+    <None Include="simple.vert" />
     <None Include="theta.frag" />
     <None Include="theta.vert" />
   </ItemGroup>

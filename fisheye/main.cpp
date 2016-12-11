@@ -43,6 +43,18 @@ constexpr int screen_samples(1271);
 // 背景色は表示されないが合成時に 0 にしておく必要がある
 constexpr GLfloat background[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
+// 表示する図形
+const char file[] = "bunny.obj";
+
+// 光源
+const GgSimpleLight lightData =
+{
+  { 0.2f, 0.2f, 0.2f, 0.4f },                           // 環境光成分
+  { 1.0f, 1.0f, 1.0f, 0.0f },                           // 拡散反射光成分
+  { 1.0f, 1.0f, 1.0f, 0.0f },                           // 鏡面光成分
+  { 0.0f, 0.0f, 1.0f, 1.0f }                            // 位置
+};
+
 //
 // メイン
 //
@@ -102,13 +114,24 @@ int main()
   //   頂点座標値を vertex shader で生成するので VBO は必要ない
   const GLuint mesh([]() { GLuint mesh; glGenVertexArrays(1, &mesh); return mesh; } ());
 
-  // 隠面消去を設定する
-  glDisable(GL_DEPTH_TEST);
-  glDisable(GL_CULL_FACE);
+  // 図形の表示に用いるシェーダを読み込む
+  const GgSimpleShader simple("simple.vert", "simple.frag");
+
+  // 光源
+  GgSimpleLightBuffer light(lightData);
+
+  // 表示する図形の形状データファイルの読み込み
+  const GgObj object(file, simple, true);
+
+  // 図形表示用の視野変換行列の
+  const GgMatrix mv(ggLookat(0.0f, 0.0f, 2.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f));
 
   // ウィンドウが開いている間繰り返す
   while (!window.shouldClose())
   {
+    // 画面クリア
+    glClear(GL_COLOR_BUFFER_BIT);
+
     // 背景画像の展開に用いるシェーダプログラムの使用を開始する
     glUseProgram(expansion);
 
@@ -163,9 +186,29 @@ int main()
     // テクスチャユニットを指定する
     glUniform1i(imageLoc, 0);
 
+    // 隠面消去を行わない
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
+
     // メッシュを描画する
     glBindVertexArray(mesh);
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, slices * 2, stacks);
+
+    // 隠面消去を行う
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+
+    // デプスバッファをクリアする
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    // 図形表示用の投影変換行列
+    const GgMatrix mp(ggPerspective(1.0f, window.getAspect(), 0.1f, 3.0f));
+
+    // 図形描画用のシェーダプログラムの使用開始
+    simple.use(light, mp, mv * window.getRightTrackball());
+
+    // 図形を描画する
+    object.draw();
 
     // カラーバッファを入れ替えてイベントを取り出す
     window.swapBuffers();
