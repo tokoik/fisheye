@@ -43,7 +43,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="normal.frag">
       <Filter>シェーダー ファイル</Filter>
     </None>
