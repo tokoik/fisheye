@@ -34,16 +34,21 @@ using namespace gg;
 #  if defined(_WIN32)
 #    define GLFW_EXPOSE_NATIVE_WIN32
 #    define GLFW_EXPOSE_NATIVE_WGL
-#    include "glfw3native.h"
-#    define OVR_OS_WIN32
+#    include <GLFW/glfw3native.h>
 #    undef APIENTRY
+#    define OVR_OS_WIN32
 #    pragma comment(lib, "LibOVR.lib")
+#    define NOTIFY(msg) MessageBox(NULL, TEXT(msg), TEXT("HMD Sample"), MB_ICONERROR | MB_OK)
+#  else
+#    define NOTIFY(msg) std::cerr << msg << '\n'
 #  endif
 #  include <OVR_CAPI_GL.h>
 #  include <Extras/OVR_Math.h>
 #  if OVR_PRODUCT_VERSION > 0
 #    include <dxgi.h> // GetDefaultAdapterLuid のため
 #    pragma comment(lib, "dxgi.lib")
+
+// デフォルトのグラフィックスアダプタの LUID を得る
 inline ovrGraphicsLuid GetDefaultAdapterLuid()
 {
   ovrGraphicsLuid luid = ovrGraphicsLuid();
@@ -71,10 +76,12 @@ inline ovrGraphicsLuid GetDefaultAdapterLuid()
   return luid;
 }
 
+// LUID を比較する
 inline int Compare(const ovrGraphicsLuid& lhs, const ovrGraphicsLuid& rhs)
 {
   return memcmp(&lhs, &rhs, sizeof (ovrGraphicsLuid));
 }
+
 #  endif
 #endif
 
@@ -143,9 +150,6 @@ class Window
   // Oculus Rift のスクリーンのサイズ
   GLfloat screen[ovrEye_Count][4];
 
-  // Oculus Rift のスクリーンのヘッドトラッキング位置からの変位
-  GLfloat offset[ovrEye_Count][3];
-
   // Oculus Rift 表示用の FBO
   GLuint oculusFbo[ovrEye_Count];
 
@@ -167,9 +171,7 @@ class Window
 
   // ミラー表示用の FBO のカラーテクスチャ
   ovrMirrorTexture mirrorTexture;
-
 #  else
-
   // Oculus Rift に送る描画データ
   ovrLayer_Union layerData;
 
@@ -213,7 +215,11 @@ public:
 
 #if defined(USE_OCULUS_RIFT)
       // Oculus Rift (LibOVR) を初期化する
-      if (OVR_FAILURE(ovr_Initialize(nullptr))) return;
+      if (OVR_FAILURE(ovr_Initialize(nullptr)))
+      {
+        NOTIFY("LibOVR can not be initialized");
+        return;
+      }
 
       // プログラム終了時には LibOVR を終了する
       atexit(ovr_Shutdown);
@@ -223,7 +229,11 @@ public:
 
       // Oculus Rift のセッションを作成する
       session = nullptr;
-      if (OVR_FAILURE(ovr_Create(&session, &luid))) return;
+      if (OVR_FAILURE(ovr_Create(&session, &luid)))
+      {
+        NOTIFY("Oculus Rift is not connected");
+        return;
+      }
 
       // Oculus Rift へのレンダリングに使う FBO の初期値を設定する
       for (int eye = 0; eye < ovrEye_Count; ++eye) oculusFbo[eye] = 0;
@@ -321,7 +331,7 @@ public:
 
 #  if defined(_DEBUG)
     // Oculus Rift の情報を表示する
-    std::cout
+    std::cerr
       << "\nProduct name: " << hmdDesc.ProductName
       << "\nResolution:   " << hmdDesc.Resolution.w << " x " << hmdDesc.Resolution.h
       << "\nDefault Fov:  (" << hmdDesc.DefaultEyeFov[ovrEye_Left].LeftTan
@@ -422,9 +432,7 @@ public:
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
       }
-
 #  else
-
       // 描画データに視野を設定する
       layerData.EyeFov.Fov[eye] = fov;
 
@@ -444,17 +452,17 @@ public:
 
       // Oculus Rift のレンズ補正等の設定値を取得する
       eyeRenderDesc[eye] = ovr_GetRenderDesc(session, ovrEyeType(eye), fov);
-
-      // Oculus Rift のスクリーンのヘッドトラッキング位置からの変位を保存する
-      offset[eye][0] = eyeRenderDesc[eye].HmdToEyeViewOffset.x;
-      offset[eye][1] = eyeRenderDesc[eye].HmdToEyeViewOffset.y;
-      offset[eye][2] = eyeRenderDesc[eye].HmdToEyeViewOffset.z;
 #  endif
     }
 
 #  if OVR_PRODUCT_VERSION > 0
-    // 姿勢のトラッキングにおける床の高さを 0 に設定する
-    ovr_SetTrackingOriginType(session, ovrTrackingOrigin_FloorLevel);
+    // 姿勢のトラッキングにおける原点を目の位置に設定する
+    // (原点を床の高さに設定するときは ovrTrackingOrigin_FloorLevel を指定する)
+    ovr_SetTrackingOriginType(session, ovrTrackingOrigin_EyeLevel);
+
+    // HMD の現在位置を基準にする
+    // (ovrTrackingOrigin_FloorLevel のときは高さはリセットされない)
+    ovr_RecenterTrackingOrigin(session);
 
     // ミラー表示用の FBO を作成する
     const ovrMirrorTextureDesc mirrorDesc =
@@ -480,9 +488,7 @@ public:
         glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
       }
     }
-
 #  else
-
     // ミラー表示用の FBO を作成する
     if (OVR_SUCCESS(ovr_CreateMirrorTextureGL(session, GL_SRGB8_ALPHA8, width, height, reinterpret_cast<ovrTexture **>(&mirrorTexture))))
     {
@@ -502,9 +508,7 @@ public:
 
     // Oculus Rift への表示ではスワップ間隔を待たない
     glfwSwapInterval(0);
-
 #else
-
     // スワップ間隔を待つ
     glfwSwapInterval(1);
 #endif
@@ -553,9 +557,7 @@ public:
       // デプスバッファとして使ったテクスチャを開放する
       glDeleteTextures(1, &oculusDepth[eye]);
       oculusDepth[eye] = 0;
-
 #  else
-
       // レンダリングターゲットに使ったテクスチャを開放する
       auto *const colorTexture(layerData.EyeFov.ColorTexture[eye]);
       for (int i = 0; i < colorTexture->TextureCount; ++i)
@@ -605,6 +607,13 @@ public:
     // 現在の状態をトラッキングの原点にする
     if (sessionStatus.ShouldRecenter) ovr_RecenterTrackingOrigin(session);
 
+    // Oculus Remote の Back ボタンを押したら視点の位置をリセットする
+    ovrInputState inputState;
+    if (OVR_SUCCESS(ovr_GetInputState(session, ovrControllerType_Remote, &inputState)))
+    {
+      if (inputState.Buttons & ovrButton_Back) ovr_RecenterTrackingOrigin(session);
+    }
+
     // HmdToEyeOffset などは実行時に変化するので毎フレーム ovr_GetRenderDesc() で ovrEyeRenderDesc を取得する
     const ovrEyeRenderDesc eyeRenderDesc[] =
     {
@@ -619,19 +628,9 @@ public:
       eyeRenderDesc[1].HmdToEyeOffset
     };
 
-    // Oculus Rift のスクリーンのヘッドトラッキング位置からの変位を保存する
-    for (int eye = 0; eye < ovrEye_Count; ++eye)
-    {
-      offset[eye][0] = hmdToEyeOffset[eye].x;
-      offset[eye][1] = hmdToEyeOffset[eye].y;
-      offset[eye][2] = hmdToEyeOffset[eye].z;
-    }
-
     // 視点の姿勢情報を取得する
     ovr_GetEyePoses(session, ++frameIndex, ovrTrue, hmdToEyeOffset, layerData.RenderPose, &layerData.SensorSampleTime);
-
 #  else
-
     // フレームのタイミング計測開始
     const auto ftiming(ovr_GetPredictedDisplayTime(session, 0));
 
@@ -685,9 +684,7 @@ public:
     // Oculus Rift の片目の位置と回転を取得する
     const auto &p(layerData.RenderPose[eye].Position);
     const auto &o(layerData.RenderPose[eye].Orientation);
-
 #  else
-
     // レンダーターゲットに描画する前にレンダーターゲットのインデックスをインクリメントする
     auto *const colorTexture(layerData.EyeFov.ColorTexture[eye]);
     colorTexture->CurrentIndex = (colorTexture->CurrentIndex + 1) % colorTexture->TextureCount;
@@ -716,16 +713,16 @@ public:
     screen[2] = this->screen[eye][2];
     screen[3] = this->screen[eye][3];
 
-    // Oculus Rift の位置を返す
-    position[0] = offset[eye][0] + p.x;
-    position[1] = offset[eye][1] + p.y;
-    position[2] = offset[eye][2] + p.z;
+    // Oculus Rift の位置を反転して返す
+    position[0] = -p.x;
+    position[1] = -p.y;
+    position[2] = -p.z;
     position[3] = 1.0f;
 
-    // Oculus Rift の方向を返す
-    orientation[0] = o.x;
-    orientation[1] = o.y;
-    orientation[2] = o.z;
+    // Oculus Rift の方向を反転して返す
+    orientation[0] = -o.x;
+    orientation[1] = -o.y;
+    orientation[2] = -o.z;
     orientation[3] = o.w;
   }
 
@@ -780,6 +777,14 @@ public:
   }
 
   //
+  // ビューポートをもとに戻す
+  //
+  void restoreViewport()
+  {
+    glViewport(0, 0, width, height);
+  }
+
+  //
   // カラーバッファを入れ替えてイベントを取り出す
   //
   void swapBuffers()
@@ -810,6 +815,7 @@ public:
     {
       // 転送に失敗したら Oculus Rift の設定を最初からやり直す必要があるらしい
       // けどめんどくさいのでウィンドウを閉じてしまう
+      NOTIFY("Oculus Rift has been disconnected");
       glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
 
@@ -827,9 +833,7 @@ public:
 
     // 残っている OpenGL コマンドを実行する
     glFlush();
-
 #else
-
     // カラーバッファを入れ替える
     glfwSwapBuffers(window);
 #endif
@@ -875,7 +879,7 @@ public:
       instance->aspect = static_cast<GLfloat>(width) / static_cast<GLfloat>(height);
 
       // ウィンドウ全体に描画する
-      glViewport(0, 0, width, height);
+      instance->restoreViewport();
 #endif
     }
   }
