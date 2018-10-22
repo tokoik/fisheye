@@ -3,7 +3,7 @@ fisheye
 
 魚眼レンズ画像の GLSL を使った平面展開のサンプルプログラム
 
-    Copyright (c) 2016 Kohe Tokoi. All Rights Reserved.
+    Copyright (c) 2017 Kohe Tokoi. All Rights Reserved.
     
     Permission is hereby granted, free of charge,  to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
