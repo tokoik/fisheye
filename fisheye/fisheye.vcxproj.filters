@@ -18,9 +18,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Window.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="CamCv.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -33,12 +30,18 @@
     <ClInclude Include="ExpansionShader.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="GgApplication.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="gg.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="fisheye.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -65,6 +68,12 @@
       <Filter>シェーダー ファイル</Filter>
     </None>
     <None Include="panorama.frag">
+      <Filter>シェーダー ファイル</Filter>
+    </None>
+    <None Include="simple.frag">
+      <Filter>シェーダー ファイル</Filter>
+    </None>
+    <None Include="simple.vert">
       <Filter>シェーダー ファイル</Filter>
     </None>
   </ItemGroup>

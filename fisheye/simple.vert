@@ -3,53 +3,53 @@
 //
 // simple.vert
 //
-//   ’Pƒ‚È‰A‰e•t‚¯‚ğs‚Á‚ÄƒIƒuƒWƒFƒNƒg‚ğ•`‰æ‚·‚éƒVƒF[ƒ_
+//   å˜ç´”ãªé™°å½±ä»˜ã‘ã‚’è¡Œã£ã¦ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’æç”»ã™ã‚‹ã‚·ã‚§ãƒ¼ãƒ€
 //
 
-// Ş¿
+// æè³ª
 layout (std140) uniform Material
 {
-  vec4 kamb;                                          // ŠÂ‹«Œõ‚Ì”½ËŒW”
-  vec4 kdiff;                                         // ŠgU”½ËŒW”
-  vec4 kspec;                                         // ‹¾–Ê”½ËŒW”
-  float kshi;                                         // ‹P‚«ŒW”
+  vec4 kamb;                                          // ç’°å¢ƒå…‰ã®åå°„ä¿‚æ•°
+  vec4 kdiff;                                         // æ‹¡æ•£åå°„ä¿‚æ•°
+  vec4 kspec;                                         // é¡é¢åå°„ä¿‚æ•°
+  float kshi;                                         // è¼ãä¿‚æ•°
 };
 
-// ŒõŒ¹
+// å…‰æº
 layout (std140) uniform Light
 {
-  vec4 lamb;                                          // ŠÂ‹«Œõ¬•ª
-  vec4 ldiff;                                         // ŠgU”½ËŒõ¬•ª
-  vec4 lspec;                                         // ‹¾–Ê”½ËŒõ¬•ª
-  vec4 lpos;                                          // ˆÊ’u
+  vec4 lamb;                                          // ç’°å¢ƒå…‰æˆåˆ†
+  vec4 ldiff;                                         // æ‹¡æ•£åå°„å…‰æˆåˆ†
+  vec4 lspec;                                         // é¡é¢åå°„å…‰æˆåˆ†
+  vec4 lpos;                                          // ä½ç½®
 };
 
-// •ÏŠ·s—ñ
-uniform mat4 mp;                                      // “Š‰e•ÏŠ·s—ñ
-uniform mat4 mv;                                      // ƒ‚ƒfƒ‹ƒrƒ…[•ÏŠ·s—ñ
-uniform mat4 mn;                                      // –@ü•ÏŠ·s—ñ
+// å¤‰æ›è¡Œåˆ—
+uniform mat4 mp;                                      // æŠ•å½±å¤‰æ›è¡Œåˆ—
+uniform mat4 mv;                                      // ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—
+uniform mat4 mn;                                      // æ³•ç·šå¤‰æ›è¡Œåˆ—
 
-// ’¸“_‘®«
-layout (location = 0) in vec4 pv;                     // ƒ[ƒJƒ‹À•WŒn‚Ì’¸“_ˆÊ’u
-layout (location = 1) in vec4 nv;                     // ’¸“_‚Ì–@üƒxƒNƒgƒ‹
+// é ‚ç‚¹å±æ€§
+layout (location = 0) in vec4 pv;                     // ãƒ­ãƒ¼ã‚«ãƒ«åº§æ¨™ç³»ã®é ‚ç‚¹ä½ç½®
+layout (location = 1) in vec4 nv;                     // é ‚ç‚¹ã®æ³•ç·šãƒ™ã‚¯ãƒˆãƒ«
 
-// ƒ‰ƒXƒ^ƒ‰ƒCƒU‚É‘—‚é’¸“_‘®«
-out vec4 idiff;                                       // ŠgU”½ËŒõ‹­“x
-out vec4 ispec;                                       // ‹¾–Ê”½ËŒõ‹­“x
+// ãƒ©ã‚¹ã‚¿ãƒ©ã‚¤ã‚¶ã«é€ã‚‹é ‚ç‚¹å±æ€§
+out vec4 idiff;                                       // æ‹¡æ•£åå°„å…‰å¼·åº¦
+out vec4 ispec;                                       // é¡é¢åå°„å…‰å¼·åº¦
 
 void main(void)
 {
-  // À•WŒvZ
-  vec4 p = mv * pv;                                   // ‹“_À•WŒn‚Ì’¸“_‚ÌˆÊ’u
-  vec3 v = normalize(p.xyz);                          // ‹“_À•WŒn‚Ì‹üƒxƒNƒgƒ‹
-  vec3 l = normalize((lpos * p.w - p * lpos.w).xyz);  // ‹“_À•WŒn‚ÌŒõüƒxƒNƒgƒ‹
-  vec3 h = normalize(l - v);                          // ’†ŠÔƒxƒNƒgƒ‹
-  vec3 n = normalize((mn * nv).xyz);                  // –@üƒxƒNƒgƒ‹
+  // åº§æ¨™è¨ˆç®—
+  vec4 p = mv * pv;                                   // è¦–ç‚¹åº§æ¨™ç³»ã®é ‚ç‚¹ã®ä½ç½®
+  vec3 v = normalize(p.xyz);                          // è¦–ç‚¹åº§æ¨™ç³»ã®è¦–ç·šãƒ™ã‚¯ãƒˆãƒ«
+  vec3 l = normalize((lpos * p.w - p * lpos.w).xyz);  // è¦–ç‚¹åº§æ¨™ç³»ã®å…‰ç·šãƒ™ã‚¯ãƒˆãƒ«
+  vec3 h = normalize(l - v);                          // ä¸­é–“ãƒ™ã‚¯ãƒˆãƒ«
+  vec3 n = normalize((mn * nv).xyz);                  // æ³•ç·šãƒ™ã‚¯ãƒˆãƒ«
 
-  // ‰A‰eŒvZ
+  // é™°å½±è¨ˆç®—
   idiff = max(dot(n, l), 0.0) * kdiff * ldiff + kamb * lamb;
   ispec = pow(max(dot(n, h), 0.0), kshi) * kspec * lspec;
 
-  // ƒNƒŠƒbƒsƒ“ƒOÀ•WŒn‚Ì’¸“_ˆÊ’u
+  // ã‚¯ãƒªãƒƒãƒ”ãƒ³ã‚°åº§æ¨™ç³»ã®é ‚ç‚¹ä½ç½®
   gl_Position = mp * p;
 }

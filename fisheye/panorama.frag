@@ -2,40 +2,40 @@
 #extension GL_ARB_explicit_attrib_location : enable
 
 //
-// ³‹—‰~“›}–@‚ÌƒeƒNƒXƒ`ƒƒ‚ðƒTƒ“ƒvƒŠƒ“ƒO
+// æ­£è·å††ç­’å›³æ³•ã®ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°
 //
 
-// ”wŒiƒeƒNƒXƒ`ƒƒ‚Ì”¼Œa‚Æ’†SˆÊ’u
+// èƒŒæ™¯ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®åŠå¾„ã¨ä¸­å¿ƒä½ç½®
 uniform vec4 circle;
 
-// ”wŒiƒeƒNƒXƒ`ƒƒ
+// èƒŒæ™¯ãƒ†ã‚¯ã‚¹ãƒãƒ£
 uniform sampler2D image;
 
-// ”wŒiƒeƒNƒXƒ`ƒƒ‚ÌƒTƒCƒY
+// èƒŒæ™¯ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ã‚µã‚¤ã‚º
 vec2 size = textureSize(image, 0);
 
-// ”wŒiƒeƒNƒXƒ`ƒƒ‚ÌƒeƒNƒXƒ`ƒƒ‹óŠÔã‚ÌƒXƒP[ƒ‹
+// èƒŒæ™¯ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ†ã‚¯ã‚¹ãƒãƒ£ç©ºé–“ä¸Šã®ã‚¹ã‚±ãƒ¼ãƒ«
 vec2 scale = vec2(-0.15915494, -0.31830989) / circle.st;
 
-// ”wŒiƒeƒNƒXƒ`ƒƒ‚ÌƒeƒNƒXƒ`ƒƒ‹óŠÔã‚Ì’†SˆÊ’u
+// èƒŒæ™¯ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ†ã‚¯ã‚¹ãƒãƒ£ç©ºé–“ä¸Šã®ä¸­å¿ƒä½ç½®
 vec2 center = circle.pq + 0.5;
 
-// Ž‹üƒxƒNƒgƒ‹
+// è¦–ç·šãƒ™ã‚¯ãƒˆãƒ«
 in vec4 vector;
 
-// ƒtƒ‰ƒOƒƒ“ƒg‚ÌF
+// ãƒ•ãƒ©ã‚°ãƒ¡ãƒ³ãƒˆã®è‰²
 layout (location = 0) out vec4 fc;
 
 void main(void)
 {
-  // Ž‹üƒxƒNƒgƒ‹‚ð³‹K‰»‚·‚é
+  // è¦–ç·šãƒ™ã‚¯ãƒˆãƒ«ã‚’æ­£è¦åŒ–ã™ã‚‹
   vec4 orientation = normalize(vector);
 
-  // ƒeƒNƒXƒ`ƒƒÀ•W‚ð‹‚ß‚é
+  // ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™ã‚’æ±‚ã‚ã‚‹
   vec2 u = orientation.xy;
   vec2 v = vec2(orientation.z, length(orientation.xz));
   vec2 texcoord = atan(u, v) * scale + center;
 
-  // ‰æ‘f‚Ì‰A‰e‚ð‹‚ß‚é
+  // ç”»ç´ ã®é™°å½±ã‚’æ±‚ã‚ã‚‹
   fc = texture(image, texcoord);
 }

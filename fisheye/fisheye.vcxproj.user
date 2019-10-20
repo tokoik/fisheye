@@ -2,18 +2,18 @@
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerEnvironment>Path=$(SolutionDir)libs\$(Platform)\vc14\bin;%Path%</LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>Path=$(SolutionDir)libs\$(Platform)\vc15\bin;$(Path)</LocalDebuggerEnvironment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerEnvironment>Path=$(SolutionDir)libs\$(Platform)\vc14\bin;%Path%</LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>Path=$(SolutionDir)libs\$(Platform)\vc15\bin;$(Path)</LocalDebuggerEnvironment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerEnvironment>Path=$(SolutionDir)libs\$(Platform)\vc14\bin;%Path%</LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>Path=$(SolutionDir)libs\$(Platform)\vc15\bin;$(Path)</LocalDebuggerEnvironment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerEnvironment>Path=$(SolutionDir)libs\$(Platform)\vc14\bin;%Path%</LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>Path=$(SolutionDir)libs\$(Platform)\vc15\bin;$(Path)</LocalDebuggerEnvironment>
   </PropertyGroup>
 </Project>

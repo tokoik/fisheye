@@ -1,173 +1,37 @@
-// ƒEƒBƒ“ƒhƒEŠÖ˜A‚Ìˆ—
-#include "Window.h"
-
-// •½–Ê“WŠJ‚Ìİ’èˆê——
-#include "ExpansionShader.h"
-
-// OpenCV ‚É‚æ‚éƒrƒfƒIƒLƒƒƒvƒ`ƒƒ
-#include "CamCv.h"
-
-//
-// İ’è
+ï»¿//
+// ãƒ¡ã‚¤ãƒ³ãƒ—ãƒ­ã‚°ãƒ©ãƒ 
 //
 
-// ”wŒi‰æ‘œ‚Ìæ“¾‚Ég—p‚·‚éƒfƒoƒCƒX
-//#define CAPTURE_INPUT 0               // 0 ”Ô‚ÌƒLƒƒƒvƒ`ƒƒƒfƒoƒCƒX‚©‚ç“ü—Í
-//#define CAPTURE_INPUT "sp360.mp4"     // Kodak SP360 4K ‚Ì Fish Eye ‰æ‘œ
-#define CAPTURE_INPUT "theta.mp4"     // THETA S ‚Ì Equirectangular ‰æ‘œ
+// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒœãƒƒã‚¯ã‚¹ã®è¡¨ç¤ºã®æº–å‚™
+#if defined(_WIN32)
+#  include <Windows.h>
+#  include <atlstr.h>  
+#endif
 
-// ”wŒi‰æ‘œ‚ğ“WŠJ‚·‚éè–@ (ExpansionShader.h QÆ)
-//constexpr int shader_selection(6);    // Kodak SP360 4K
-//constexpr int shader_selection(7);    // THETA S ‚Ì Dual Fisheye ‰æ‘œ
-constexpr int shader_selection(2);    // THETA S ‚Ì Equirectangular ‰æ‘œ
-
-// ”wŒi‰æ‘œ‚Ì“WŠJ‚Ég—p‚·‚éƒo[ƒeƒbƒNƒXƒVƒF[ƒ_‚Ìƒ\[ƒXƒtƒ@ƒCƒ‹–¼
-const char *const capture_vsrc(shader_type[shader_selection].vsrc);
-
-// ”wŒi‰æ‘œ‚Ì“WŠJ‚Ég—p‚·‚éƒtƒ‰ƒOƒƒ“ƒgƒVƒF[ƒ_‚Ìƒ\[ƒXƒtƒ@ƒCƒ‹–¼
-const char *const capture_fsrc(shader_type[shader_selection].fsrc);
-
-// ”wŒi‰æ‘œ‚Ìæ“¾‚Ég—p‚·‚éƒJƒƒ‰‚Ì‰ğ‘œ“x (0 ‚È‚çƒJƒƒ‰‚©‚çæ“¾)
-const int capture_width(shader_type[shader_selection].width);
-const int capture_height(shader_type[shader_selection].height);
-
-// ”wŒi‰æ‘œ‚Ìæ“¾‚Ég—p‚·‚éƒJƒƒ‰‚ÌƒtƒŒ[ƒ€ƒŒ[ƒg (0 ‚È‚çƒJƒƒ‰‚©‚çæ“¾)
-constexpr int capture_fps(0);
-
-// ”wŒi‰æ‘œ‚ÌŠÖS—Ìˆæ
-const float *const capture_circle(shader_type[shader_selection].circle);
-
-// ”wŒi‰æ‘œ‚Ì•`‰æ‚É—p‚¢‚éƒƒbƒVƒ…‚ÌŠiq“_”
-constexpr int screen_samples(1271);
-
-// ”wŒiF‚Í•\¦‚³‚ê‚È‚¢‚ª‡¬‚É 0 ‚É‚µ‚Ä‚¨‚­•K—v‚ª‚ ‚é
-constexpr GLfloat background[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+// ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³æœ¬ä½“
+#include "GgApplication.h"
 
 //
-// ƒƒCƒ“
+// ãƒ¡ã‚¤ãƒ³ãƒ—ãƒ­ã‚°ãƒ©ãƒ 
 //
-
-int main()
+int main() try
 {
-  // ƒJƒƒ‰‚Ìg—p‚ğŠJn‚·‚é
-  CamCv camera;
-  if (!camera.open(CAPTURE_INPUT, capture_width, capture_height, capture_fps))
-  {
-    std::cerr << "Can't open capture device.\n";
-    return EXIT_FAILURE;
-  }
-  camera.start();
+  // ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³æœ¬ä½“
+  GgApplication app(4, 1);
 
-  // ƒEƒBƒ“ƒhƒE‚ğì¬‚·‚é
-  Window window;
+  // ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã‚’å®Ÿè¡Œã™ã‚‹
+  app.run();
+}
+catch (const std::exception &e)
+{
+  // ã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’è¡¨ç¤ºã™ã‚‹
+#if defined(_WIN32)
+  MessageBox(NULL, CString(e.what()), TEXT("ã‚²ãƒ¼ãƒ ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚¹ç‰¹è«–"), MB_OK | MB_ICONERROR);
+#else
+  std::cerr << e.what() << "\n\n[Type enter key] ";
+  std::cin.get();
+#endif
 
-  // ƒEƒBƒ“ƒhƒE‚ªŠJ‚¯‚½‚©‚Ç‚¤‚©Šm‚©‚ß‚é
-  if (!window.get())
-  {
-    // ƒEƒBƒ“ƒhƒE‚ªŠJ‚¯‚È‚©‚Á‚½
-    std::cerr << "Can't open GLFW window.\n";
-    return EXIT_FAILURE;
-  }
-
-  // ”wŒi•`‰æ—p‚ÌƒVƒF[ƒ_ƒvƒƒOƒ‰ƒ€‚ğ“Ç‚İ‚Ş
-  const GLuint expansion(ggLoadShader(capture_vsrc, capture_fsrc));
-  if (!expansion)
-  {
-    // ƒVƒF[ƒ_‚ª“Ç‚İ‚ß‚È‚©‚Á‚½
-    std::cerr << "Can't create program object.\n";
-    return EXIT_FAILURE;
-  }
-
-  // uniform •Ï”‚ÌêŠ‚ğw’è‚·‚é
-  const GLuint gapLoc(glGetUniformLocation(expansion, "gap"));
-  const GLuint screenLoc(glGetUniformLocation(expansion, "screen"));
-  const GLuint focalLoc(glGetUniformLocation(expansion, "focal"));
-  const GLuint rotationLoc(glGetUniformLocation(expansion, "rotation"));
-  const GLuint circleLoc(glGetUniformLocation(expansion, "circle"));
-  const GLuint imageLoc(glGetUniformLocation(expansion, "image"));
-
-  // ”wŒi—p‚ÌƒeƒNƒXƒ`ƒƒ‚ğì¬‚·‚é
-  //   ƒ|ƒŠƒSƒ“‚Åƒrƒ…[ƒ|[ƒg‘S‘Ì‚ğ–„‚ß‚é‚Ì‚Å”wŒi‚Í•\¦‚³‚ê‚È‚¢B
-  //   GL_CLAMP_TO_BORDER ‚É‚µ‚Ä‚¨‚¯‚ÎƒeƒNƒXƒ`ƒƒ‚ÌŠO‚ª GL_TEXTURE_BORDER_COLOR ‚É‚È‚é‚Ì‚ÅA‚±‚ê‚ª”wŒiF‚É‚È‚éB
-  const GLuint image([]() { GLuint image; glGenTextures(1, &image); return image; } ());
-  glBindTexture(GL_TEXTURE_2D, image);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, camera.getWidth(), camera.getHeight(), 0, GL_BGR, GL_UNSIGNED_BYTE, NULL);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, background);
-
-  // ”wŒi•`‰æ‚Ì‚½‚ß‚ÌƒƒbƒVƒ…‚ğì¬‚·‚é
-  //   ’¸“_À•W’l‚ğ vertex shader ‚Å¶¬‚·‚é‚Ì‚Å VBO ‚Í•K—v‚È‚¢
-  const GLuint mesh([]() { GLuint mesh; glGenVertexArrays(1, &mesh); return mesh; } ());
-
-  // ‰B–ÊÁ‹‚ğİ’è‚·‚é
-  glDisable(GL_DEPTH_TEST);
-  glDisable(GL_CULL_FACE);
-
-  // ƒEƒBƒ“ƒhƒE‚ªŠJ‚¢‚Ä‚¢‚éŠÔŒJ‚è•Ô‚·
-  while (!window.shouldClose())
-  {
-    // ”wŒi‰æ‘œ‚Ì“WŠJ‚É—p‚¢‚éƒVƒF[ƒ_ƒvƒƒOƒ‰ƒ€‚Ìg—p‚ğŠJn‚·‚é
-    glUseProgram(expansion);
-
-    // ƒXƒNƒŠ[ƒ“‚Ì‹éŒ`‚ÌŠiq“_”
-    //   •W–{“_‚Ì” (’¸“_”) n = x * y ‚Æ‚·‚é‚Æ‚«A‚±‚ê‚ÉƒAƒXƒyƒNƒg”ä a = x / y ‚ğ‚©‚¯‚ê‚ÎA
-    //   a * n = x * x ‚Æ‚È‚é‚©‚ç x = sqrt(a * n), y = n / x; ‚Å‹‚ß‚ç‚ê‚éB
-    //   ‚±‚Ì•û–@‚Í’¸“_‘®«‚ğ‚Á‚Ä‚¢‚È‚¢‚Ì‚ÅÀs’†‚É•W–{“_‚Ì”‚âƒAƒXƒyƒNƒg”ä‚Ì•ÏX‚ª—eˆÕB
-    const GLsizei slices(static_cast<GLsizei>(sqrt(window.getAspect() * screen_samples)));
-    const GLsizei stacks(screen_samples / slices - 1); // •`‰æ‚·‚éƒCƒ“ƒXƒ^ƒ“ƒX‚Ì”‚È‚Ì‚Åæ‚É 1 ‚ğˆø‚¢‚Ä‚¨‚­B
-
-    // ƒXƒNƒŠ[ƒ“‚ÌŠiqŠÔŠu
-    //   ƒNƒŠƒbƒsƒ“ƒO‹óŠÔ‘S‘Ì‚ğ–„‚ß‚élŠpŒ`‚Í [-1, 1] ‚Ì”ÍˆÍ‚·‚È‚í‚¿c‰¡ 2 ‚Ì‘å‚«‚³‚¾‚©‚çA
-    //   ‚»‚ê‚ğc‰¡‚Ì (Šiq” - 1) ‚ÅŠ„‚Á‚ÄŠiq‚ÌŠÔŠu‚ğ‹‚ß‚éB
-    glUniform2f(gapLoc, 2.0f / (slices - 1), 2.0f / stacks);
-
-    // ƒXƒNƒŠ[ƒ“‚ÌƒTƒCƒY‚Æ’†SˆÊ’u
-    //   screen[0] = (right - left) / 2
-    //   screen[1] = (top - bottom) / 2
-    //   screen[2] = (right + left) / 2
-    //   screen[3] = (top + bottom) / 2
-    const GLfloat screen[] = { window.getAspect(), 1.0f, 0.0f, 0.0f };
-    glUniform4fv(screenLoc, 1, screen);
-
-    // ƒXƒNƒŠ[ƒ“‚Ü‚Å‚ÌÅ“_‹——£
-    //   window.getWheel() ‚Í [-100, 49] ‚Ì”ÍˆÍ‚ğ•Ô‚·B
-    //   ‚µ‚½‚ª‚Á‚ÄÅ“_‹——£ focal ‚Í [1 / 3, 1] ‚Ì”ÍˆÍ‚É‚È‚éB
-    //   ‚±‚ê‚ÍÅ“_‹——£‚ª’·‚­‚È‚é‚É‚µ‚½‚ª‚Á‚Ä•Ï‰»‚ª‘å‚«‚­‚È‚éB
-    glUniform1f(focalLoc, -50.0f / (window.getWheel() - 50.0f));
-
-    // ”wŒi‚É‘Î‚·‚é‹ü‚Ì‰ñ“]s—ñ
-    glUniformMatrix4fv(rotationLoc, 1, GL_TRUE, window.getLeftTrackball().get());
-
-    // ƒeƒNƒXƒ`ƒƒ‚Ì”¼Œa‚Æ’†SˆÊ’u
-    //   circle[0] = ƒCƒ[ƒWƒT[ƒNƒ‹‚Ì x •ûŒü‚Ì”¼Œa
-    //   circle[1] = ƒCƒ[ƒWƒT[ƒNƒ‹‚Ì y •ûŒü‚Ì”¼Œa
-    //   circle[2] = ƒCƒ[ƒWƒT[ƒNƒ‹‚Ì’†S‚Ì x À•W
-    //   circle[3] = ƒCƒ[ƒWƒT[ƒNƒ‹‚Ì’†S‚Ì y À•W
-    const GLfloat circle[] =
-    {
-      capture_circle[0] + window.getShiftWheel() * 0.001f,
-      capture_circle[1] + window.getShiftWheel() * 0.001f,
-      capture_circle[2] + (window.getShiftArrowX() - window.getControlArrowX()) * 0.001f,
-      capture_circle[3] + (window.getShiftArrowY() + window.getControlArrowY()) * 0.001f
-    };
-    glUniform4fv(circleLoc, 1, circle);
-
-    // ƒLƒƒƒvƒ`ƒƒ‚µ‚½‰æ‘œ‚ğ”wŒi—p‚ÌƒeƒNƒXƒ`ƒƒ‚É“]‘—‚·‚é
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, image);
-    camera.transmit();
-
-    // ƒeƒNƒXƒ`ƒƒƒ†ƒjƒbƒg‚ğw’è‚·‚é
-    glUniform1i(imageLoc, 0);
-
-    // ƒƒbƒVƒ…‚ğ•`‰æ‚·‚é
-    glBindVertexArray(mesh);
-    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, slices * 2, stacks);
-
-    // ƒJƒ‰[ƒoƒbƒtƒ@‚ğ“ü‚ê‘Ö‚¦‚ÄƒCƒxƒ“ƒg‚ğæ‚èo‚·
-    window.swapBuffers();
-  }
+  // ãƒ–ãƒ­ã‚°ãƒ©ãƒ ã‚’çµ‚äº†ã™ã‚‹
+  return EXIT_FAILURE;
 }

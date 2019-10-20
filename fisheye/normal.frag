@@ -2,20 +2,20 @@
 #extension GL_ARB_explicit_attrib_location : enable
 
 //
-// ƒeƒNƒXƒ`ƒƒÀ•W‚ÌˆÊ’u‚Ì‰æ‘fF‚ğ‚»‚Ì‚Ü‚Üg‚¤
+// ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™ã®ä½ç½®ã®ç”»ç´ è‰²ã‚’ãã®ã¾ã¾ä½¿ã†
 //
 
-// ”wŒiƒeƒNƒXƒ`ƒƒ
+// èƒŒæ™¯ãƒ†ã‚¯ã‚¹ãƒãƒ£
 uniform sampler2D image;
 
-// ƒeƒNƒXƒ`ƒƒÀ•W
+// ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 in vec2 texcoord;
 
-// ƒtƒ‰ƒOƒƒ“ƒg‚ÌF
+// ãƒ•ãƒ©ã‚°ãƒ¡ãƒ³ãƒˆã®è‰²
 layout (location = 0) out vec4 fc;
 
 void main(void)
 {
-  // ‰æ‘f‚Ì‰A‰e‚ğ‹‚ß‚é
+  // ç”»ç´ ã®é™°å½±ã‚’æ±‚ã‚ã‚‹
   fc = texture(image, texcoord);
 }

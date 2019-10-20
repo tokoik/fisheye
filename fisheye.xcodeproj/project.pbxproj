@@ -9,6 +9,15 @@
 /* Begin PBXBuildFile section */
 		7D33F75B1DE524E90094FE12 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D33F75A1DE524E90094FE12 /* main.cpp */; };
 		7D33F7631DE525140094FE12 /* gg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D33F7611DE525140094FE12 /* gg.cpp */; };
+		7DD58009235CA61B002B91C4 /* libglfw.3.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DD58008235CA61B002B91C4 /* libglfw.3.3.dylib */; };
+		7DD5800B235CA625002B91C4 /* libopencv_core.4.1.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DD5800A235CA625002B91C4 /* libopencv_core.4.1.2.dylib */; };
+		7DD5800D235CA62A002B91C4 /* libopencv_highgui.4.1.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DD5800C235CA62A002B91C4 /* libopencv_highgui.4.1.2.dylib */; };
+		7DD5800F235CA633002B91C4 /* libopencv_videoio.4.1.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DD5800E235CA633002B91C4 /* libopencv_videoio.4.1.2.dylib */; };
+		7DD58011235CA784002B91C4 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DD58010235CA784002B91C4 /* OpenGL.framework */; };
+		7DD58013235CA8CE002B91C4 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DD58012235CA8CE002B91C4 /* CoreVideo.framework */; };
+		7DD58015235CA8DB002B91C4 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DD58014235CA8DB002B91C4 /* IOKit.framework */; };
+		7DD58017235CA8EB002B91C4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DD58016235CA8EB002B91C4 /* Cocoa.framework */; };
+		7DD58019235CAEB6002B91C4 /* fisheye.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7DD58018235CAEB6002B91C4 /* fisheye.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -24,22 +33,33 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		7D1828451DF98D7800C66A44 /* panorama.frag */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.glsl; path = panorama.frag; sourceTree = "<group>"; };
+		7D1828451DF98D7800C66A44 /* panorama.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; lineEnding = 0; path = panorama.frag; sourceTree = "<group>"; };
 		7D33F7571DE524E90094FE12 /* fisheye */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = fisheye; sourceTree = BUILT_PRODUCTS_DIR; };
-		7D33F75A1DE524E90094FE12 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		7D33F7611DE525140094FE12 /* gg.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; path = gg.cpp; sourceTree = "<group>"; };
-		7D33F7621DE525140094FE12 /* gg.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; path = gg.h; sourceTree = "<group>"; };
-		7D33F7651DE52EF80094FE12 /* CamCv.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; path = CamCv.h; sourceTree = "<group>"; };
-		7D33F7671DE52EF80094FE12 /* Camera.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; path = Camera.h; sourceTree = "<group>"; };
-		7D33F76B1DE5B9B70094FE12 /* Window.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; path = Window.h; sourceTree = "<group>"; };
-		7DEBC5341DEA7CB8003AFDF7 /* fisheye.vert */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.glsl; path = fisheye.vert; sourceTree = "<group>"; };
-		7DEBC5351DEA7CB8003AFDF7 /* fixed.vert */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.glsl; path = fixed.vert; sourceTree = "<group>"; };
-		7DEBC5361DEA7CBE003AFDF7 /* normal.frag */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.glsl; path = normal.frag; sourceTree = "<group>"; };
-		7DEBC5371DEA7CC8003AFDF7 /* panorama.vert */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.glsl; path = panorama.vert; sourceTree = "<group>"; };
-		7DEBC5381DEA7CC8003AFDF7 /* rectangle.vert */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.glsl; path = rectangle.vert; sourceTree = "<group>"; };
-		7DEBC5391DEA7CC8003AFDF7 /* theta.frag */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.glsl; path = theta.frag; sourceTree = "<group>"; };
-		7DEBC53A1DEA7CC8003AFDF7 /* theta.vert */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.glsl; path = theta.vert; sourceTree = "<group>"; };
-		7DEBC53B1DEA7CF1003AFDF7 /* ExpansionShader.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; path = ExpansionShader.h; sourceTree = "<group>"; };
+		7D33F75A1DE524E90094FE12 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = main.cpp; sourceTree = "<group>"; };
+		7D33F7611DE525140094FE12 /* gg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = gg.cpp; sourceTree = "<group>"; };
+		7D33F7621DE525140094FE12 /* gg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = gg.h; sourceTree = "<group>"; };
+		7D33F7651DE52EF80094FE12 /* CamCv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = CamCv.h; sourceTree = "<group>"; };
+		7D33F7671DE52EF80094FE12 /* Camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = Camera.h; sourceTree = "<group>"; };
+		7D9F40BC1DFD53510048331D /* simple.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; lineEnding = 0; path = simple.frag; sourceTree = "<group>"; };
+		7D9F40BD1DFD53510048331D /* simple.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; lineEnding = 0; path = simple.vert; sourceTree = "<group>"; };
+		7DD58008235CA61B002B91C4 /* libglfw.3.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libglfw.3.3.dylib; path = libs/macOS/lib/libglfw.3.3.dylib; sourceTree = "<group>"; };
+		7DD5800A235CA625002B91C4 /* libopencv_core.4.1.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_core.4.1.2.dylib; path = libs/macOS/lib/libopencv_core.4.1.2.dylib; sourceTree = "<group>"; };
+		7DD5800C235CA62A002B91C4 /* libopencv_highgui.4.1.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_highgui.4.1.2.dylib; path = libs/macOS/lib/libopencv_highgui.4.1.2.dylib; sourceTree = "<group>"; };
+		7DD5800E235CA633002B91C4 /* libopencv_videoio.4.1.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_videoio.4.1.2.dylib; path = libs/macOS/lib/libopencv_videoio.4.1.2.dylib; sourceTree = "<group>"; };
+		7DD58010235CA784002B91C4 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		7DD58012235CA8CE002B91C4 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
+		7DD58014235CA8DB002B91C4 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		7DD58016235CA8EB002B91C4 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		7DD58018235CAEB6002B91C4 /* fisheye.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fisheye.cpp; sourceTree = "<group>"; };
+		7DD5801A235CB072002B91C4 /* GgApplication.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GgApplication.h; sourceTree = "<group>"; };
+		7DEBC5341DEA7CB8003AFDF7 /* fisheye.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; lineEnding = 0; path = fisheye.vert; sourceTree = "<group>"; };
+		7DEBC5351DEA7CB8003AFDF7 /* fixed.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; lineEnding = 0; path = fixed.vert; sourceTree = "<group>"; };
+		7DEBC5361DEA7CBE003AFDF7 /* normal.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; lineEnding = 0; path = normal.frag; sourceTree = "<group>"; };
+		7DEBC5371DEA7CC8003AFDF7 /* panorama.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; lineEnding = 0; path = panorama.vert; sourceTree = "<group>"; };
+		7DEBC5381DEA7CC8003AFDF7 /* rectangle.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; lineEnding = 0; path = rectangle.vert; sourceTree = "<group>"; };
+		7DEBC5391DEA7CC8003AFDF7 /* theta.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; lineEnding = 0; path = theta.frag; sourceTree = "<group>"; };
+		7DEBC53A1DEA7CC8003AFDF7 /* theta.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; lineEnding = 0; path = theta.vert; sourceTree = "<group>"; };
+		7DEBC53B1DEA7CF1003AFDF7 /* ExpansionShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = ExpansionShader.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,6 +67,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7DD5800F235CA633002B91C4 /* libopencv_videoio.4.1.2.dylib in Frameworks */,
+				7DD5800D235CA62A002B91C4 /* libopencv_highgui.4.1.2.dylib in Frameworks */,
+				7DD5800B235CA625002B91C4 /* libopencv_core.4.1.2.dylib in Frameworks */,
+				7DD58009235CA61B002B91C4 /* libglfw.3.3.dylib in Frameworks */,
+				7DD58011235CA784002B91C4 /* OpenGL.framework in Frameworks */,
+				7DD58013235CA8CE002B91C4 /* CoreVideo.framework in Frameworks */,
+				7DD58015235CA8DB002B91C4 /* IOKit.framework in Frameworks */,
+				7DD58017235CA8EB002B91C4 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -58,6 +86,7 @@
 			children = (
 				7D33F7591DE524E90094FE12 /* fisheye */,
 				7D33F7581DE524E90094FE12 /* Products */,
+				7DD58007235CA61A002B91C4 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -73,12 +102,13 @@
 			isa = PBXGroup;
 			children = (
 				7D33F75A1DE524E90094FE12 /* main.cpp */,
+				7DD58018235CAEB6002B91C4 /* fisheye.cpp */,
 				7D33F7621DE525140094FE12 /* gg.h */,
 				7D33F7611DE525140094FE12 /* gg.cpp */,
 				7DEBC53B1DEA7CF1003AFDF7 /* ExpansionShader.h */,
-				7D33F76B1DE5B9B70094FE12 /* Window.h */,
 				7D33F7671DE52EF80094FE12 /* Camera.h */,
 				7D33F7651DE52EF80094FE12 /* CamCv.h */,
+				7DD5801A235CB072002B91C4 /* GgApplication.h */,
 				7DEBC5351DEA7CB8003AFDF7 /* fixed.vert */,
 				7DEBC5381DEA7CC8003AFDF7 /* rectangle.vert */,
 				7DEBC5341DEA7CB8003AFDF7 /* fisheye.vert */,
@@ -87,8 +117,25 @@
 				7D1828451DF98D7800C66A44 /* panorama.frag */,
 				7DEBC53A1DEA7CC8003AFDF7 /* theta.vert */,
 				7DEBC5391DEA7CC8003AFDF7 /* theta.frag */,
+				7D9F40BD1DFD53510048331D /* simple.vert */,
+				7D9F40BC1DFD53510048331D /* simple.frag */,
 			);
 			path = fisheye;
+			sourceTree = "<group>";
+		};
+		7DD58007235CA61A002B91C4 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				7DD58016235CA8EB002B91C4 /* Cocoa.framework */,
+				7DD58014235CA8DB002B91C4 /* IOKit.framework */,
+				7DD58012235CA8CE002B91C4 /* CoreVideo.framework */,
+				7DD58010235CA784002B91C4 /* OpenGL.framework */,
+				7DD5800E235CA633002B91C4 /* libopencv_videoio.4.1.2.dylib */,
+				7DD5800C235CA62A002B91C4 /* libopencv_highgui.4.1.2.dylib */,
+				7DD5800A235CA625002B91C4 /* libopencv_core.4.1.2.dylib */,
+				7DD58008235CA61B002B91C4 /* libglfw.3.3.dylib */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -117,7 +164,7 @@
 		7D33F74F1DE524E90094FE12 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0830;
+				LastUpgradeCheck = 1110;
 				ORGANIZATIONNAME = "Kohe Tokoi";
 				TargetAttributes = {
 					7D33F7561DE524E90094FE12 = {
@@ -129,10 +176,11 @@
 			};
 			buildConfigurationList = 7D33F7521DE524E90094FE12 /* Build configuration list for PBXProject "fisheye" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = 7D33F74E1DE524E90094FE12;
 			productRefGroup = 7D33F7581DE524E90094FE12 /* Products */;
@@ -150,6 +198,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7D33F75B1DE524E90094FE12 /* main.cpp in Sources */,
+				7DD58019235CAEB6002B91C4 /* fisheye.cpp in Sources */,
 				7D33F7631DE525140094FE12 /* gg.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -161,20 +210,29 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
@@ -209,20 +267,29 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
@@ -250,22 +317,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_WARN_DOCUMENTATION_COMMENTS = NO;
+				CODE_SIGN_IDENTITY = "-";
 				DEVELOPMENT_TEAM = T98UR7H9EJ;
-				HEADER_SEARCH_PATHS = /usr/local/include;
-				LIBRARY_SEARCH_PATHS = /usr/local/lib;
-				OTHER_LDFLAGS = (
-					"-lglfw",
-					"-framework",
-					OpenGL,
-					"-framework",
-					CoreVideo,
-					"-framework",
-					IOKit,
-					"-framework",
-					Cocoa,
-					"-lopencv_highgui",
-					"-lopencv_core",
+				HEADER_SEARCH_PATHS = (
+					$PROJECT_DIR/libs/macOS/include,
+					$PROJECT_DIR/libs/include,
 				);
+				LIBRARY_SEARCH_PATHS = $PROJECT_DIR/libs/macOS/lib;
+				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -274,22 +333,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_WARN_DOCUMENTATION_COMMENTS = NO;
+				CODE_SIGN_IDENTITY = "-";
 				DEVELOPMENT_TEAM = T98UR7H9EJ;
-				HEADER_SEARCH_PATHS = /usr/local/include;
-				LIBRARY_SEARCH_PATHS = /usr/local/lib;
-				OTHER_LDFLAGS = (
-					"-lglfw",
-					"-framework",
-					OpenGL,
-					"-framework",
-					CoreVideo,
-					"-framework",
-					IOKit,
-					"-framework",
-					Cocoa,
-					"-lopencv_highgui",
-					"-lopencv_core",
+				HEADER_SEARCH_PATHS = (
+					$PROJECT_DIR/libs/macOS/include,
+					$PROJECT_DIR/libs/include,
 				);
+				LIBRARY_SEARCH_PATHS = $PROJECT_DIR/libs/macOS/lib;
+				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

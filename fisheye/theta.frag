@@ -2,28 +2,28 @@
 #extension GL_ARB_explicit_attrib_location : enable
 
 //
-//   RICOH THETA S ‚Ìƒ‰ƒCƒuƒXƒgƒŠ[ƒ~ƒ“ƒO‰f‘œ‚Ì•½–Ê“WŠJ
+//   RICOH THETA S ã®ãƒ©ã‚¤ãƒ–ã‚¹ãƒˆãƒªãƒ¼ãƒŸãƒ³ã‚°æ˜ åƒã®å¹³é¢å±•é–‹
 //
 
-// ”wŒiƒeƒNƒXƒ`ƒƒ
+// èƒŒæ™¯ãƒ†ã‚¯ã‚¹ãƒãƒ£
 uniform sampler2D image;
 
-// ƒeƒNƒXƒ`ƒƒÀ•W
+// ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 in vec2 texcoord_b;
 in vec2 texcoord_f;
 
-// ‘OŒã‚ÌƒeƒNƒXƒ`ƒƒ‚Ì¬‡”ä
+// å‰å¾Œã®ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®æ··åˆæ¯”
 in float blend;
 
-// ƒtƒ‰ƒOƒƒ“ƒg‚ÌF
+// ãƒ•ãƒ©ã‚°ãƒ¡ãƒ³ãƒˆã®è‰²
 layout (location = 0) out vec4 fc;
 
 void main(void)
 {
-  // ‘OŒã‚ÌƒeƒNƒXƒ`ƒƒ‚ÌF‚ðƒTƒ“ƒvƒŠƒ“ƒO‚·‚é
+  // å‰å¾Œã®ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®è‰²ã‚’ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°ã™ã‚‹
   vec4 color_b = texture(image, texcoord_b);
   vec4 color_f = texture(image, texcoord_f);
 
-  // ƒTƒ“ƒvƒŠƒ“ƒO‚µ‚½F‚ðƒuƒŒƒ“ƒh‚µ‚Äƒtƒ‰ƒOƒƒ“ƒg‚ÌF‚ð‹‚ß‚é
+  // ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°ã—ãŸè‰²ã‚’ãƒ–ãƒ¬ãƒ³ãƒ‰ã—ã¦ãƒ•ãƒ©ã‚°ãƒ¡ãƒ³ãƒˆã®è‰²ã‚’æ±‚ã‚ã‚‹
   fc = mix(color_f, color_b, blend);
 }

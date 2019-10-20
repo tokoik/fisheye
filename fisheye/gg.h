@@ -1,10 +1,10 @@
-#pragma once
+ï»¿#pragma once
 
 /*
-** ƒQ[ƒ€ƒOƒ‰ƒtƒBƒbƒNƒX“Á˜_—p•â•ƒvƒƒOƒ‰ƒ€ GLFW3 ”Å
+** ã‚²ãƒ¼ãƒ ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚¹ç‰¹è«–ã®å®¿é¡Œç”¨è£œåŠ©ãƒ—ãƒ­ã‚°ãƒ©ãƒ  GLFW3 ç‰ˆ
 **
 
-Copyright (c) 2011-2017 Kohe Tokoi. All Rights Reserved.
+Copyright (c) 2011-2019 Kohe Tokoi. All Rights Reserved.
 
 Permission is hereby granted, free of charge,  to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,14 +25,25 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 **
 */
 
+//! \cond INCLUDE_OPENGL_FUNCTIONS
+
+// GLFW ã§ã¯ OpenGL ã® Core Profile ã‚’ä½¿ã†
 #define GLFW_INCLUDE_GLCOREARB
 #include <GLFW/glfw3.h>
 
+// Windows (Visual Studio) ç”¨ã®è¨­å®š
 #if defined(_WIN32)
 #  pragma warning(disable:4996)
 #  define _USE_MATH_DEFINES
 #  define NOMINMAX
 #  undef APIENTRY
+#  if defined(_DEBUG)
+#    define DEBUG
+#  endif
+#endif
+
+// OpenGL 3.2 ã® API ã®ã‚¨ãƒ³ãƒˆãƒªãƒã‚¤ãƒ³ãƒˆ
+#if !defined(GL3_PROTOTYPES)
 extern PFNGLACTIVEPROGRAMEXTPROC glActiveProgramEXT;
 extern PFNGLACTIVESHADERPROGRAMPROC glActiveShaderProgram;
 extern PFNGLACTIVETEXTUREPROC glActiveTexture;
@@ -1270,130 +1281,180 @@ extern PFNGLWEIGHTPATHSNVPROC glWeightPathsNV;
 extern PFNGLWINDOWRECTANGLESEXTPROC glWindowRectanglesEXT;
 #endif
 
-// •W€ƒ‰ƒCƒuƒ‰ƒŠ
+//! \endcond
+
+// æ¨™æº–ãƒ©ã‚¤ãƒ–ãƒ©ãƒª
 #include <array>
 #include <vector>
+#include <memory>
+#include <cstddef>
 
+/*!
+** \brief ã‚²ãƒ¼ãƒ ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚¹ç‰¹è«–ã®å®¿é¡Œç”¨è£œåŠ©ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®åå‰ç©ºé–“
+*/
 namespace gg
 {
+  // å…‰æºã¨æè³ªã® uniform buffer object ã® binding point
+  enum BindingPoints
+  {
+    LightBindingPoint = 0,
+    MaterialBindingPoint
+  };
+
   /*!
-  ** \brief g—p‚µ‚Ä‚¢‚é GPU ‚Ìƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚ÌƒAƒ‰ƒCƒƒ“ƒg
+  ** \brief ä½¿ç”¨ã—ã¦ã„ã‚‹ GPU ã®ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆ
   */
   extern GLint ggBufferAlignment;
 
   /*!
-  ** \brief 4 —v‘f‚Ì’P¸“xÀ”‚Ì”z—ñ
+  ** \brief 4 è¦ç´ ã®å˜ç²¾åº¦å®Ÿæ•°ã®é…åˆ—
   */
-  typedef std::array<GLfloat, 4> GgVector;
+  using GgVector = std::array<GLfloat, 4>;
 
   /*!
-  ** \brief ƒQ[ƒ€ƒOƒ‰ƒtƒBƒbƒNƒX“Á˜_‚Ì“s‡‚É‚à‚Æ‚Ã‚­‰Šú‰»‚ğs‚¤.
+  ** \brief ã‚²ãƒ¼ãƒ ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚¹ç‰¹è«–ã®éƒ½åˆã«ã‚‚ã¨ã¥ãåˆæœŸåŒ–ã‚’è¡Œã†.
   **
-  **   Windows ‚Å OpenGL 1.2 ˆÈ~‚Ì API ‚ğ—LŒø‰»‚·‚é.
+  **   Windows ã§ OpenGL 1.2 ä»¥é™ã® API ã‚’æœ‰åŠ¹åŒ–ã™ã‚‹.
   */
   extern void ggInit();
 
   /*!
-  ** \brief OpenGL ‚ÌƒGƒ‰[‚ğƒ`ƒFƒbƒN‚·‚é.
+  ** \brief OpenGL ã®ã‚¨ãƒ©ãƒ¼ã‚’ãƒã‚§ãƒƒã‚¯ã™ã‚‹.
   **
-  **   OpenGL ‚Ì API ‚ğŒÄ‚Ño‚µ’¼Œã‚ÉÀs‚·‚ê‚ÎƒGƒ‰[‚Ì‚ ‚é‚Æ‚«‚ÉƒƒbƒZ[ƒW‚ğ•\¦‚·‚é.
+  **   OpenGL ã® API ã‚’å‘¼ã³å‡ºã—ç›´å¾Œã«å®Ÿè¡Œã™ã‚Œã°ã‚¨ãƒ©ãƒ¼ã®ã‚ã‚‹ã¨ãã«ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’è¡¨ç¤ºã™ã‚‹.
   **
-  **   \param msg ƒGƒ‰[”­¶‚É•W€ƒGƒ‰[o—Í‚Éo—Í‚·‚é•¶š—ñ. nullptr ‚È‚ç‰½‚ào—Í‚µ‚È‚¢.
+  **   \param msg ã‚¨ãƒ©ãƒ¼ç™ºç”Ÿæ™‚ã«æ¨™æº–ã‚¨ãƒ©ãƒ¼å‡ºåŠ›ã«å‡ºåŠ›ã™ã‚‹æ–‡å­—åˆ—. nullptr ãªã‚‰ä½•ã‚‚å‡ºåŠ›ã—ãªã„.
   */
-  extern void ggError(const char *name = nullptr, unsigned int line = 0);
+  extern void _ggError(const char *name = nullptr, unsigned int line = 0);
+#if defined(DEBUG)
+#  define ggError() gg::_ggError(__FILE__, __LINE__)
+#else
+#  define ggError()
+#endif
 
   /*!
-  ** \brief FBO ‚ÌƒGƒ‰[‚ğƒ`ƒFƒbƒN‚·‚é.
+  ** \brief FBO ã®ã‚¨ãƒ©ãƒ¼ã‚’ãƒã‚§ãƒƒã‚¯ã™ã‚‹.
   **
-  **   FBO ‚Ì API ‚ğŒÄ‚Ño‚µ’¼Œã‚ÉÀs‚·‚ê‚ÎƒGƒ‰[‚Ì‚ ‚é‚Æ‚«‚ÉƒƒbƒZ[ƒW‚ğ•\¦‚·‚é.
+  **   FBO ã® API ã‚’å‘¼ã³å‡ºã—ç›´å¾Œã«å®Ÿè¡Œã™ã‚Œã°ã‚¨ãƒ©ãƒ¼ã®ã‚ã‚‹ã¨ãã«ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’è¡¨ç¤ºã™ã‚‹.
   **
-  **   \param msg ƒGƒ‰[”­¶‚É•W€ƒGƒ‰[o—Í‚Éo—Í‚·‚é•¶š—ñ. nullptr ‚È‚ç‰½‚ào—Í‚µ‚È‚¢.
+  **   \param msg ã‚¨ãƒ©ãƒ¼ç™ºç”Ÿæ™‚ã«æ¨™æº–ã‚¨ãƒ©ãƒ¼å‡ºåŠ›ã«å‡ºåŠ›ã™ã‚‹æ–‡å­—åˆ—. nullptr ãªã‚‰ä½•ã‚‚å‡ºåŠ›ã—ãªã„.
   */
-  extern void ggFBOError(const char *name = nullptr, unsigned int line = 0);
+  extern void _ggFBOError(const char *name = nullptr, unsigned int line = 0);
+#if defined(DEBUG)
+#  define ggFBOError() gg::_ggFBOError(__FILE__, __LINE__)
+#else
+#  define ggFBOError()
+#endif
 
   /*!
-  ** \brief ”z—ñ‚Ì“à—e‚ğ TGA ƒtƒ@ƒCƒ‹‚É•Û‘¶‚·‚é.
+  ** \brief é…åˆ—ã®å†…å®¹ã‚’ TGA ãƒ•ã‚¡ã‚¤ãƒ«ã«ä¿å­˜ã™ã‚‹.
   **
-  **   \param name •Û‘¶‚·‚éƒtƒ@ƒCƒ‹–¼.
-  **   \param buffer ‰æ‘œƒf[ƒ^‚ğŠi”[‚µ‚½”z—ñ.
-  **   \param sx ‰æ‘œ‚Ì‰¡‚Ì‰æ‘f”.
-  **   \param sy ‰æ‘œ‚Ìc‚Ì‰æ‘f”.
-  **   \param depth 1‰æ‘f‚ÌƒoƒCƒg”.
-  **   \return •Û‘¶‚É¬Œ÷‚·‚ê‚Î true, ¸”s‚·‚ê‚Î false.
+  **   \param name ä¿å­˜ã™ã‚‹ãƒ•ã‚¡ã‚¤ãƒ«å.
+  **   \param buffer ç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’æ ¼ç´ã—ãŸé…åˆ—.
+  **   \param width ç”»åƒã®æ¨ªã®ç”»ç´ æ•°.
+  **   \param height ç”»åƒã®ç¸¦ã®ç”»ç´ æ•°.
+  **   \param depth 1ç”»ç´ ã®ãƒã‚¤ãƒˆæ•°.
+  **   \return ä¿å­˜ã«æˆåŠŸã™ã‚Œã° true, å¤±æ•—ã™ã‚Œã° false.
   */
-  bool ggSaveTga(const char *name, const void *buffer,
-    unsigned int sx, unsigned int sy, unsigned int depth);
+  extern bool ggSaveTga(const char *name, const void *buffer,
+    unsigned int width, unsigned int height, unsigned int depth);
 
   /*!
-  ** \brief ƒJƒ‰[ƒoƒbƒtƒ@‚Ì“à—e‚ğ TGA ƒtƒ@ƒCƒ‹‚É•Û‘¶‚·‚é.
+  ** \brief ã‚«ãƒ©ãƒ¼ãƒãƒƒãƒ•ã‚¡ã®å†…å®¹ã‚’ TGA ãƒ•ã‚¡ã‚¤ãƒ«ã«ä¿å­˜ã™ã‚‹.
   **
-  **   \param name •Û‘¶‚·‚éƒtƒ@ƒCƒ‹–¼.
-  **   \return •Û‘¶‚É¬Œ÷‚·‚ê‚Î true, ¸”s‚·‚ê‚Î false.
+  **   \param name ä¿å­˜ã™ã‚‹ãƒ•ã‚¡ã‚¤ãƒ«å.
+  **   \return ä¿å­˜ã«æˆåŠŸã™ã‚Œã° true, å¤±æ•—ã™ã‚Œã° false.
   */
   extern bool ggSaveColor(const char *name);
 
   /*!
-  ** \brief ƒfƒvƒXƒoƒbƒtƒ@‚Ì“à—e‚ğ TGA ƒtƒ@ƒCƒ‹‚É•Û‘¶‚·‚é.
+  ** \brief ãƒ‡ãƒ—ã‚¹ãƒãƒƒãƒ•ã‚¡ã®å†…å®¹ã‚’ TGA ãƒ•ã‚¡ã‚¤ãƒ«ã«ä¿å­˜ã™ã‚‹.
   **
-  **   \param name •Û‘¶‚·‚éƒtƒ@ƒCƒ‹–¼.
-  **   \return •Û‘¶‚É¬Œ÷‚·‚ê‚Î true, ¸”s‚·‚ê‚Î false.
+  **   \param name ä¿å­˜ã™ã‚‹ãƒ•ã‚¡ã‚¤ãƒ«å.
+  **   \return ä¿å­˜ã«æˆåŠŸã™ã‚Œã° true, å¤±æ•—ã™ã‚Œã° false.
   */
   extern bool ggSaveDepth(const char *name);
 
   /*!
-  ** \brief TGA ƒtƒ@ƒCƒ‹ (8/16/24/32bit) ‚ğƒƒ‚ƒŠ‚É“Ç‚İ‚Ş.
+  ** \brief TGA ãƒ•ã‚¡ã‚¤ãƒ« (8/16/24/32bit) ã‚’ãƒ¡ãƒ¢ãƒªã«èª­ã¿è¾¼ã‚€.
   **
-  **   \param name “Ç‚İ‚Şƒtƒ@ƒCƒ‹–¼.
-  **   \param width “Ç‚İ‚ñ‚¾ƒtƒ@ƒCƒ‹‚Ì‰¡‚Ì‰æ‘f”.
-  **   \param height “Ç‚İ‚ñ‚¾ƒtƒ@ƒCƒ‹‚Ìc‚Ì‰æ‘f”.
-  **   \param format “Ç‚İ‚ñ‚¾ƒtƒ@ƒCƒ‹‚Ì‘®. GL_RED, G_RG, GL_BGR, G_BGRA.
-  **   \return “Ç‚İ‚İ‚É¬Œ÷‚·‚ê‚Î“Ç‚İ‚ñ‚¾ƒf[ƒ^‚Ìƒ|ƒCƒ“ƒ^, ¸”s‚·‚ê‚Î nullptr.
+  **   \param name èª­ã¿è¾¼ã‚€ãƒ•ã‚¡ã‚¤ãƒ«å.
+  **   \param image èª­ã¿è¾¼ã‚“ã ãƒ‡ãƒ¼ã‚¿ã‚’æ ¼ç´ã™ã‚‹ vector.
+  **   \param pWidth èª­ã¿è¾¼ã‚“ã ç”»åƒã®æ¨ªã®ç”»ç´ æ•°ã®æ ¼ç´å…ˆã®ãƒã‚¤ãƒ³ã‚¿. nullptr ãªã‚‰æ ¼ç´ã—ãªã„.
+  **   \param pHeight èª­ã¿è¾¼ã‚“ã ç”»åƒã®ç¸¦ã®ç”»ç´ æ•°ã®æ ¼ç´å…ˆã®ãƒã‚¤ãƒ³ã‚¿. nullptr ãªã‚‰æ ¼ç´ã—ãªã„.
+  **   \param pFormat èª­ã¿è¾¼ã‚“ã ãƒ•ã‚¡ã‚¤ãƒ«ã®æ›¸å¼ (GL_RED, G_RG, GL_BGR, G_BGRA) ã®æ ¼ç´å…ˆã®ãƒã‚¤ãƒ³ã‚¿. nullptr ãªã‚‰æ ¼ç´ã—ãªã„.
+  **   \return èª­ã¿è¾¼ã¿ã«æˆåŠŸã™ã‚Œã° true, å¤±æ•—ã™ã‚Œã° false.
   */
-  extern GLubyte *ggLoadTga(const char *name, GLsizei *width, GLsizei *height, GLenum *format);
+  extern bool ggReadImage(const char *name, std::vector<GLubyte> &image, GLsizei *pWidth, GLsizei *pHeight, GLenum *pFormat);
 
   /*!
-  ** \brief ƒeƒNƒXƒ`ƒƒƒƒ‚ƒŠ‚ğŠm•Û‚µ‚Ä‰æ‘œƒf[ƒ^‚ğƒeƒNƒXƒ`ƒƒ‚Æ‚µ‚Ä“Ç‚İ‚Ş.
+  ** \brief ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ¡ãƒ¢ãƒªã‚’ç¢ºä¿ã—ã¦ç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’ãƒ†ã‚¯ã‚¹ãƒãƒ£ã¨ã—ã¦èª­ã¿è¾¼ã‚€.
   **
-  **   \param width ƒeƒNƒXƒ`ƒƒ‚Æ‚µ‚Ä“Ç‚İ‚Şƒf[ƒ^ image ‚Ì‰¡‚Ì‰æ‘f”.
-  **   \param height ƒeƒNƒXƒ`ƒƒ‚Æ‚µ‚Ä“Ç‚İ‚Şƒf[ƒ^ image ‚Ìc‚Ì‰æ‘f”.
-  **   \param internal glTexImage2D() ‚Éw’è‚·‚éƒeƒNƒXƒ`ƒƒ‚Ì“à•”ƒtƒH[ƒ}ƒbƒg.
-  **   \param format glTexImage2D() ‚Éw’è‚·‚éƒf[ƒ^ image ‚ÌƒtƒH[ƒ}ƒbƒg.
-  **   \param image ƒeƒNƒXƒ`ƒƒ‚Æ‚µ‚Ä“Ç‚İ‚Şƒf[ƒ^. nullptr ‚È‚çƒeƒNƒXƒ`ƒƒƒƒ‚ƒŠ‚ÌŠm•Û‚Ì‚İ.
+  **   \param image ãƒ†ã‚¯ã‚¹ãƒãƒ£ã¨ã—ã¦èª­ã¿è¾¼ã‚€ãƒ‡ãƒ¼ã‚¿. nullptr ãªã‚‰ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ¡ãƒ¢ãƒªã®ç¢ºä¿ã®ã¿ã‚’è¡Œã†.
+  **   \param width ãƒ†ã‚¯ã‚¹ãƒãƒ£ã¨ã—ã¦èª­ã¿è¾¼ã‚€ãƒ‡ãƒ¼ã‚¿ image ã®æ¨ªã®ç”»ç´ æ•°.
+  **   \param height ãƒ†ã‚¯ã‚¹ãƒãƒ£ã¨ã—ã¦èª­ã¿è¾¼ã‚€ãƒ‡ãƒ¼ã‚¿ image ã®ç¸¦ã®ç”»ç´ æ•°.
+  **   \param format image ã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ.
+  **   \param type image ã®ãƒ‡ãƒ¼ã‚¿å‹.
+  **   \param internal ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å†…éƒ¨ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ.
+  **   \param wrap ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ©ãƒƒãƒ”ãƒ³ã‚°ãƒ¢ãƒ¼ãƒ‰, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ GL_CLAMP_TO_EDGE.
+  **   \return ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ä½œæˆã«æˆåŠŸã™ã‚Œã°ãƒ†ã‚¯ã‚¹ãƒãƒ£å, å¤±æ•—ã™ã‚Œã° 0.
   */
-  extern GLuint ggLoadTexture(GLsizei width, GLsizei height, GLenum internal,
-    GLenum format = GL_RGBA, const GLvoid *image = nullptr);
+  extern GLuint ggLoadTexture(const GLvoid *image, GLsizei width, GLsizei height,
+    GLenum format = GL_BGR, GLenum type = GL_UNSIGNED_BYTE,
+    GLenum internal = GL_RGB, GLenum wrap = GL_CLAMP_TO_EDGE);
 
   /*!
-  ** \brief TGA ‰æ‘œƒtƒ@ƒCƒ‹‚ğƒeƒNƒXƒ`ƒƒ‚Æ‚µ‚Ä“Ç‚İ‚Ş.
+  ** \brief ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ¡ãƒ¢ãƒªã‚’ç¢ºä¿ã—ã¦ TGA ç”»åƒãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚€.
   **
-  **   \param name “Ç‚İ‚Şƒtƒ@ƒCƒ‹–¼.
-  **   \param internal glTexImage2D() ‚Éw’è‚·‚éƒeƒNƒXƒ`ƒƒ‚Ì“à•”ƒtƒH[ƒ}ƒbƒg. 0 ‚È‚çŠO•”ƒtƒH[ƒ}ƒbƒg‚É‡‚í‚¹‚é.
-  **   \return “Ç‚İ‚İ‚É¬Œ÷‚·‚ê‚Î true, ¸”s‚·‚ê‚Î false.
+  **   \param name èª­ã¿è¾¼ã‚€ãƒ•ã‚¡ã‚¤ãƒ«å.
+  **   \param pWidth èª­ã¿ã ã—ãŸç”»åƒãƒ•ã‚¡ã‚¤ãƒ«ã®æ¨ªã®ç”»ç´ æ•°ã®æ ¼ç´å…ˆã®ãƒã‚¤ãƒ³ã‚¿ (nullptr ãªã‚‰æ ¼ç´ã—ãªã„).
+  ++   \param pHeight èª­ã¿ã ã—ãŸç”»åƒãƒ•ã‚¡ã‚¤ãƒ«ã®ç¸¦ã®ç”»ç´ æ•°ã®æ ¼ç´å…ˆã®ãƒã‚¤ãƒ³ã‚¿ (nullptr ãªã‚‰æ ¼ç´ã—ãªã„).
+  **   \param internal glTexImage2D() ã«æŒ‡å®šã™ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å†…éƒ¨ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ. 0 ãªã‚‰å¤–éƒ¨ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã«åˆã‚ã›ã‚‹.
+  **   \param wrap ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ©ãƒƒãƒ”ãƒ³ã‚°ãƒ¢ãƒ¼ãƒ‰, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ GL_CLAMP_TO_EDGE.
+  **   \return ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ä½œæˆã«æˆåŠŸã™ã‚Œã°ãƒ†ã‚¯ã‚¹ãƒãƒ£å, å¤±æ•—ã™ã‚Œã° 0.
   */
-  extern GLuint ggLoadImage(const char *name, GLenum internal = 0);
+  extern GLuint ggLoadImage(const char *name, GLsizei *pWidth = nullptr, GLsizei *pHeight = nullptr,
+    GLenum internal = 0, GLenum wrap = GL_CLAMP_TO_EDGE);
 
   /*!
-  ** \brief ‚‚³ƒ}ƒbƒv—p‚Ì TGA ‰æ‘œƒtƒ@ƒCƒ‹‚Ì“Ç‚İ‚ñ‚Å–@üƒ}ƒbƒv‚ğì¬‚·‚é.
+  ** \brief ã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«ç”»åƒ (8bit) ã‹ã‚‰æ³•ç·šãƒãƒƒãƒ—ã®ãƒ‡ãƒ¼ã‚¿ã‚’ä½œæˆã™ã‚‹.
   **
-  **   \param name “Ç‚İ‚Şƒtƒ@ƒCƒ‹–¼.
-  **   \param nz –@ü‚Ì z ¬•ª‚ÌŠ„‡.
-  **   \param internal glTexImage2D() ‚Éw’è‚·‚éƒeƒNƒXƒ`ƒƒ‚Ì“à•”ƒtƒH[ƒ}ƒbƒg.
-  **   \return “Ç‚İ‚İ‚É¬Œ÷‚·‚ê‚Î true, ¸”s‚·‚ê‚Î false.
+  **   \param hmap ã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«ç”»åƒã®ãƒ‡ãƒ¼ã‚¿.
+  **   \param width é«˜ã•ãƒãƒƒãƒ—ã®ã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«ç”»åƒ hmap ã®æ¨ªã®ç”»ç´ æ•°.
+  **   \param height é«˜ã•ãƒãƒƒãƒ—ã®ã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«ç”»åƒ hmap ã®ç¸¦ã®ç”»ç´ æ•°.
+  **   \param stride ãƒ‡ãƒ¼ã‚¿ã®é–“éš”.
+  **   \param nz æ³•ç·šã® z æˆåˆ†ã®å‰²åˆ.
+  **   \param æ³•ç·šãƒãƒƒãƒ—ã‚’æ ¼ç´ã™ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å†…éƒ¨ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ.
+  **   \param nmap æ³•ç·šãƒãƒƒãƒ—ã‚’æ ¼ç´ã™ã‚‹ vector.
   */
-  extern GLuint ggLoadHeight(const char *name, float nz, GLenum internal = GL_RGBA);
+  extern void ggCreateNormalMap(const GLubyte *hmap, GLsizei width, GLsizei height, GLenum format, GLfloat nz,
+    GLenum internal, std::vector<GgVector> &nmap);
 
   /*!
-  ** \brief ƒVƒF[ƒ_‚Ìƒ\[ƒXƒvƒƒOƒ‰ƒ€‚Ì•¶š—ñ‚ğ“Ç‚İ‚ñ‚ÅƒvƒƒOƒ‰ƒ€ƒIƒuƒWƒFƒNƒg‚ğì¬‚·‚é.
+  ** \brief ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ¡ãƒ¢ãƒªã‚’ç¢ºä¿ã—ã¦ TGA ç”»åƒãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã¿æ³•ç·šãƒãƒƒãƒ—ã‚’ä½œæˆã™ã‚‹.
   **
-  **   \param vsrc ƒo[ƒeƒbƒNƒXƒVƒF[ƒ_‚Ìƒ\[ƒXƒvƒƒOƒ‰ƒ€‚Ì•¶š—ñ.
-  **   \param fsrc ƒtƒ‰ƒOƒƒ“ƒgƒVƒF[ƒ_‚Ìƒ\[ƒXƒvƒƒOƒ‰ƒ€‚Ì•¶š—ñ (nullptr ‚È‚ç•sg—p).
-  **   \param gsrc ƒWƒIƒƒgƒŠƒVƒF[ƒ_‚Ìƒ\[ƒXƒvƒƒOƒ‰ƒ€‚Ì•¶š—ñ (nullptr ‚È‚ç•sg—p).
-  **   \param nvarying ƒtƒB[ƒhƒoƒbƒN‚·‚é varying •Ï”‚Ì” (0 ‚È‚ç•sg—p).
-  **   \param varyings ƒtƒB[ƒhƒoƒbƒN‚·‚é varying •Ï”‚ÌƒŠƒXƒg (nullptr ‚È‚ç•sg—p).
-  **   \param vtext ƒo[ƒeƒbƒNƒXƒVƒF[ƒ_‚ÌƒRƒ“ƒpƒCƒ‹‚ÌƒƒbƒZ[ƒW‚É’Ç‰Á‚·‚é•¶š—ñ.
-  **   \param ftext ƒtƒ‰ƒOƒƒ“ƒgƒVƒF[ƒ_‚ÌƒRƒ“ƒpƒCƒ‹‚ÌƒƒbƒZ[ƒW‚É’Ç‰Á‚·‚é•¶š—ñ.
-  **   \param gtext ƒWƒIƒƒgƒŠƒVƒF[ƒ_‚ÌƒRƒ“ƒpƒCƒ‹‚ÌƒƒbƒZ[ƒW‚É’Ç‰Á‚·‚é•¶š—ñ.
-  **   \return ƒVƒF[ƒ_ƒvƒƒOƒ‰ƒ€‚ÌƒvƒƒOƒ‰ƒ€–¼ (ì¬‚Å‚«‚È‚¯‚ê‚Î 0).
+  **   \param name èª­ã¿è¾¼ã‚€ãƒ•ã‚¡ã‚¤ãƒ«å.
+  **   \param nz æ³•ç·šã® z æˆåˆ†ã®å‰²åˆ.
+  **   \param pWidth èª­ã¿ã ã—ãŸç”»åƒãƒ•ã‚¡ã‚¤ãƒ«ã®æ¨ªã®ç”»ç´ æ•°ã®æ ¼ç´å…ˆã®ãƒã‚¤ãƒ³ã‚¿ (nullptr ãªã‚‰æ ¼ç´ã—ãªã„).
+  ++   \param pHeight èª­ã¿ã ã—ãŸç”»åƒãƒ•ã‚¡ã‚¤ãƒ«ã®ç¸¦ã®ç”»ç´ æ•°ã®æ ¼ç´å…ˆã®ãƒã‚¤ãƒ³ã‚¿ (nullptr ãªã‚‰æ ¼ç´ã—ãªã„).
+  **   \param internal glTexImage2D() ã«æŒ‡å®šã™ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å†…éƒ¨ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ.
+  **   \return ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ä½œæˆã«æˆåŠŸã™ã‚Œã°ãƒ†ã‚¯ã‚¹ãƒãƒ£å, å¤±æ•—ã™ã‚Œã° 0.
+  */
+  extern GLuint ggLoadHeight(const char *name, float nz, GLsizei *pWidth = nullptr, GLsizei *pHeight = nullptr,
+    GLenum internal = GL_RGBA);
+
+  /*!
+  ** \brief ã‚·ã‚§ãƒ¼ãƒ€ã®ã‚½ãƒ¼ã‚¹ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®æ–‡å­—åˆ—ã‚’èª­ã¿è¾¼ã‚“ã§ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä½œæˆã™ã‚‹.
+  **
+  **   \param vsrc ãƒãƒ¼ãƒ†ãƒƒã‚¯ã‚¹ã‚·ã‚§ãƒ¼ãƒ€ã®ã‚½ãƒ¼ã‚¹ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®æ–‡å­—åˆ—.
+  **   \param fsrc ãƒ•ãƒ©ã‚°ãƒ¡ãƒ³ãƒˆã‚·ã‚§ãƒ¼ãƒ€ã®ã‚½ãƒ¼ã‚¹ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®æ–‡å­—åˆ— (nullptr ãªã‚‰ä¸ä½¿ç”¨).
+  **   \param gsrc ã‚¸ã‚ªãƒ¡ãƒˆãƒªã‚·ã‚§ãƒ¼ãƒ€ã®ã‚½ãƒ¼ã‚¹ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®æ–‡å­—åˆ— (nullptr ãªã‚‰ä¸ä½¿ç”¨).
+  **   \param nvarying ãƒ•ã‚£ãƒ¼ãƒ‰ãƒãƒƒã‚¯ã™ã‚‹ varying å¤‰æ•°ã®æ•° (0 ãªã‚‰ä¸ä½¿ç”¨).
+  **   \param varyings ãƒ•ã‚£ãƒ¼ãƒ‰ãƒãƒƒã‚¯ã™ã‚‹ varying å¤‰æ•°ã®ãƒªã‚¹ãƒˆ (nullptr ãªã‚‰ä¸ä½¿ç”¨).
+  **   \param vtext ãƒãƒ¼ãƒ†ãƒƒã‚¯ã‚¹ã‚·ã‚§ãƒ¼ãƒ€ã®ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«æ™‚ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã«è¿½åŠ ã™ã‚‹æ–‡å­—åˆ—.
+  **   \param ftext ãƒ•ãƒ©ã‚°ãƒ¡ãƒ³ãƒˆã‚·ã‚§ãƒ¼ãƒ€ã®ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«æ™‚ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã«è¿½åŠ ã™ã‚‹æ–‡å­—åˆ—.
+  **   \param gtext ã‚¸ã‚ªãƒ¡ãƒˆãƒªã‚·ã‚§ãƒ¼ãƒ€ã®ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«æ™‚ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã«è¿½åŠ ã™ã‚‹æ–‡å­—åˆ—.
+  **   \return ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ å (ä½œæˆã§ããªã‘ã‚Œã° 0).
   */
   extern GLuint ggCreateShader(const char *vsrc, const char *fsrc = nullptr, const char *gsrc = nullptr,
     GLint nvarying = 0, const char *const varyings[] = nullptr,
@@ -1402,29 +1463,48 @@ namespace gg
     const char *gtext = "geometry shader");
 
   /*!
-  ** \brief ƒVƒF[ƒ_‚Ìƒ\[ƒXƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚ñ‚ÅƒvƒƒOƒ‰ƒ€ƒIƒuƒWƒFƒNƒg‚ğì¬‚·‚é.
+  ** \brief ã‚·ã‚§ãƒ¼ãƒ€ã®ã‚½ãƒ¼ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚“ã§ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä½œæˆã™ã‚‹.
   **
-  **   \param vert ƒo[ƒeƒbƒNƒXƒVƒF[ƒ_‚Ìƒ\[ƒXƒtƒ@ƒCƒ‹–¼.
-  **   \param frag ƒtƒ‰ƒOƒƒ“ƒgƒVƒF[ƒ_‚Ìƒ\[ƒXƒtƒ@ƒCƒ‹–¼ (nullptr ‚È‚ç•sg—p).
-  **   \param geom ƒWƒIƒƒgƒŠƒVƒF[ƒ_‚Ìƒ\[ƒXƒtƒ@ƒCƒ‹–¼ (nullptr ‚È‚ç•sg—p).
-  **   \param nvarying ƒtƒB[ƒhƒoƒbƒN‚·‚é varying •Ï”‚Ì” (0 ‚È‚ç•sg—p).
-  **   \param varyings ƒtƒB[ƒhƒoƒbƒN‚·‚é varying •Ï”‚ÌƒŠƒXƒg (nullptr ‚È‚ç•sg—p).
-  **   \return ƒVƒF[ƒ_ƒvƒƒOƒ‰ƒ€‚ÌƒvƒƒOƒ‰ƒ€–¼ (ì¬‚Å‚«‚È‚¯‚ê‚Î 0).
+  **   \param vert ãƒãƒ¼ãƒ†ãƒƒã‚¯ã‚¹ã‚·ã‚§ãƒ¼ãƒ€ã®ã‚½ãƒ¼ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«å.
+  **   \param frag ãƒ•ãƒ©ã‚°ãƒ¡ãƒ³ãƒˆã‚·ã‚§ãƒ¼ãƒ€ã®ã‚½ãƒ¼ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«å (nullptr ãªã‚‰ä¸ä½¿ç”¨).
+  **   \param geom ã‚¸ã‚ªãƒ¡ãƒˆãƒªã‚·ã‚§ãƒ¼ãƒ€ã®ã‚½ãƒ¼ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«å (nullptr ãªã‚‰ä¸ä½¿ç”¨).
+  **   \param nvarying ãƒ•ã‚£ãƒ¼ãƒ‰ãƒãƒƒã‚¯ã™ã‚‹ varying å¤‰æ•°ã®æ•° (0 ãªã‚‰ä¸ä½¿ç”¨).
+  **   \param varyings ãƒ•ã‚£ãƒ¼ãƒ‰ãƒãƒƒã‚¯ã™ã‚‹ varying å¤‰æ•°ã®ãƒªã‚¹ãƒˆ (nullptr ãªã‚‰ä¸ä½¿ç”¨).
+  **   \return ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ å (ä½œæˆã§ããªã‘ã‚Œã° 0).
   */
   extern GLuint ggLoadShader(const char *vert, const char *frag = nullptr, const char *geom = nullptr,
     GLint nvarying = 0, const char *const varyings[] = nullptr);
 
+#if !defined(__APPLE__)
   /*!
-  ** \brief 3 —v‘f‚Ì’·‚³.
+  ** \brief ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ãƒˆã‚·ã‚§ãƒ¼ãƒ€ã®ã‚½ãƒ¼ã‚¹ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®æ–‡å­—åˆ—ã‚’èª­ã¿è¾¼ã‚“ã§ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä½œæˆã™ã‚‹.
   **
-  **   \param a GLfloat Œ^‚Ì 3 —v‘f‚Ì”z—ñ.
+  **   \param csrc ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ãƒˆã‚·ã‚§ãƒ¼ãƒ€ã®ã‚½ãƒ¼ã‚¹ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®æ–‡å­—åˆ—.
+  **   \param ctext ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ãƒˆã‚·ã‚§ãƒ¼ãƒ€ã®ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«æ™‚ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã«è¿½åŠ ã™ã‚‹æ–‡å­—åˆ—.
+  **   \return ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ å (ä½œæˆã§ããªã‘ã‚Œã° 0).
+  */
+  extern GLuint ggCreateComputeShader(const char *csrc, const char *ctext = "compute shader");
+
+  /*!
+  ** \brief ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ãƒˆã‚·ã‚§ãƒ¼ãƒ€ã®ã‚½ãƒ¼ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚“ã§ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä½œæˆã™ã‚‹.
+  **
+  **   \param vert ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ãƒˆã‚·ã‚§ãƒ¼ãƒ€ã®ã‚½ãƒ¼ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«å.
+  **   \returnãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ å (ä½œæˆã§ããªã‘ã‚Œã° 0).
+  */
+  extern GLuint ggLoadComputeShader(const char *comp);
+#endif
+
+  /*!
+  ** \brief 3 è¦ç´ ã®é•·ã•.
+  **
+  **   \param a GLfloat å‹ã® 3 è¦ç´ ã®é…åˆ—å¤‰æ•°.
   */
   extern GLfloat ggLength3(const GLfloat *a);
 
   /*!
-  ** \brief 3 —v‘f‚Ì³‹K‰».
+  ** \brief 3 è¦ç´ ã®æ­£è¦åŒ–.
   **
-  **   \param a GLfloat Œ^‚Ì 3 —v‘f‚Ì”z—ñ.
+  **   \param a GLfloat å‹ã® 3 è¦ç´ ã®é…åˆ—å¤‰æ•°.
   */
   inline void ggNormalize3(GLfloat *a)
   {
@@ -1438,10 +1518,10 @@ namespace gg
   }
 
   /*!
-  ** \brief 3 —v‘f‚Ì“àÏ.
+  ** \brief 3 è¦ç´ ã®å†…ç©.
   **
-  **   \param a GLfloat Œ^‚Ì 3 —v‘f‚Ì”z—ñ.
-  **   \param b GLfloat Œ^‚Ì 3 —v‘f‚Ì”z—ñ.
+  **   \param a GLfloat å‹ã® 3 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+  **   \param b GLfloat å‹ã® 3 è¦ç´ ã®é…åˆ—å¤‰æ•°.
   */
   inline GLfloat ggDot3(const GLfloat *a, const GLfloat *b)
   {
@@ -1449,11 +1529,11 @@ namespace gg
   }
 
   /*!
-  ** \brief 3 —v‘f‚ÌŠOÏ.
+  ** \brief 3 è¦ç´ ã®å¤–ç©.
   **
-  **   \param a GLfloat Œ^‚Ì 3 —v‘f‚Ì”z—ñ.
-  **   \param b GLfloat Œ^‚Ì 3 —v‘f‚Ì”z—ñ.
-  **   \param c Œ‹‰Ê‚ğŠi”[‚·‚é GLfloat Œ^‚Ì 3 —v‘f‚Ì”z—ñ.
+  **   \param a GLfloat å‹ã® 3 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+  **   \param b GLfloat å‹ã® 3 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+  **   \param c çµæœã‚’æ ¼ç´ã™ã‚‹ GLfloat å‹ã® 3 è¦ç´ ã®é…åˆ—å¤‰æ•°.
   */
   inline void ggCross(GLfloat *c, const GLfloat *a, const GLfloat *b)
   {
@@ -1463,16 +1543,26 @@ namespace gg
   }
 
   /*!
-  ** \brief 4 —v‘f‚Ì’·‚³.
+  ** \brief 4 è¦ç´ ã®é•·ã•.
   **
-  **   \param a GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
+  **   \param a GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
   */
   extern GLfloat ggLength4(const GLfloat *a);
 
   /*!
-  ** \brief 4 —v‘f‚Ì³‹K‰».
+  ** \brief GgVector å‹ã®é•·ã•.
   **
-  **   \param a GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
+  **   \param a GgVector å‹ã®å¤‰æ•°.
+  */
+  inline GLfloat ggLength4(const GgVector &a)
+  {
+    return ggLength4(a.data());
+  }
+
+  /*!
+  ** \brief 4 è¦ç´ ã®æ­£è¦åŒ–.
+  **
+  **   \param a GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
   */
   inline void ggNormalize4(GLfloat *a)
   {
@@ -1487,10 +1577,27 @@ namespace gg
   }
 
   /*!
-  ** \brief 4 —v‘f‚Ì“àÏ
+  ** \brief GgVector å‹ã®æ­£è¦åŒ–.
   **
-  **   \param a GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
-  **   \param b GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
+  **   \param a GgVector å‹ã®å¤‰æ•°
+  */
+  inline void ggNormalize4(GgVector &a)
+  {
+    const GLfloat l(ggLength4(a));
+    if (l > 0.0f)
+    {
+      a[0] /= l;
+      a[1] /= l;
+      a[2] /= l;
+      a[3] /= l;
+    }
+  }
+
+  /*!
+  ** \brief 4 è¦ç´ ã®å†…ç©
+  **
+  **   \param a GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+  **   \param b GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
   */
   inline GLfloat ggDot4(const GLfloat *a, const GLfloat *b)
   {
@@ -1498,164 +1605,175 @@ namespace gg
   }
 
   /*!
-  ** \brief •ÏŠ·s—ñ.
+  ** \brief GgVector å‹ã®å†…ç©
+  **
+  **   \param a GgVector å‹ã®å¤‰æ•°.
+  **   \param b GgVector å‹ã®å¤‰æ•°.
+  */
+  inline GLfloat ggDot4(const GgVector &a, const GgVector &b)
+  {
+    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3];
+  }
+
+  /*!
+  ** \brief å¤‰æ›è¡Œåˆ—.
   */
   class GgMatrix
   {
-    // •ÏŠ·s—ñ‚Ì—v‘f
+    // å¤‰æ›è¡Œåˆ—ã®è¦ç´ 
     std::array<GLfloat, 16> array;
 
-    // s—ñ a ‚ÆƒxƒNƒgƒ‹ b ‚ÌÏ‚ğƒxƒNƒgƒ‹ c ‚É‘ã“ü‚·‚é
+    // è¡Œåˆ— a ã¨ãƒ™ã‚¯ãƒˆãƒ« b ã®ç©ã‚’ãƒ™ã‚¯ãƒˆãƒ« c ã«ä»£å…¥ã™ã‚‹
     void projection(GLfloat *c, const GLfloat *a, const GLfloat *b) const;
 
-    // s—ñ a ‚Æs—ñ b ‚ÌÏ‚ğs—ñ c ‚É‘ã“ü‚·‚é
+    // è¡Œåˆ— a ã¨è¡Œåˆ— b ã®ç©ã‚’è¡Œåˆ— c ã«ä»£å…¥ã™ã‚‹
     void multiply(GLfloat *c, const GLfloat *a, const GLfloat *b) const;
 
-    // •ÏŠ·s—ñ‚Ì—v‘f‚ÉlŒ³”‚©‚ç’¼Úƒf[ƒ^‚ğ•Û‘¶‚Å‚«‚é‚æ‚¤‚É‚·‚é
+    // å¤‰æ›è¡Œåˆ—ã®è¦ç´ ã«å››å…ƒæ•°ã‹ã‚‰ç›´æ¥ãƒ‡ãƒ¼ã‚¿ã‚’ä¿å­˜ã§ãã‚‹ã‚ˆã†ã«ã™ã‚‹
     friend class GgQuaternion;
 
   public:
 
-    //! \brief ƒfƒXƒgƒ‰ƒNƒ^.
-    ~GgMatrix() {}
-
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
+    //! \brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
     GgMatrix() {}
 
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    //!   \param a GLfloat Œ^‚Ì 16 —v‘f‚Ì”z—ñ.
+    //! \brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    //!   \param a GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°.
     GgMatrix(const GLfloat *a)
     {
       load(a);
     }
 
-    //! \brief ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    //!   \param m GgMatrix Œ^‚Ì•Ï”.
+    //! \brief ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    //!   \param m GgMatrix å‹ã®å¤‰æ•°.
     GgMatrix(const GgMatrix &m)
     {
       load(m);
     }
 
-    //! \brief ”z—ñ•Ï”‚Ì’l‚ğŠi”[‚·‚é.
-    //!   \param a GLfloat Œ^‚Ì 16 —v‘f‚Ì”z—ñ.
-    //!   \return a ‚ğ‘ã“ü‚µ‚½ GgMatrix Œ^‚Ì’l.
+    //! \brief ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    ~GgMatrix() {}
+
+    //! \brief é…åˆ—å¤‰æ•°ã®å€¤ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param a GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \return a ã‚’ä»£å…¥ã—ãŸ GgMatrix å‹ã®å€¤.
     GgMatrix &load(const GLfloat *a)
     {
       for (int i = 0; i < 16; ++i) array[i] = a[i];
       return *this;
     }
 
-    //! \brief •Ê‚Ì•ÏŠ·s—ñ‚Ì’l‚ğŠi”[‚·‚é.
-    //!   \param m GgMatrix Œ^‚Ì•Ï”.
-    //!   \return m ‚ğ‘ã“ü‚µ‚½ GgMatrix Œ^‚Ì’l.
+    //! \brief åˆ¥ã®å¤‰æ›è¡Œåˆ—ã®å€¤ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param m GgMatrix å‹ã®å¤‰æ•°.
+    //!   \return m ã‚’ä»£å…¥ã—ãŸ GgMatrix å‹ã®å€¤.
     GgMatrix &load(const GgMatrix &m)
     {
       return load(m.array.data());
     }
 
-    //! \brief •ÏŠ·s—ñ‚É”z—ñ‚ÉŠi”[‚µ‚½•ÏŠ·s—ñ‚ğ‰ÁZ‚µ‚½Œ‹‰Ê‚ğŠi”[‚·‚é.
-    //!   \param a GLfloat Œ^‚Ì 16 —v‘f‚Ì”z—ñ.
-    //!   \return •ÏŠ·s—ñ‚É a ‚ğ‰Á‚¦‚½ GgMatrix Œ^‚Ì’l.
+    //! \brief å¤‰æ›è¡Œåˆ—ã«é…åˆ—ã«æ ¼ç´ã—ãŸå¤‰æ›è¡Œåˆ—ã‚’åŠ ç®—ã—ãŸçµæœã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param a GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \return å¤‰æ›è¡Œåˆ—ã« a ã‚’åŠ ãˆãŸ GgMatrix å‹ã®å€¤.
     GgMatrix &loadAdd(const GLfloat *a)
     {
       for (int i = 0; i < 16; ++i) array[i] += a[i];
       return *this;
     }
 
-    //! \brief •ÏŠ·s—ñ‚É•Ê‚Ì•ÏŠ·s—ñ‚ğ‰ÁZ‚µ‚½Œ‹‰Ê‚ğŠi”[‚·‚é.
-    //!   \param m GgMatrix Œ^‚Ì•Ï”.
-    //!   \return •ÏŠ·s—ñ‚É m ‚ğ‰Á‚¦‚½ GgMatrix Œ^‚Ì’l.
+    //! \brief å¤‰æ›è¡Œåˆ—ã«åˆ¥ã®å¤‰æ›è¡Œåˆ—ã‚’åŠ ç®—ã—ãŸçµæœã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param m GgMatrix å‹ã®å¤‰æ•°.
+    //!   \return å¤‰æ›è¡Œåˆ—ã« m ã‚’åŠ ãˆãŸ GgMatrix å‹ã®å€¤.
     GgMatrix &loadAdd(const GgMatrix &m)
     {
       return loadAdd(m.array.data());
     }
 
-    //! \brief •ÏŠ·s—ñ‚©‚ç”z—ñ‚ÉŠi”[‚µ‚½•ÏŠ·s—ñ‚ğŒ¸Z‚µ‚½Œ‹‰Ê‚ğŠi”[‚·‚é.
-    //!   \param a GLfloat Œ^‚Ì 16 —v‘f‚Ì”z—ñ.
-    //!   \return •ÏŠ·s—ñ‚É a ‚ğˆø‚¢‚½ GgMatrix Œ^‚Ì’l.
+    //! \brief å¤‰æ›è¡Œåˆ—ã‹ã‚‰é…åˆ—ã«æ ¼ç´ã—ãŸå¤‰æ›è¡Œåˆ—ã‚’æ¸›ç®—ã—ãŸçµæœã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param a GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \return å¤‰æ›è¡Œåˆ—ã« a ã‚’å¼•ã„ãŸ GgMatrix å‹ã®å€¤.
     GgMatrix &loadSubtract(const GLfloat *a)
     {
       for (int i = 0; i < 16; ++i) array[i] -= a[i];
       return *this;
     }
 
-    //! \brief •ÏŠ·s—ñ‚©‚ç•Ê‚Ì•ÏŠ·s—ñ‚ğŒ¸Z‚µ‚½Œ‹‰Ê‚ğŠi”[‚·‚é.
-    //!   \param m GgMatrix Œ^‚Ì•Ï”.
-    //!   \return •ÏŠ·s—ñ‚É m ‚ğˆø‚¢‚½ GgMatrix Œ^‚Ì’l.
+    //! \brief å¤‰æ›è¡Œåˆ—ã‹ã‚‰åˆ¥ã®å¤‰æ›è¡Œåˆ—ã‚’æ¸›ç®—ã—ãŸçµæœã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param m GgMatrix å‹ã®å¤‰æ•°.
+    //!   \return å¤‰æ›è¡Œåˆ—ã« m ã‚’å¼•ã„ãŸ GgMatrix å‹ã®å€¤.
     GgMatrix &loadSubtract(const GgMatrix &m)
     {
       return loadSubtract(m.array.data());
     }
 
-    //! \brief •ÏŠ·s—ñ‚É”z—ñ‚ÉŠi”[‚µ‚½•ÏŠ·s—ñ‚ğæZ‚µ‚½Œ‹‰Ê‚ğŠi”[‚·‚é.
-    //!   \param a GLfloat Œ^‚Ì 16 —v‘f‚Ì”z—ñ.
-    //!   \return •ÏŠ·s—ñ‚É a ‚ğŠ|‚¯‚½ GgMatrix Œ^‚Ì’l.
+    //! \brief å¤‰æ›è¡Œåˆ—ã«é…åˆ—ã«æ ¼ç´ã—ãŸå¤‰æ›è¡Œåˆ—ã‚’ä¹—ç®—ã—ãŸçµæœã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param a GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \return å¤‰æ›è¡Œåˆ—ã« a ã‚’æ›ã‘ãŸ GgMatrix å‹ã®å€¤.
     GgMatrix &loadMultiply(const GLfloat *a)
     {
       return load(multiply(a));
     }
 
-    //! \brief •ÏŠ·s—ñ‚É•Ê‚Ì•ÏŠ·s—ñ‚ğæZ‚µ‚½Œ‹‰Ê‚ğŠi”[‚·‚é.
-    //!   \param m GgMatrix Œ^‚Ì•Ï”.
-    //!   \return •ÏŠ·s—ñ‚É m ‚ğŠ|‚¯‚½ GgMatrix Œ^‚Ì’l.
+    //! \brief å¤‰æ›è¡Œåˆ—ã«åˆ¥ã®å¤‰æ›è¡Œåˆ—ã‚’ä¹—ç®—ã—ãŸçµæœã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param m GgMatrix å‹ã®å¤‰æ•°.
+    //!   \return å¤‰æ›è¡Œåˆ—ã« m ã‚’æ›ã‘ãŸ GgMatrix å‹ã®å€¤.
     GgMatrix &loadMultiply(const GgMatrix &m)
     {
       return loadMultiply(m.array.data());
     }
 
-    //! \brief •ÏŠ·s—ñ‚ğ”z—ñ‚ÉŠi”[‚µ‚½•ÏŠ·s—ñ‚ÅœZ‚µ‚½Œ‹‰Ê‚ğŠi”[‚·‚é.
-    //!   \param a GLfloat Œ^‚Ì 16 —v‘f‚Ì”z—ñ.
-    //!   \return •ÏŠ·s—ñ‚É a ‚ğæ‚¶‚½ GgMatrix Œ^‚Ì’l.
+    //! \brief å¤‰æ›è¡Œåˆ—ã‚’é…åˆ—ã«æ ¼ç´ã—ãŸå¤‰æ›è¡Œåˆ—ã§é™¤ç®—ã—ãŸçµæœã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param a GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \return å¤‰æ›è¡Œåˆ—ã« a ã‚’ä¹—ã˜ãŸ GgMatrix å‹ã®å€¤.
     GgMatrix &loadDivide(const GLfloat *a)
     {
       return load(divide(a));
     }
 
-    //! \brief •ÏŠ·s—ñ‚ğ•Ê‚Ì•ÏŠ·s—ñ‚ÅœZ‚µ‚½Œ‹‰Ê‚ğŠi”[‚·‚é.
-    //!   \param m GgMatrix Œ^‚Ì•Ï”.
-    //!   \return •ÏŠ·s—ñ‚É m ‚ğæ‚¶‚½ GgMatrix Œ^‚Ì’l.
+    //! \brief å¤‰æ›è¡Œåˆ—ã‚’åˆ¥ã®å¤‰æ›è¡Œåˆ—ã§é™¤ç®—ã—ãŸçµæœã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param m GgMatrix å‹ã®å¤‰æ•°.
+    //!   \return å¤‰æ›è¡Œåˆ—ã« m ã‚’ä¹—ã˜ãŸ GgMatrix å‹ã®å€¤.
     GgMatrix &loadDivide(const GgMatrix &m)
     {
       return loadDivide(m.array.data());
     }
 
-    //! \brief •ÏŠ·s—ñ‚É”z—ñ‚ÉŠi”[‚µ‚½•ÏŠ·s—ñ‚ğ‰ÁZ‚µ‚½’l‚ğ•Ô‚·.
-    //!   \param a GLfloat Œ^‚Ì 16 —v‘f‚Ì”z—ñ.
-    //!   \return •ÏŠ·s—ñ‚É a ‚ğ‰Á‚¦‚½ GgMatrix Œ^‚Ì’l.
+    //! \brief å¤‰æ›è¡Œåˆ—ã«é…åˆ—ã«æ ¼ç´ã—ãŸå¤‰æ›è¡Œåˆ—ã‚’åŠ ç®—ã—ãŸå€¤ã‚’è¿”ã™.
+    //!   \param a GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \return å¤‰æ›è¡Œåˆ—ã« a ã‚’åŠ ãˆãŸ GgMatrix å‹ã®å€¤.
     GgMatrix add(const GLfloat *a) const
     {
       GgMatrix t;
       return t.loadAdd(a);
     }
 
-    //! \brief •ÏŠ·s—ñ‚É•Ê‚Ì•ÏŠ·s—ñ‚ğ‰ÁZ‚µ‚½’l‚ğ•Ô‚·.
-    //!   \param m GgMatrix Œ^‚Ì•Ï”.
-    //!   \return •ÏŠ·s—ñ‚É m ‚ğ‰Á‚¦‚½ GgMatrix Œ^‚Ì’l.
+    //! \brief å¤‰æ›è¡Œåˆ—ã«åˆ¥ã®å¤‰æ›è¡Œåˆ—ã‚’åŠ ç®—ã—ãŸå€¤ã‚’è¿”ã™.
+    //!   \param m GgMatrix å‹ã®å¤‰æ•°.
+    //!   \return å¤‰æ›è¡Œåˆ—ã« m ã‚’åŠ ãˆãŸ GgMatrix å‹ã®å€¤.
     GgMatrix add(const GgMatrix &m) const
     {
       return add(m.array.data());
     }
 
-    //! \brief •ÏŠ·s—ñ‚©‚ç”z—ñ‚ÉŠi”[‚µ‚½•ÏŠ·s—ñ‚ğŒ¸Z‚µ‚½’l‚ğ•Ô‚·.
-    //!   \param a GLfloat Œ^‚Ì 16 —v‘f‚Ì”z—ñ.
-    //!   \return •ÏŠ·s—ñ‚É a ‚ğˆø‚¢‚½ GgMatrix Œ^‚Ì’l.
+    //! \brief å¤‰æ›è¡Œåˆ—ã‹ã‚‰é…åˆ—ã«æ ¼ç´ã—ãŸå¤‰æ›è¡Œåˆ—ã‚’æ¸›ç®—ã—ãŸå€¤ã‚’è¿”ã™.
+    //!   \param a GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \return å¤‰æ›è¡Œåˆ—ã« a ã‚’å¼•ã„ãŸ GgMatrix å‹ã®å€¤.
     GgMatrix subtract(const GLfloat *a) const
     {
       GgMatrix t;
       return t.loadSubtract(a);
     }
 
-    //! \brief •ÏŠ·s—ñ‚©‚ç•Ê‚Ì•ÏŠ·s—ñ‚ğŒ¸Z‚µ‚½’l‚ğ•Ô‚·.
-    //!   \param m GgMatrix Œ^‚Ì•Ï”.
-    //!   \return •ÏŠ·s—ñ‚É m ‚ğˆø‚¢‚½ GgMatrix Œ^‚Ì’l.
+    //! \brief å¤‰æ›è¡Œåˆ—ã‹ã‚‰åˆ¥ã®å¤‰æ›è¡Œåˆ—ã‚’æ¸›ç®—ã—ãŸå€¤ã‚’è¿”ã™.
+    //!   \param m GgMatrix å‹ã®å¤‰æ•°.
+    //!   \return å¤‰æ›è¡Œåˆ—ã« m ã‚’å¼•ã„ãŸ GgMatrix å‹ã®å€¤.
     GgMatrix subtract(const GgMatrix &m) const
     {
       return subtract(m.array.data());
     }
 
-    //! \brief •ÏŠ·s—ñ‚É”z—ñ‚ÉŠi”[‚µ‚½•ÏŠ·s—ñ‚ğæZ‚µ‚½’l‚ğ•Ô‚·.
-    //!   \param a GLfloat Œ^‚Ì 16 —v‘f‚Ì”z—ñ.
-    //!   \return •ÏŠ·s—ñ‚É a ‚ğŠ|‚¯‚½ GgMatrix Œ^‚Ì’l.
+    //! \brief å¤‰æ›è¡Œåˆ—ã«é…åˆ—ã«æ ¼ç´ã—ãŸå¤‰æ›è¡Œåˆ—ã‚’ä¹—ç®—ã—ãŸå€¤ã‚’è¿”ã™.
+    //!   \param a GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \return å¤‰æ›è¡Œåˆ—ã« a ã‚’æ›ã‘ãŸ GgMatrix å‹ã®å€¤.
     GgMatrix multiply(const GLfloat *a) const
     {
       GgMatrix t;
@@ -1663,17 +1781,17 @@ namespace gg
       return t;
     }
 
-    //! \brief •ÏŠ·s—ñ‚É•Ê‚Ì•ÏŠ·s—ñ‚ğæZ‚µ‚½’l‚ğ•Ô‚·.
-    //!   \param m GgMatrix Œ^‚Ì•Ï”.
-    //!   \return •ÏŠ·s—ñ‚É m ‚ğŠ|‚¯‚½ GgMatrix Œ^‚Ì’l.
+    //! \brief å¤‰æ›è¡Œåˆ—ã«åˆ¥ã®å¤‰æ›è¡Œåˆ—ã‚’ä¹—ç®—ã—ãŸå€¤ã‚’è¿”ã™.
+    //!   \param m GgMatrix å‹ã®å¤‰æ•°.
+    //!   \return å¤‰æ›è¡Œåˆ—ã« m ã‚’æ›ã‘ãŸ GgMatrix å‹ã®å€¤.
     GgMatrix multiply(const GgMatrix &m) const
     {
       return multiply(m.array.data());
     }
 
-    //! \brief •ÏŠ·s—ñ‚ğ”z—ñ‚ÉŠi”[‚µ‚½•ÏŠ·s—ñ‚ÅœZ‚µ‚½’l‚ğ•Ô‚·.
-    //!   \param a GLfloat Œ^‚Ì 16 —v‘f‚Ì”z—ñ.
-    //!   \return •ÏŠ·s—ñ‚ğ a ‚ÅŠ„‚Á‚½ GgMatrix Œ^‚Ì’l.
+    //! \brief å¤‰æ›è¡Œåˆ—ã‚’é…åˆ—ã«æ ¼ç´ã—ãŸå¤‰æ›è¡Œåˆ—ã§é™¤ç®—ã—ãŸå€¤ã‚’è¿”ã™.
+    //!   \param a GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \return å¤‰æ›è¡Œåˆ—ã‚’ a ã§å‰²ã£ãŸ GgMatrix å‹ã®å€¤.
     GgMatrix divide(const GLfloat *a) const
     {
       GgMatrix t, ia;
@@ -1682,15 +1800,15 @@ namespace gg
       return t;
     }
 
-    //! \brief •ÏŠ·s—ñ‚ğ”z—ñ‚ÉŠi”[‚µ‚½•ÏŠ·s—ñ‚ÅœZ‚µ‚½’l‚ğ•Ô‚·.
-    //!   \param m GgMatrix Œ^‚Ì•Ï”.
-    //!   \return •ÏŠ·s—ñ‚ğ m ‚ÅŠ„‚Á‚½ GgMatrix Œ^‚Ì’l.
+    //! \brief å¤‰æ›è¡Œåˆ—ã‚’é…åˆ—ã«æ ¼ç´ã—ãŸå¤‰æ›è¡Œåˆ—ã§é™¤ç®—ã—ãŸå€¤ã‚’è¿”ã™.
+    //!   \param m GgMatrix å‹ã®å¤‰æ•°.
+    //!   \return å¤‰æ›è¡Œåˆ—ã‚’ m ã§å‰²ã£ãŸ GgMatrix å‹ã®å€¤.
     GgMatrix divide(const GgMatrix &m) const
     {
       return divide(m.array.data());
     }
 
-    // ‰‰Zq
+    // æ¼”ç®—å­
     GgMatrix &operator=(const GLfloat *a)
     {
       return load(a);
@@ -1764,285 +1882,361 @@ namespace gg
       return operator/(m.array.data());
     }
 
-    //! \brief ’PˆÊs—ñ‚ğŠi”[‚·‚é.
+    //! \brief å˜ä½è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹.
     GgMatrix &loadIdentity();
 
-    //! \brief •½sˆÚ“®‚Ì•ÏŠ·s—ñ‚ğŠi”[‚·‚é.
-    //!   \param x x •ûŒü‚ÌˆÚ“®—Ê.
-    //!   \param y y •ûŒü‚ÌˆÚ“®—Ê.
-    //!   \param z z •ûŒü‚ÌˆÚ“®—Ê.
-    //!   \param w w ˆÚ“®—Ê‚ÌƒXƒP[ƒ‹ƒtƒ@ƒNƒ^ (= 1.0f).
-    //!   \return İ’è‚µ‚½•ÏŠ·s—ñ.
+    //! \brief å¹³è¡Œç§»å‹•ã®å¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param x x æ–¹å‘ã®ç§»å‹•é‡.
+    //!   \param y y æ–¹å‘ã®ç§»å‹•é‡.
+    //!   \param z z æ–¹å‘ã®ç§»å‹•é‡.
+    //!   \param w w ç§»å‹•é‡ã®ã‚¹ã‚±ãƒ¼ãƒ«ãƒ•ã‚¡ã‚¯ã‚¿ (= 1.0f).
+    //!   \return è¨­å®šã—ãŸå¤‰æ›è¡Œåˆ—.
     GgMatrix &loadTranslate(GLfloat x, GLfloat y, GLfloat z, GLfloat w = 1.0f);
 
-    //! \brief •½sˆÚ“®‚Ì•ÏŠ·s—ñ‚ğŠi”[‚·‚é.
-    //!   \param t ˆÚ“®—Ê‚Ì GLfloat Œ^‚Ì”z—ñ (x, y, z).
-    //!   \return İ’è‚µ‚½•ÏŠ·s—ñ.
+    //! \brief å¹³è¡Œç§»å‹•ã®å¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param t ç§»å‹•é‡ã® GLfloat å‹ã®é…åˆ— (x, y, z).
+    //!   \return è¨­å®šã—ãŸå¤‰æ›è¡Œåˆ—.
     GgMatrix &loadTranslate(const GLfloat *t)
     {
       return loadTranslate(t[0], t[1], t[2]);
     }
 
-    //! \brief Šg‘åk¬‚Ì•ÏŠ·s—ñ‚ğŠi”[‚·‚é.
-    //!   \param x x •ûŒü‚ÌŠg‘å—¦.
-    //!   \param y y •ûŒü‚ÌŠg‘å—¦.
-    //!   \param z z •ûŒü‚ÌŠg‘å—¦.
-    //!   \param w w Šg‘å—¦‚ÌƒXƒP[ƒ‹ƒtƒ@ƒNƒ^ (= 1.0f).
-    //!   \return İ’è‚µ‚½•ÏŠ·s—ñ.
+    //! \brief å¹³è¡Œç§»å‹•ã®å¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param t ç§»å‹•é‡ã® GgVector å‹ã®å¤‰æ•°.
+    //!   \return è¨­å®šã—ãŸå¤‰æ›è¡Œåˆ—.
+    GgMatrix &loadTranslate(const GgVector &t)
+    {
+      return loadTranslate(t[0], t[1], t[2], t[3]);
+    }
+
+    //! \brief æ‹¡å¤§ç¸®å°ã®å¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param x x æ–¹å‘ã®æ‹¡å¤§ç‡.
+    //!   \param y y æ–¹å‘ã®æ‹¡å¤§ç‡.
+    //!   \param z z æ–¹å‘ã®æ‹¡å¤§ç‡.
+    //!   \param w w æ‹¡å¤§ç‡ã®ã‚¹ã‚±ãƒ¼ãƒ«ãƒ•ã‚¡ã‚¯ã‚¿ (= 1.0f).
+    //!   \return è¨­å®šã—ãŸå¤‰æ›è¡Œåˆ—.
     GgMatrix &loadScale(GLfloat x, GLfloat y, GLfloat z, GLfloat w = 1.0f);
 
-    //! \brief Šg‘åk¬‚Ì•ÏŠ·s—ñ‚ğŠi”[‚·‚é.
-    //!   \param s Šg‘å—¦‚Ì GLfloat Œ^‚Ì”z—ñ (x, y, z).
-    //!   \return İ’è‚µ‚½•ÏŠ·s—ñ.
+    //! \brief æ‹¡å¤§ç¸®å°ã®å¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param s æ‹¡å¤§ç‡ã® GLfloat å‹ã®é…åˆ— (x, y, z).
+    //!   \return è¨­å®šã—ãŸå¤‰æ›è¡Œåˆ—.
     GgMatrix &loadScale(const GLfloat *s)
     {
       return loadScale(s[0], s[1], s[2]);
     }
 
-    //! \brief x ²’†S‚Ì‰ñ“]‚Ì•ÏŠ·s—ñ‚ğŠi”[‚·‚é.
-    //!   \param a ‰ñ“]Šp.
-    //!   \return İ’è‚µ‚½•ÏŠ·s—ñ.
+    //! \brief æ‹¡å¤§ç¸®å°ã®å¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param s æ‹¡å¤§ç‡ã® GgVector å‹ã®å¤‰æ•°.
+    //!   \return è¨­å®šã—ãŸå¤‰æ›è¡Œåˆ—.
+    GgMatrix &loadScale(const GgVector &s)
+    {
+      return loadScale(s[0], s[1], s[2], s[3]);
+    }
+
+    //! \brief x è»¸ä¸­å¿ƒã®å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param a å›è»¢è§’.
+    //!   \return è¨­å®šã—ãŸå¤‰æ›è¡Œåˆ—.
     GgMatrix &loadRotateX(GLfloat a);
 
-    //! \brief y ²’†S‚Ì‰ñ“]‚Ì•ÏŠ·s—ñ‚ğŠi”[‚·‚é.
-    //!   \param a ‰ñ“]Šp.
-    //!   \return İ’è‚µ‚½•ÏŠ·s—ñ.
+    //! \brief y è»¸ä¸­å¿ƒã®å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param a å›è»¢è§’.
+    //!   \return è¨­å®šã—ãŸå¤‰æ›è¡Œåˆ—.
     GgMatrix &loadRotateY(GLfloat a);
 
-    //! \brief z ²’†S‚Ì‰ñ“]‚Ì•ÏŠ·s—ñ‚ğŠi”[‚·‚é.
-    //!   \param a ‰ñ“]Šp.
-    //!   \return İ’è‚µ‚½•ÏŠ·s—ñ.
+    //! \brief z è»¸ä¸­å¿ƒã®å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param a å›è»¢è§’.
+    //!   \return è¨­å®šã—ãŸå¤‰æ›è¡Œåˆ—.
     GgMatrix &loadRotateZ(GLfloat a);
 
-    //! \brief (x, y, z) •ûŒü‚ÌƒxƒNƒgƒ‹‚ğ²‚Æ‚·‚é‰ñ“]‚Ì•ÏŠ·s—ñ‚ğŠi”[‚·‚é.
-    //!   \param x ‰ñ“]²‚Ì x ¬•ª.
-    //!   \param y ‰ñ“]²‚Ì y ¬•ª.
-    //!   \param z ‰ñ“]²‚Ì z ¬•ª.
-    //!   \param a ‰ñ“]Šp.
-    //!   \return İ’è‚µ‚½•ÏŠ·s—ñ.
+    //! \brief (x, y, z) æ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è»¸ã¨ã™ã‚‹å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param x å›è»¢è»¸ã® x æˆåˆ†.
+    //!   \param y å›è»¢è»¸ã® y æˆåˆ†.
+    //!   \param z å›è»¢è»¸ã® z æˆåˆ†.
+    //!   \param a å›è»¢è§’.
+    //!   \return è¨­å®šã—ãŸå¤‰æ›è¡Œåˆ—.
     GgMatrix &loadRotate(GLfloat x, GLfloat y, GLfloat z, GLfloat a);
 
-    //! \brief r •ûŒü‚ÌƒxƒNƒgƒ‹‚ğ²‚Æ‚·‚é‰ñ“]‚Ì•ÏŠ·s—ñ‚ğŠi”[‚·‚é.
-    //!   \param r ‰ñ“]²‚Ì•ûŒüƒxƒNƒgƒ‹ (x, y, z).
-    //!   \param a ‰ñ“]Šp.
-    //!   \return İ’è‚µ‚½•ÏŠ·s—ñ.
+    //! \brief r æ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è»¸ã¨ã™ã‚‹å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param r å›è»¢è»¸ã®æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 3 è¦ç´ ã®é…åˆ—å¤‰æ•° (x, y, z).
+    //!   \param a å›è»¢è§’.
+    //!   \return è¨­å®šã—ãŸå¤‰æ›è¡Œåˆ—.
     GgMatrix &loadRotate(const GLfloat *r, GLfloat a)
     {
       return loadRotate(r[0], r[1], r[2], a);
     }
 
-    //! \brief r •ûŒü‚ÌƒxƒNƒgƒ‹‚ğ²‚Æ‚·‚é‰ñ“]‚Ì•ÏŠ·s—ñ‚ğŠi”[‚·‚é.
-    //!   \param r ‰ñ“]²‚Ì•ûŒüƒxƒNƒgƒ‹‚Æ‰ñ“]Šp (x, y, z, a).
-    //!   \return İ’è‚µ‚½•ÏŠ·s—ñ.
+    //! \brief r æ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è»¸ã¨ã™ã‚‹å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param r å›è»¢è»¸ã®æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã‚’æ ¼ç´ã—ãŸ GgVector å‹ã®å¤‰æ•°.
+    //!   \param a å›è»¢è§’.
+    //!   \return è¨­å®šã—ãŸå¤‰æ›è¡Œåˆ—.
+    GgMatrix &loadRotate(const GgVector &r, GLfloat a)
+    {
+      return loadRotate(r[0], r[1], r[2], a);
+    }
+
+    //! \brief r æ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è»¸ã¨ã™ã‚‹å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param r å›è»¢è»¸ã®æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã¨å›è»¢è§’ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•° (x, y, z, a).
+    //!   \return è¨­å®šã—ãŸå¤‰æ›è¡Œåˆ—.
     GgMatrix &loadRotate(const GLfloat *r)
     {
       return loadRotate(r[0], r[1], r[2], r[3]);
     }
 
-    //! \brief ƒrƒ…[•ÏŠ·s—ñ‚ğŠi”[‚·‚é.
-    //!   \param ex ‹“_‚ÌˆÊ’u‚Ì x À•W’l.
-    //!   \param ey ‹“_‚ÌˆÊ’u‚Ì y À•W’l.
-    //!   \param ez ‹“_‚ÌˆÊ’u‚Ì z À•W’l.
-    //!   \param tx –Ú•W“_‚ÌˆÊ’u‚Ì x À•W’l.
-    //!   \param ty –Ú•W“_‚ÌˆÊ’u‚Ì y À•W’l.
-    //!   \param tz –Ú•W“_‚ÌˆÊ’u‚Ì z À•W’l.
-    //!   \param ux ã•ûŒü‚ÌƒxƒNƒgƒ‹‚Ì x ¬•ª.
-    //!   \param uy ã•ûŒü‚ÌƒxƒNƒgƒ‹‚Ì y ¬•ª.
-    //!   \param uz ã•ûŒü‚ÌƒxƒNƒgƒ‹‚Ì z ¬•ª.
-    //!   \return İ’è‚µ‚½ƒrƒ…[•ÏŠ·s—ñ.
+    //! \brief r æ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è»¸ã¨ã™ã‚‹å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param r å›è»¢è»¸ã®æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã¨å›è»¢è§’ã‚’æ ¼ç´ã—ãŸ GgVector å‹ã®å¤‰æ•°.
+    //!   \return è¨­å®šã—ãŸå¤‰æ›è¡Œåˆ—.
+    GgMatrix &loadRotate(const GgVector &r)
+    {
+      return loadRotate(r[0], r[1], r[2], r[3]);
+    }
+
+    //! \brief ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param ex è¦–ç‚¹ã®ä½ç½®ã® x åº§æ¨™å€¤.
+    //!   \param ey è¦–ç‚¹ã®ä½ç½®ã® y åº§æ¨™å€¤.
+    //!   \param ez è¦–ç‚¹ã®ä½ç½®ã® z åº§æ¨™å€¤.
+    //!   \param tx ç›®æ¨™ç‚¹ã®ä½ç½®ã® x åº§æ¨™å€¤.
+    //!   \param ty ç›®æ¨™ç‚¹ã®ä½ç½®ã® y åº§æ¨™å€¤.
+    //!   \param tz ç›®æ¨™ç‚¹ã®ä½ç½®ã® z åº§æ¨™å€¤.
+    //!   \param ux ä¸Šæ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã® x æˆåˆ†.
+    //!   \param uy ä¸Šæ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã® y æˆåˆ†.
+    //!   \param uz ä¸Šæ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã® z æˆåˆ†.
+    //!   \return è¨­å®šã—ãŸãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—.
     GgMatrix &loadLookat(GLfloat ex, GLfloat ey, GLfloat ez,
       GLfloat tx, GLfloat ty, GLfloat tz,
       GLfloat ux, GLfloat uy, GLfloat uz);
 
-    //! \brief ƒrƒ…[•ÏŠ·s—ñ‚ğŠi”[‚·‚é.
-    //!   \param e ‹“_‚ÌˆÊ’u‚Ì”z—ñ•Ï”.
-    //!   \param t –Ú•W“_‚ÌˆÊ’u‚Ì”z—ñ•Ï”.
-    //!   \param u ã•ûŒü‚ÌƒxƒNƒgƒ‹‚Ì‚Ì”z—ñ•Ï”.
-    //!   \return İ’è‚µ‚½ƒrƒ…[•ÏŠ·s—ñ.
+    //! \brief ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param e è¦–ç‚¹ã®ä½ç½®ã®é…åˆ—å¤‰æ•°.
+    //!   \param t ç›®æ¨™ç‚¹ã®ä½ç½®ã®é…åˆ—å¤‰æ•°.
+    //!   \param u ä¸Šæ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã®é…åˆ—å¤‰æ•°.
+    //!   \return è¨­å®šã—ãŸãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—.
     GgMatrix &loadLookat(const GLfloat *e, const GLfloat *t, const GLfloat *u)
     {
       return loadLookat(e[0], e[1], e[2], t[0], t[1], t[2], u[0], u[1], u[2]);
     }
 
-    //! \brief ’¼Œğ“Š‰e•ÏŠ·s—ñ‚ğŠi”[‚·‚é.
-    //!   \param left ƒEƒBƒ“ƒhƒE‚Ì¶’[‚ÌˆÊ’u.
-    //!   \param right ƒEƒBƒ“ƒhƒE‚Ì‰E’[‚ÌˆÊ’u.
-    //!   \param bottom ƒEƒBƒ“ƒhƒE‚Ì‰º’[‚ÌˆÊ’u.
-    //!   \param top ƒEƒBƒ“ƒhƒE‚Ìã’[‚ÌˆÊ’u.
-    //!   \param zNear ‹“_‚©‚ç‘O•û–Ê‚Ü‚Å‚ÌˆÊ’u.
-    //!   \param zFar ‹“_‚©‚çŒã•û–Ê‚Ü‚Å‚ÌˆÊ’u.
-    //!   \return İ’è‚µ‚½’¼Œğ“Š‰e•ÏŠ·s—ñ.
+    //! \brief ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param e è¦–ç‚¹ã®ä½ç½®ã® GgVector å‹ã®å¤‰æ•°.
+    //!   \param t ç›®æ¨™ç‚¹ã®ä½ç½®ã® GgVector å‹ã®å¤‰æ•°.
+    //!   \param u ä¸Šæ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã® GgVector å‹ã®å¤‰æ•°.
+    //!   \return è¨­å®šã—ãŸãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—.
+    GgMatrix &loadLookat(const GgVector &e, const GgVector &t, const GgVector &u)
+    {
+      return loadLookat(e[0], e[1], e[2], t[0], t[1], t[2], u[0], u[1], u[2]);
+    }
+
+    //! \brief ç›´äº¤æŠ•å½±å¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param left ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å·¦ç«¯ã®ä½ç½®.
+    //!   \param right ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å³ç«¯ã®ä½ç½®.
+    //!   \param bottom ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä¸‹ç«¯ã®ä½ç½®.
+    //!   \param top ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä¸Šç«¯ã®ä½ç½®.
+    //!   \param zNear è¦–ç‚¹ã‹ã‚‰å‰æ–¹é¢ã¾ã§ã®ä½ç½®.
+    //!   \param zFar è¦–ç‚¹ã‹ã‚‰å¾Œæ–¹é¢ã¾ã§ã®ä½ç½®.
+    //!   \return è¨­å®šã—ãŸç›´äº¤æŠ•å½±å¤‰æ›è¡Œåˆ—.
     GgMatrix &loadOrthogonal(GLfloat left, GLfloat right,
       GLfloat bottom, GLfloat top,
       GLfloat zNear, GLfloat zFar);
 
-    //! \brief “§‹“§‹“Š‰e•ÏŠ·s—ñ‚ğŠi”[‚·‚é.
-    //!   \param left ƒEƒBƒ“ƒhƒE‚Ì¶’[‚ÌˆÊ’u.
-    //!   \param right ƒEƒBƒ“ƒhƒE‚Ì‰E’[‚ÌˆÊ’u.
-    //!   \param bottom ƒEƒBƒ“ƒhƒE‚Ì‰º’[‚ÌˆÊ’u.
-    //!   \param top ƒEƒBƒ“ƒhƒE‚Ìã’[‚ÌˆÊ’u.
-    //!   \param zNear ‹“_‚©‚ç‘O•û–Ê‚Ü‚Å‚ÌˆÊ’u.
-    //!   \param zFar ‹“_‚©‚çŒã•û–Ê‚Ü‚Å‚ÌˆÊ’u.
-    //!   \return İ’è‚µ‚½“§‹“Š‰e•ÏŠ·s—ñ.
+    //! \brief é€è¦–é€è¦–æŠ•å½±å¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param left ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å·¦ç«¯ã®ä½ç½®.
+    //!   \param right ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å³ç«¯ã®ä½ç½®.
+    //!   \param bottom ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä¸‹ç«¯ã®ä½ç½®.
+    //!   \param top ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä¸Šç«¯ã®ä½ç½®.
+    //!   \param zNear è¦–ç‚¹ã‹ã‚‰å‰æ–¹é¢ã¾ã§ã®ä½ç½®.
+    //!   \param zFar è¦–ç‚¹ã‹ã‚‰å¾Œæ–¹é¢ã¾ã§ã®ä½ç½®.
+    //!   \return è¨­å®šã—ãŸé€è¦–æŠ•å½±å¤‰æ›è¡Œåˆ—.
     GgMatrix &loadFrustum(GLfloat left, GLfloat right,
       GLfloat bottom, GLfloat top,
       GLfloat zNear, GLfloat zFar);
 
-    //! \brief ‰æŠp‚ğw’è‚µ‚Ä“§‹“Š‰e•ÏŠ·s—ñ‚ğŠi”[‚·‚é.
-    //!   \param fovy y •ûŒü‚Ì‰æŠp.
-    //!   \param aspect c‰¡”ä.
-    //!   \param zNear ‹“_‚©‚ç‘O•û–Ê‚Ü‚Å‚ÌˆÊ’u.
-    //!   \param zFar ‹“_‚©‚çŒã•û–Ê‚Ü‚Å‚ÌˆÊ’u.
-    //!   \return İ’è‚µ‚½“§‹“Š‰e•ÏŠ·s—ñ.
+    //! \brief ç”»è§’ã‚’æŒ‡å®šã—ã¦é€è¦–æŠ•å½±å¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param fovy y æ–¹å‘ã®ç”»è§’.
+    //!   \param aspect ç¸¦æ¨ªæ¯”.
+    //!   \param zNear è¦–ç‚¹ã‹ã‚‰å‰æ–¹é¢ã¾ã§ã®ä½ç½®.
+    //!   \param zFar è¦–ç‚¹ã‹ã‚‰å¾Œæ–¹é¢ã¾ã§ã®ä½ç½®.
+    //!   \return è¨­å®šã—ãŸé€è¦–æŠ•å½±å¤‰æ›è¡Œåˆ—.
     GgMatrix &loadPerspective(GLfloat fovy, GLfloat aspect,
       GLfloat zNear, GLfloat zFar);
 
-    //! \brief “]’us—ñ‚ğŠi”[‚·‚é.
-    //!   \param a GLfloat Œ^‚Ì 16 —v‘f‚Ì•ÏŠ·s—ñ.
-    //!   \return İ’è‚µ‚½ a ‚Ì“]’us—ñ.
+    //! \brief è»¢ç½®è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param a GLfloat å‹ã® 16 è¦ç´ ã®å¤‰æ›è¡Œåˆ—.
+    //!   \return è¨­å®šã—ãŸ a ã®è»¢ç½®è¡Œåˆ—.
     GgMatrix &loadTranspose(const GLfloat *a);
 
-    //! \brief “]’us—ñ‚ğŠi”[‚·‚é.
-    //!   \param m GgMatrix Œ^‚Ì•ÏŠ·s—ñ.
-    //!   \return İ’è‚µ‚½ m ‚Ì“]’us—ñ.
+    //! \brief è»¢ç½®è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param m GgMatrix å‹ã®å¤‰æ›è¡Œåˆ—.
+    //!   \return è¨­å®šã—ãŸ m ã®è»¢ç½®è¡Œåˆ—.
     GgMatrix &loadTranspose(const GgMatrix &m)
     {
       return loadTranspose(m.array.data());
     }
 
-    //! \brief ‹ts—ñ‚ğŠi”[‚·‚é.
-    //!   \param a GLfloat Œ^‚Ì 16 —v‘f‚Ì•ÏŠ·s—ñ.
-    //!   \return İ’è‚µ‚½ a ‚Ì‹ts—ñ.
+    //! \brief é€†è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param a GLfloat å‹ã® 16 è¦ç´ ã®å¤‰æ›è¡Œåˆ—.
+    //!   \return è¨­å®šã—ãŸ a ã®é€†è¡Œåˆ—.
     GgMatrix &loadInvert(const GLfloat *a);
 
-    //! \brief ‹ts—ñ‚ğŠi”[‚·‚é.
-    //!   \param m GgMatrix Œ^‚Ì•ÏŠ·s—ñ.
-    //!   \return İ’è‚µ‚½ m ‚Ì‹ts—ñ.
+    //! \brief é€†è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param m GgMatrix å‹ã®å¤‰æ›è¡Œåˆ—.
+    //!   \return è¨­å®šã—ãŸ m ã®é€†è¡Œåˆ—.
     GgMatrix &loadInvert(const GgMatrix &m)
     {
       return loadInvert(m.array.data());
     }
 
-    //! \brief –@ü•ÏŠ·s—ñ‚ğŠi”[‚·‚é.
-    //!   \param a GLfloat Œ^‚Ì 16 —v‘f‚Ì•ÏŠ·s—ñ.
-    //!   \return İ’è‚µ‚½ m ‚Ì–@ü•ÏŠ·s—ñ.
+    //! \brief æ³•ç·šå¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param a GLfloat å‹ã® 16 è¦ç´ ã®å¤‰æ›è¡Œåˆ—.
+    //!   \return è¨­å®šã—ãŸ m ã®æ³•ç·šå¤‰æ›è¡Œåˆ—.
     GgMatrix &loadNormal(const GLfloat *a);
 
-    //! \brief –@ü•ÏŠ·s—ñ‚ğŠi”[‚·‚é.
-    //!   \param GgMatrix Œ^‚Ì•ÏŠ·s—ñ.
-    //!   \return İ’è‚µ‚½ m ‚Ì–@ü•ÏŠ·s—ñ.
+    //! \brief æ³•ç·šå¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param GgMatrix å‹ã®å¤‰æ›è¡Œåˆ—.
+    //!   \return è¨­å®šã—ãŸ m ã®æ³•ç·šå¤‰æ›è¡Œåˆ—.
     GgMatrix &loadNormal(const GgMatrix &m)
     {
       return loadNormal(m.array.data());
     }
 
-    //! \brief •½sˆÚ“®•ÏŠ·‚ğæ‚¶‚½Œ‹‰Ê‚ğ•Ô‚·.
-    //!   \param x x •ûŒü‚ÌˆÚ“®—Ê.
-    //!   \param y y •ûŒü‚ÌˆÚ“®—Ê.
-    //!   \param z z •ûŒü‚ÌˆÚ“®—Ê.
-    //!   \param w w ˆÚ“®—Ê‚ÌƒXƒP[ƒ‹ƒtƒ@ƒNƒ^ (= 1.0f).
-    //!   \return •½sˆÚ“®‚µ‚½Œ‹‰Ê‚Ì•ÏŠ·s—ñ.
+    //! \brief å¹³è¡Œç§»å‹•å¤‰æ›ã‚’ä¹—ã˜ãŸçµæœã‚’è¿”ã™.
+    //!   \param x x æ–¹å‘ã®ç§»å‹•é‡.
+    //!   \param y y æ–¹å‘ã®ç§»å‹•é‡.
+    //!   \param z z æ–¹å‘ã®ç§»å‹•é‡.
+    //!   \param w w ç§»å‹•é‡ã®ã‚¹ã‚±ãƒ¼ãƒ«ãƒ•ã‚¡ã‚¯ã‚¿ (= 1.0f).
+    //!   \return å¹³è¡Œç§»å‹•ã—ãŸçµæœã®å¤‰æ›è¡Œåˆ—.
     GgMatrix translate(GLfloat x, GLfloat y, GLfloat z, GLfloat w = 1.0f) const
     {
       GgMatrix m;
       return multiply(m.loadTranslate(x, y, z, w));
     }
 
-    //! \brief •½sˆÚ“®•ÏŠ·‚ğæ‚¶‚½Œ‹‰Ê‚ğ•Ô‚·.
-    //!   \param t ˆÚ“®—Ê‚Ì GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ (x, y, z, w).
-    //!   \return •½sˆÚ“®‚µ‚½Œ‹‰Ê‚Ì•ÏŠ·s—ñ.
+    //! \brief å¹³è¡Œç§»å‹•å¤‰æ›ã‚’ä¹—ã˜ãŸçµæœã‚’è¿”ã™.
+    //!   \param t ç§»å‹•é‡ã® GLfloat å‹ã® 3 è¦ç´ ã®é…åˆ—å¤‰æ•° (x, y, z).
+    //!   \return å¹³è¡Œç§»å‹•ã—ãŸçµæœã®å¤‰æ›è¡Œåˆ—.
     GgMatrix translate(const GLfloat *t) const
+    {
+      return translate(t[0], t[1], t[2]);
+    }
+
+    //! \brief å¹³è¡Œç§»å‹•å¤‰æ›ã‚’ä¹—ã˜ãŸçµæœã‚’è¿”ã™.
+    //!   \param t ç§»å‹•é‡ã® GgVector å‹ã®å¤‰æ•°.
+    //!   \return å¹³è¡Œç§»å‹•ã—ãŸçµæœã®å¤‰æ›è¡Œåˆ—.
+    GgMatrix translate(const GgVector &t) const
     {
       return translate(t[0], t[1], t[2], t[3]);
     }
 
-    //! \brief Šg‘åk¬•ÏŠ·‚ğæ‚¶‚½Œ‹‰Ê‚ğ•Ô‚·.
-    //!   \param x x •ûŒü‚ÌŠg‘å—¦.
-    //!   \param y y •ûŒü‚ÌŠg‘å—¦.
-    //!   \param z z •ûŒü‚ÌŠg‘å—¦.
-    //!   \param w w ˆÚ“®—Ê‚ÌƒXƒP[ƒ‹ƒtƒ@ƒNƒ^ (= 1.0f).
-    //!   \return Šg‘åk¬‚µ‚½Œ‹‰Ê‚Ì•ÏŠ·s—ñ.
+    //! \brief æ‹¡å¤§ç¸®å°å¤‰æ›ã‚’ä¹—ã˜ãŸçµæœã‚’è¿”ã™.
+    //!   \param x x æ–¹å‘ã®æ‹¡å¤§ç‡.
+    //!   \param y y æ–¹å‘ã®æ‹¡å¤§ç‡.
+    //!   \param z z æ–¹å‘ã®æ‹¡å¤§ç‡.
+    //!   \param w w ç§»å‹•é‡ã®ã‚¹ã‚±ãƒ¼ãƒ«ãƒ•ã‚¡ã‚¯ã‚¿ (= 1.0f).
+    //!   \return æ‹¡å¤§ç¸®å°ã—ãŸçµæœã®å¤‰æ›è¡Œåˆ—.
     GgMatrix scale(GLfloat x, GLfloat y, GLfloat z, GLfloat w = 1.0f) const
     {
       GgMatrix m;
       return multiply(m.loadScale(x, y, z, w));
     }
 
-    //! \brief Šg‘åk¬•ÏŠ·‚ğæ‚¶‚½Œ‹‰Ê‚ğ•Ô‚·.
-    //!   \param s Šg‘å—¦‚Ì GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ (x, y, z, w).
-    //!   \return Šg‘åk¬‚µ‚½Œ‹‰Ê‚Ì•ÏŠ·s—ñ.
+    //! \brief æ‹¡å¤§ç¸®å°å¤‰æ›ã‚’ä¹—ã˜ãŸçµæœã‚’è¿”ã™.
+    //!   \param s æ‹¡å¤§ç‡ã® GLfloat å‹ã® 3 è¦ç´ ã®é…åˆ—å¤‰æ•° (x, y, z).
+    //!   \return æ‹¡å¤§ç¸®å°ã—ãŸçµæœã®å¤‰æ›è¡Œåˆ—.
     GgMatrix scale(const GLfloat *s) const
+    {
+      return scale(s[0], s[1], s[2]);
+    }
+
+    //! \brief æ‹¡å¤§ç¸®å°å¤‰æ›ã‚’ä¹—ã˜ãŸçµæœã‚’è¿”ã™.
+    //!   \param s æ‹¡å¤§ç‡ã® GgVector å‹ã®å¤‰æ•°.
+    //!   \return æ‹¡å¤§ç¸®å°ã—ãŸçµæœã®å¤‰æ›è¡Œåˆ—.
+    GgMatrix scale(const GgVector &s) const
     {
       return scale(s[0], s[1], s[2], s[3]);
     }
 
-    //! \brief x ²’†S‚Ì‰ñ“]•ÏŠ·‚ğæ‚¶‚½Œ‹‰Ê‚ğ•Ô‚·.
-    //!   \param a ‰ñ“]Šp.
-    //!   \return x ²’†S‚É‚³‚ç‚É a ‰ñ“]‚µ‚½•ÏŠ·s—ñ.
+    //! \brief x è»¸ä¸­å¿ƒã®å›è»¢å¤‰æ›ã‚’ä¹—ã˜ãŸçµæœã‚’è¿”ã™.
+    //!   \param a å›è»¢è§’.
+    //!   \return x è»¸ä¸­å¿ƒã«ã•ã‚‰ã« a å›è»¢ã—ãŸå¤‰æ›è¡Œåˆ—.
     GgMatrix rotateX(GLfloat a) const
     {
       GgMatrix m;
       return multiply(m.loadRotateX(a));
     }
 
-    //! \brief y ²’†S‚Ì‰ñ“]•ÏŠ·‚ğæ‚¶‚½Œ‹‰Ê‚ğ•Ô‚·.
-    //!   \param a ‰ñ“]Šp.
-    //!   \return y ²’†S‚É‚³‚ç‚É a ‰ñ“]‚µ‚½•ÏŠ·s—ñ.
+    //! \brief y è»¸ä¸­å¿ƒã®å›è»¢å¤‰æ›ã‚’ä¹—ã˜ãŸçµæœã‚’è¿”ã™.
+    //!   \param a å›è»¢è§’.
+    //!   \return y è»¸ä¸­å¿ƒã«ã•ã‚‰ã« a å›è»¢ã—ãŸå¤‰æ›è¡Œåˆ—.
     GgMatrix rotateY(GLfloat a) const
     {
       GgMatrix m;
       return multiply(m.loadRotateY(a));
     }
 
-    //! \brief z ²’†S‚Ì‰ñ“]•ÏŠ·‚ğæ‚¶‚½Œ‹‰Ê‚ğ•Ô‚·.
-    //!   \param a ‰ñ“]Šp.
-    //!   \return z ²’†S‚É‚³‚ç‚É a ‰ñ“]‚µ‚½•ÏŠ·s—ñ.
+    //! \brief z è»¸ä¸­å¿ƒã®å›è»¢å¤‰æ›ã‚’ä¹—ã˜ãŸçµæœã‚’è¿”ã™.
+    //!   \param a å›è»¢è§’.
+    //!   \return z è»¸ä¸­å¿ƒã«ã•ã‚‰ã« a å›è»¢ã—ãŸå¤‰æ›è¡Œåˆ—.
     GgMatrix rotateZ(GLfloat a) const
     {
       GgMatrix m;
       return multiply(m.loadRotateZ(a));
     }
 
-    //! \brief (x, y, z) •ûŒü‚ÌƒxƒNƒgƒ‹‚ğ²‚Æ‚·‚é‰ñ“]•ÏŠ·‚ğæ‚¶‚½Œ‹‰Ê‚ğ•Ô‚·.
-    //!   \param x ‰ñ“]²‚Ì x ¬•ª.
-    //!   \param y ‰ñ“]²‚Ì y ¬•ª.
-    //!   \param z ‰ñ“]²‚Ì z ¬•ª.
-    //!   \param a ‰ñ“]Šp.
-    //!   \return (x, y, z) ‚ğ²‚É‚³‚ç‚É a ‰ñ“]‚µ‚½•ÏŠ·s—ñ.
+    //! \brief (x, y, z) æ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è»¸ã¨ã™ã‚‹å›è»¢å¤‰æ›ã‚’ä¹—ã˜ãŸçµæœã‚’è¿”ã™.
+    //!   \param x å›è»¢è»¸ã® x æˆåˆ†.
+    //!   \param y å›è»¢è»¸ã® y æˆåˆ†.
+    //!   \param z å›è»¢è»¸ã® z æˆåˆ†.
+    //!   \param a å›è»¢è§’.
+    //!   \return (x, y, z) ã‚’è»¸ã«ã•ã‚‰ã« a å›è»¢ã—ãŸå¤‰æ›è¡Œåˆ—.
     GgMatrix rotate(GLfloat x, GLfloat y, GLfloat z, GLfloat a) const
     {
       GgMatrix m;
       return multiply(m.loadRotate(x, y, z, a));
     }
 
-    //! \brief r •ûŒü‚ÌƒxƒNƒgƒ‹‚ğ²‚Æ‚·‚é‰ñ“]•ÏŠ·‚ğæ‚¶‚½Œ‹‰Ê‚ğ•Ô‚·.
-    //!   \param r ‰ñ“]²‚Ì•ûŒüƒxƒNƒgƒ‹‚Æ‰ñ“]Šp (x, y, z).
-    //!   \param a ‰ñ“]Šp.
-    //!   \return (r[0], r[1], r[2]) ‚ğ²‚É‚³‚ç‚É a ‰ñ“]‚µ‚½•ÏŠ·s—ñ.
+    //! \brief r æ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è»¸ã¨ã™ã‚‹å›è»¢å¤‰æ›ã‚’ä¹—ã˜ãŸçµæœã‚’è¿”ã™.
+    //!   \param r å›è»¢è»¸ã®æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 3 è¦ç´ ã®é…åˆ—å¤‰æ•° (x, y, z).
+    //!   \param a å›è»¢è§’.
+    //!   \return (r[0], r[1], r[2]) ã‚’è»¸ã«ã•ã‚‰ã« a å›è»¢ã—ãŸå¤‰æ›è¡Œåˆ—.
     GgMatrix rotate(const GLfloat *r, GLfloat a) const
     {
       return rotate(r[0], r[1], r[2], a);
     }
 
-    //! \brief r •ûŒü‚ÌƒxƒNƒgƒ‹‚ğ²‚Æ‚·‚é‰ñ“]‚Ì•ÏŠ·s—ñ‚ğæ‚¶‚½Œ‹‰Ê‚ğ•Ô‚·.
-    //!   \param r ‰ñ“]²‚Ì•ûŒüƒxƒNƒgƒ‹‚Æ‰ñ“]Šp (x, y, z, a).
-    //!   \return (r[0], r[1], r[2]) ‚ğ²‚É‚³‚ç‚É r[3] ‰ñ“]‚µ‚½•ÏŠ·s—ñ.
+    //! \brief r æ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è»¸ã¨ã™ã‚‹å›è»¢å¤‰æ›ã‚’ä¹—ã˜ãŸçµæœã‚’è¿”ã™.
+    //!   \param r å›è»¢è»¸ã®æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã‚’æ ¼ç´ã—ãŸ GgVector å‹ã®å¤‰æ•°.
+    //!   \param a å›è»¢è§’.
+    //!   \return (r[0], r[1], r[2]) ã‚’è»¸ã«ã•ã‚‰ã« a å›è»¢ã—ãŸå¤‰æ›è¡Œåˆ—.
+    GgMatrix rotate(const GgVector &r, GLfloat a) const
+    {
+      return rotate(r[0], r[1], r[2], a);
+    }
+
+    //! \brief r æ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è»¸ã¨ã™ã‚‹å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’ä¹—ã˜ãŸçµæœã‚’è¿”ã™.
+    //!   \param r å›è»¢è»¸ã®æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã¨å›è»¢è§’ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•° (x, y, z, a).
+    //!   \return (r[0], r[1], r[2]) ã‚’è»¸ã«ã•ã‚‰ã« r[3] å›è»¢ã—ãŸå¤‰æ›è¡Œåˆ—.
     GgMatrix rotate(const GLfloat *r) const
     {
       return rotate(r[0], r[1], r[2], r[3]);
     }
 
-    //! \brief ƒrƒ…[•ÏŠ·‚ğæ‚¶‚½Œ‹‰Ê‚ğ•Ô‚·.
-    //!   \param ex ‹“_‚ÌˆÊ’u‚Ì x À•W’l.
-    //!   \param ey ‹“_‚ÌˆÊ’u‚Ì y À•W’l.
-    //!   \param ez ‹“_‚ÌˆÊ’u‚Ì z À•W’l.
-    //!   \param tx –Ú•W“_‚ÌˆÊ’u‚Ì x À•W’l.
-    //!   \param ty –Ú•W“_‚ÌˆÊ’u‚Ì y À•W’l.
-    //!   \param tz –Ú•W“_‚ÌˆÊ’u‚Ì z À•W’l.
-    //!   \param ux ã•ûŒü‚ÌƒxƒNƒgƒ‹‚Ì x ¬•ª.
-    //!   \param uy ã•ûŒü‚ÌƒxƒNƒgƒ‹‚Ì y ¬•ª.
-    //!   \param uz ã•ûŒü‚ÌƒxƒNƒgƒ‹‚Ì z ¬•ª.
-    //!   \return ƒrƒ…[•ÏŠ·s—ñ‚ğæ‚¶‚½•ÏŠ·s—ñ.
+    //! \brief r æ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è»¸ã¨ã™ã‚‹å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’ä¹—ã˜ãŸçµæœã‚’è¿”ã™.
+    //!   \param r å›è»¢è»¸ã®æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã¨å›è»¢è§’ã‚’æ ¼ç´ã—ãŸ GgVector å‹ã®å¤‰æ•°).
+    //!   \return (r[0], r[1], r[2]) ã‚’è»¸ã«ã•ã‚‰ã« r[3] å›è»¢ã—ãŸå¤‰æ›è¡Œåˆ—.
+    GgMatrix rotate(const GgVector &r) const
+    {
+      return rotate(r[0], r[1], r[2], r[3]);
+    }
+
+    //! \brief ãƒ“ãƒ¥ãƒ¼å¤‰æ›ã‚’ä¹—ã˜ãŸçµæœã‚’è¿”ã™.
+    //!   \param ex è¦–ç‚¹ã®ä½ç½®ã® x åº§æ¨™å€¤.
+    //!   \param ey è¦–ç‚¹ã®ä½ç½®ã® y åº§æ¨™å€¤.
+    //!   \param ez è¦–ç‚¹ã®ä½ç½®ã® z åº§æ¨™å€¤.
+    //!   \param tx ç›®æ¨™ç‚¹ã®ä½ç½®ã® x åº§æ¨™å€¤.
+    //!   \param ty ç›®æ¨™ç‚¹ã®ä½ç½®ã® y åº§æ¨™å€¤.
+    //!   \param tz ç›®æ¨™ç‚¹ã®ä½ç½®ã® z åº§æ¨™å€¤.
+    //!   \param ux ä¸Šæ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã® x æˆåˆ†.
+    //!   \param uy ä¸Šæ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã® y æˆåˆ†.
+    //!   \param uz ä¸Šæ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã® z æˆåˆ†.
+    //!   \return ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã‚’ä¹—ã˜ãŸå¤‰æ›è¡Œåˆ—.
     GgMatrix lookat(GLfloat ex, GLfloat ey, GLfloat ez,
       GLfloat tx, GLfloat ty, GLfloat tz,
       GLfloat ux, GLfloat uy, GLfloat uz) const
@@ -2051,24 +2245,34 @@ namespace gg
       return multiply(m.loadLookat(ex, ey, ez, tx, ty, tz, ux, uy, uz));
     }
 
-    //! \brief ƒrƒ…[•ÏŠ·‚ğæ‚¶‚½Œ‹‰Ê‚ğ•Ô‚·.
-    //!   \param e ‹“_‚ÌˆÊ’u‚Ì”z—ñ•Ï”.
-    //!   \param t –Ú•W“_‚ÌˆÊ’u‚Ì”z—ñ•Ï”.
-    //!   \param u ã•ûŒü‚ÌƒxƒNƒgƒ‹‚Ì‚Ì”z—ñ•Ï”.
-    //!   \return ƒrƒ…[•ÏŠ·s—ñ‚ğæ‚¶‚½•ÏŠ·s—ñ.
+    //! \brief ãƒ“ãƒ¥ãƒ¼å¤‰æ›ã‚’ä¹—ã˜ãŸçµæœã‚’è¿”ã™.
+    //!   \param e è¦–ç‚¹ã®ä½ç½®ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 3 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \param t ç›®æ¨™ç‚¹ã®ä½ç½®ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 3 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \param u ä¸Šæ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 3 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \return ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã‚’ä¹—ã˜ãŸå¤‰æ›è¡Œåˆ—.
     GgMatrix lookat(const GLfloat *e, const GLfloat *t, const GLfloat *u) const
     {
       return lookat(e[0], e[1], e[2], t[0], t[1], t[2], u[0], u[1], u[2]);
     }
 
-    //! \brief ’¼Œğ“Š‰e•ÏŠ·‚ğæ‚¶‚½Œ‹‰Ê‚ğ•Ô‚·.
-    //!   \param left ƒEƒBƒ“ƒhƒE‚Ì¶’[‚ÌˆÊ’u.
-    //!   \param right ƒEƒBƒ“ƒhƒE‚Ì‰E’[‚ÌˆÊ’u.
-    //!   \param bottom ƒEƒBƒ“ƒhƒE‚Ì‰º’[‚ÌˆÊ’u.
-    //!   \param top ƒEƒBƒ“ƒhƒE‚Ìã’[‚ÌˆÊ’u.
-    //!   \param zNear ‹“_‚©‚ç‘O•û–Ê‚Ü‚Å‚ÌˆÊ’u.
-    //!   \param zFar ‹“_‚©‚çŒã•û–Ê‚Ü‚Å‚ÌˆÊ’u.
-    //!   \return ’¼Œğ“Š‰e•ÏŠ·s—ñ‚ğæ‚¶‚½•ÏŠ·s—ñ.
+    //! \brief ãƒ“ãƒ¥ãƒ¼å¤‰æ›ã‚’ä¹—ã˜ãŸçµæœã‚’è¿”ã™.
+    //!   \param e è¦–ç‚¹ã®ä½ç½®ã‚’æ ¼ç´ã—ãŸ GgVector å‹ã®å¤‰æ•°.
+    //!   \param t ç›®æ¨™ç‚¹ã®ä½ç½®ã‚’æ ¼ç´ã—ãŸ GgVector å‹ã®å¤‰æ•°.
+    //!   \param u ä¸Šæ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’æ ¼ç´ã—ãŸ GgVector å‹ã®å¤‰æ•°.
+    //!   \return ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã‚’ä¹—ã˜ãŸå¤‰æ›è¡Œåˆ—.
+    GgMatrix lookat(const GgVector &e, const GgVector &t, const GgVector &u) const
+    {
+      return lookat(e[0], e[1], e[2], t[0], t[1], t[2], u[0], u[1], u[2]);
+    }
+
+    //! \brief ç›´äº¤æŠ•å½±å¤‰æ›ã‚’ä¹—ã˜ãŸçµæœã‚’è¿”ã™.
+    //!   \param left ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å·¦ç«¯ã®ä½ç½®.
+    //!   \param right ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å³ç«¯ã®ä½ç½®.
+    //!   \param bottom ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä¸‹ç«¯ã®ä½ç½®.
+    //!   \param top ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä¸Šç«¯ã®ä½ç½®.
+    //!   \param zNear è¦–ç‚¹ã‹ã‚‰å‰æ–¹é¢ã¾ã§ã®ä½ç½®.
+    //!   \param zFar è¦–ç‚¹ã‹ã‚‰å¾Œæ–¹é¢ã¾ã§ã®ä½ç½®.
+    //!   \return ç›´äº¤æŠ•å½±å¤‰æ›è¡Œåˆ—ã‚’ä¹—ã˜ãŸå¤‰æ›è¡Œåˆ—.
     GgMatrix orthogonal(GLfloat left, GLfloat right,
       GLfloat bottom, GLfloat top,
       GLfloat zNear, GLfloat zFar) const
@@ -2077,14 +2281,14 @@ namespace gg
       return multiply(m.loadOrthogonal(left, right, bottom, top, zNear, zFar));
     }
 
-    //! \brief “§‹“Š‰e•ÏŠ·‚ğæ‚¶‚½Œ‹‰Ê‚ğ•Ô‚·.
-    //!   \param left ƒEƒBƒ“ƒhƒE‚Ì¶’[‚ÌˆÊ’u.
-    //!   \param right ƒEƒBƒ“ƒhƒE‚Ì‰E’[‚ÌˆÊ’u.
-    //!   \param bottom ƒEƒBƒ“ƒhƒE‚Ì‰º’[‚ÌˆÊ’u.
-    //!   \param top ƒEƒBƒ“ƒhƒE‚Ìã’[‚ÌˆÊ’u.
-    //!   \param zNear ‹“_‚©‚ç‘O•û–Ê‚Ü‚Å‚ÌˆÊ’u.
-    //!   \param zFar ‹“_‚©‚çŒã•û–Ê‚Ü‚Å‚ÌˆÊ’u.
-    //!   \return “§‹“Š‰e•ÏŠ·s—ñ‚ğæ‚¶‚½•ÏŠ·s—ñ.
+    //! \brief é€è¦–æŠ•å½±å¤‰æ›ã‚’ä¹—ã˜ãŸçµæœã‚’è¿”ã™.
+    //!   \param left ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å·¦ç«¯ã®ä½ç½®.
+    //!   \param right ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å³ç«¯ã®ä½ç½®.
+    //!   \param bottom ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä¸‹ç«¯ã®ä½ç½®.
+    //!   \param top ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä¸Šç«¯ã®ä½ç½®.
+    //!   \param zNear è¦–ç‚¹ã‹ã‚‰å‰æ–¹é¢ã¾ã§ã®ä½ç½®.
+    //!   \param zFar è¦–ç‚¹ã‹ã‚‰å¾Œæ–¹é¢ã¾ã§ã®ä½ç½®.
+    //!   \return é€è¦–æŠ•å½±å¤‰æ›è¡Œåˆ—ã‚’ä¹—ã˜ãŸå¤‰æ›è¡Œåˆ—.
     GgMatrix frustum(GLfloat left, GLfloat right,
       GLfloat bottom, GLfloat top,
       GLfloat zNear, GLfloat zFar) const
@@ -2093,12 +2297,12 @@ namespace gg
       return multiply(m.loadFrustum(left, right, bottom, top, zNear, zFar));
     }
 
-    //! \brief ‰æŠp‚ğw’è‚µ‚Ä“§‹“Š‰e•ÏŠ·‚ğæ‚¶‚½Œ‹‰Ê‚ğ•Ô‚·.
-    //!   \param fovy y •ûŒü‚Ì‰æŠp.
-    //!   \param aspect c‰¡”ä.
-    //!   \param zNear ‹“_‚©‚ç‘O•û–Ê‚Ü‚Å‚ÌˆÊ’u.
-    //!   \param zFar ‹“_‚©‚çŒã•û–Ê‚Ü‚Å‚ÌˆÊ’u.
-    //!   \return “§‹“Š‰e•ÏŠ·s—ñ‚ğæ‚¶‚½•ÏŠ·s—ñ.
+    //! \brief ç”»è§’ã‚’æŒ‡å®šã—ã¦é€è¦–æŠ•å½±å¤‰æ›ã‚’ä¹—ã˜ãŸçµæœã‚’è¿”ã™.
+    //!   \param fovy y æ–¹å‘ã®ç”»è§’.
+    //!   \param aspect ç¸¦æ¨ªæ¯”.
+    //!   \param zNear è¦–ç‚¹ã‹ã‚‰å‰æ–¹é¢ã¾ã§ã®ä½ç½®.
+    //!   \param zFar è¦–ç‚¹ã‹ã‚‰å¾Œæ–¹é¢ã¾ã§ã®ä½ç½®.
+    //!   \return é€è¦–æŠ•å½±å¤‰æ›è¡Œåˆ—ã‚’ä¹—ã˜ãŸå¤‰æ›è¡Œåˆ—.
     GgMatrix perspective(GLfloat fovy, GLfloat aspect,
       GLfloat zNear, GLfloat zFar) const
     {
@@ -2106,213 +2310,312 @@ namespace gg
       return multiply(m.loadPerspective(fovy, aspect, zNear, zFar));
     }
 
-    //! \brief “]’us—ñ‚ğ•Ô‚·.
-    //!   \return “]’us—ñ.
+    //! \brief è»¢ç½®è¡Œåˆ—ã‚’è¿”ã™.
+    //!   \return è»¢ç½®è¡Œåˆ—.
     GgMatrix transpose() const
     {
       GgMatrix t;
       return t.loadTranspose(*this);
     }
 
-    //! \brief ‹ts—ñ‚ğ•Ô‚·.
-    //!   \return ‹ts—ñ.
+    //! \brief é€†è¡Œåˆ—ã‚’è¿”ã™.
+    //!   \return é€†è¡Œåˆ—.
     GgMatrix invert() const
     {
       GgMatrix t;
       return t.loadInvert(*this);
     }
 
-    //! \brief –@ü•ÏŠ·s—ñ‚ğ•Ô‚·.
-    //!   \return –@ü•ÏŠ·s—ñ.
+    //! \brief æ³•ç·šå¤‰æ›è¡Œåˆ—ã‚’è¿”ã™.
+    //!   \return æ³•ç·šå¤‰æ›è¡Œåˆ—.
     GgMatrix normal() const
     {
       GgMatrix t;
       return t.loadNormal(*this);
     }
 
-    //! \brief ƒxƒNƒgƒ‹‚É‘Î‚µ‚Ä“Š‰e•ÏŠ·‚ğs‚¤.
-    //!   \param c •ÏŠ·Œ‹‰Ê‚ğŠi”[‚·‚é GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
-    //!   \param v Œ³‚ÌƒxƒNƒgƒ‹‚Ì GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
+    //! \brief ãƒ™ã‚¯ãƒˆãƒ«ã«å¯¾ã—ã¦æŠ•å½±å¤‰æ›ã‚’è¡Œã†.
+    //!   \param c å¤‰æ›çµæœã‚’æ ¼ç´ã™ã‚‹ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \param v å…ƒã®ãƒ™ã‚¯ãƒˆãƒ«ã® GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
     void projection(GLfloat *c, const GLfloat *v) const
     {
       projection(c, array.data(), v);
     }
 
-    //! \brief ƒxƒNƒgƒ‹‚É‘Î‚µ‚Ä“Š‰e•ÏŠ·‚ğs‚¤.
-    //!   \param c •ÏŠ·Œ‹‰Ê‚ğŠi”[‚·‚é GgVector Œ^‚Ì•Ï”.
-    //!   \param v Œ³‚ÌƒxƒNƒgƒ‹‚Ì GgVector Œ^‚Ì•Ï”.
+    //! \brief ãƒ™ã‚¯ãƒˆãƒ«ã«å¯¾ã—ã¦æŠ•å½±å¤‰æ›ã‚’è¡Œã†.
+    //!   \param c å¤‰æ›çµæœã‚’æ ¼ç´ã™ã‚‹ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \param v å…ƒã®ãƒ™ã‚¯ãƒˆãƒ«ã® GgVector å‹ã®å¤‰æ•°.
+    void projection(GLfloat *c, const GgVector &v) const
+    {
+      projection(c, v.data());
+    }
+
+    //! \brief ãƒ™ã‚¯ãƒˆãƒ«ã«å¯¾ã—ã¦æŠ•å½±å¤‰æ›ã‚’è¡Œã†.
+    //!   \param c å¤‰æ›çµæœã‚’æ ¼ç´ã™ã‚‹ GgVector å‹ã®å¤‰æ•°.
+    //!   \param v å…ƒã®ãƒ™ã‚¯ãƒˆãƒ«ã® GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    void projection(GgVector &c, const GLfloat *v) const
+    {
+      projection(c.data(), v);
+    }
+
+    //! \brief ãƒ™ã‚¯ãƒˆãƒ«ã«å¯¾ã—ã¦æŠ•å½±å¤‰æ›ã‚’è¡Œã†.
+    //!   \param c å¤‰æ›çµæœã‚’æ ¼ç´ã™ã‚‹ GgVector å‹ã®å¤‰æ•°.
+    //!   \param v å…ƒã®ãƒ™ã‚¯ãƒˆãƒ«ã® GgVector å‹ã®å¤‰æ•°.
     void projection(GgVector &c, const GgVector &v) const
     {
       projection(c.data(), v.data());
     }
 
-    //! \brief •ÏŠ·s—ñ‚ğæ‚èo‚·.
-    //!   \return •ÏŠ·s—ñ‚ğŠi”[‚µ‚½ GLfloat Œ^‚Ì 16 —v‘f‚Ì”z—ñ.
+    //! \brief ãƒ™ã‚¯ãƒˆãƒ«ã«å¯¾ã—ã¦æŠ•å½±å¤‰æ›ã‚’è¡Œã†.
+    //!   \param v å…ƒã®ãƒ™ã‚¯ãƒˆãƒ«ã® GgVector å‹ã®å¤‰æ•°.
+    //!   \return c å¤‰æ›çµæœã® GgVector å‹ã®å€¤.
+    GgVector operator*(const GgVector &v) const
+    {
+      GgVector c;
+      projection(c, v);
+      return c;
+    }
+
+    //! \brief å¤‰æ›è¡Œåˆ—ã‚’å–ã‚Šå‡ºã™.
+    //!   \return å¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°.
     const GLfloat *get() const
     {
       return array.data();
     }
 
-    //! \brief •ÏŠ·s—ñ‚ğæ‚èo‚·.
-    //!   \param a •ÏŠ·s—ñ‚ğŠi”[‚·‚é GLfloat Œ^‚Ì 16 —v‘f‚Ì”z—ñ.
+    //! \brief å¤‰æ›è¡Œåˆ—ã‚’å–ã‚Šå‡ºã™.
+    //!   \param a å¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹ GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°.
     void get(GLfloat *a) const
     {
       for (int i = 0; i < 16; ++i) a[i] = array[i];
     }
+
+    //! \brief å¤‰æ›è¡Œåˆ—ã®è¦ç´ ã‚’å–ã‚Šå‡ºã™.
+    //!   \return å¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•° ã® i ç•ªç›®ã®è¦ç´ .
+    GLfloat get(int i) const
+    {
+      return array[i];
+    }
+
+    //! \brief å¤‰æ›è¡Œåˆ—ã®è¦ç´ ã«ã‚¢ã‚¯ã‚»ã‚¹ã™ã‚‹.
+    //!   \return å¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•° ã® i ç•ªç›®ã®è¦ç´ ã®å‚ç…§.
+    const GLfloat &operator[](std::size_t i) const
+    {
+      return array[i];
+    }
+
+    //! \brief å¤‰æ›è¡Œåˆ—ã®è¦ç´ ã«ã‚¢ã‚¯ã‚»ã‚¹ã™ã‚‹.
+    //!   \return å¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•° ã® i ç•ªç›®ã®è¦ç´ ã®å‚ç…§.
+    GLfloat &operator[](std::size_t i)
+    {
+      return array[i];
+    }
   };
 
-  //! \brief ’PˆÊs—ñ‚ğ•Ô‚·.
-  //!   \return ’PˆÊs—ñ
+  //! \brief å˜ä½è¡Œåˆ—ã‚’è¿”ã™.
+  //!   \return å˜ä½è¡Œåˆ—
   inline GgMatrix ggIdentity()
   {
     GgMatrix t;
     return t.loadIdentity();
   };
 
-  //! \brief •½sˆÚ“®‚Ì•ÏŠ·s—ñ‚ğ•Ô‚·.
-  //!   \param x x •ûŒü‚ÌˆÚ“®—Ê.
-  //!   \param y y •ûŒü‚ÌˆÚ“®—Ê.
-  //!   \param z z •ûŒü‚ÌˆÚ“®—Ê.
-  //!   \param w ˆÚ“®—Ê‚ÌƒXƒP[ƒ‹ƒtƒ@ƒNƒ^ (= 1.0f).
-  //!   \return •½sˆÚ“®‚Ì•ÏŠ·s—ñ.
+  //! \brief å¹³è¡Œç§»å‹•ã®å¤‰æ›è¡Œåˆ—ã‚’è¿”ã™.
+  //!   \param x x æ–¹å‘ã®ç§»å‹•é‡.
+  //!   \param y y æ–¹å‘ã®ç§»å‹•é‡.
+  //!   \param z z æ–¹å‘ã®ç§»å‹•é‡.
+  //!   \param w ç§»å‹•é‡ã®ã‚¹ã‚±ãƒ¼ãƒ«ãƒ•ã‚¡ã‚¯ã‚¿ (= 1.0f).
+  //!   \return å¹³è¡Œç§»å‹•ã®å¤‰æ›è¡Œåˆ—.
   inline GgMatrix ggTranslate(GLfloat x, GLfloat y, GLfloat z, GLfloat w = 1.0f)
   {
     GgMatrix m;
     return m.loadTranslate(x, y, z, w);
   }
 
-  //! \brief •½sˆÚ“®‚Ì•ÏŠ·s—ñ‚ğ•Ô‚·.
-  //!   \param t ˆÚ“®—Ê‚Ì GLfloat Œ^‚Ì”z—ñ (x, y, z).
-  //!   \return •½sˆÚ“®‚Ì•ÏŠ·s—ñ
+  //! \brief å¹³è¡Œç§»å‹•ã®å¤‰æ›è¡Œåˆ—ã‚’è¿”ã™.
+  //!   \param t ç§»å‹•é‡ã® GLfloat å‹ã® 3 è¦ç´ ã®é…åˆ—å¤‰æ•° (x, y, z).
+  //!   \return å¹³è¡Œç§»å‹•ã®å¤‰æ›è¡Œåˆ—
   inline GgMatrix ggTranslate(const GLfloat *t)
   {
     GgMatrix m;
     return m.loadTranslate(t[0], t[1], t[2]);
   }
 
-  //! \brief Šg‘åk¬‚Ì•ÏŠ·s—ñ‚ğ•Ô‚·.
-  //!   \param x x •ûŒü‚ÌŠg‘å—¦.
-  //!   \param y y •ûŒü‚ÌŠg‘å—¦.
-  //!   \param z z •ûŒü‚ÌŠg‘å—¦.
-  //!   \param w Šg‘å—¦‚ÌƒXƒP[ƒ‹ƒtƒ@ƒNƒ^ (= 1.0f).
-  //!   \return Šg‘åk¬‚Ì•ÏŠ·s—ñ.
+  //! \brief å¹³è¡Œç§»å‹•ã®å¤‰æ›è¡Œåˆ—ã‚’è¿”ã™.
+  //!   \param t ç§»å‹•é‡ã® GgVector å‹ã®å¤‰æ•°.
+  //!   \return å¹³è¡Œç§»å‹•ã®å¤‰æ›è¡Œåˆ—
+  inline GgMatrix ggTranslate(const GgVector &t)
+  {
+    GgMatrix m;
+    return m.loadTranslate(t[0], t[1], t[2], t[3]);
+  }
+
+  //! \brief æ‹¡å¤§ç¸®å°ã®å¤‰æ›è¡Œåˆ—ã‚’è¿”ã™.
+  //!   \param x x æ–¹å‘ã®æ‹¡å¤§ç‡.
+  //!   \param y y æ–¹å‘ã®æ‹¡å¤§ç‡.
+  //!   \param z z æ–¹å‘ã®æ‹¡å¤§ç‡.
+  //!   \param w æ‹¡å¤§ç‡ã®ã‚¹ã‚±ãƒ¼ãƒ«ãƒ•ã‚¡ã‚¯ã‚¿ (= 1.0f).
+  //!   \return æ‹¡å¤§ç¸®å°ã®å¤‰æ›è¡Œåˆ—.
   inline GgMatrix ggScale(GLfloat x, GLfloat y, GLfloat z, GLfloat w = 1.0f)
   {
     GgMatrix m;
     return m.loadScale(x, y, z, w);
   }
 
-  //! \brief Šg‘åk¬‚Ì•ÏŠ·s—ñ‚ğ•Ô‚·.
-  //!   \param s Šg‘å—¦‚Ì GLfloat Œ^‚Ì”z—ñ (x, y, z).
-  //!   \return Šg‘åk¬‚Ì•ÏŠ·s—ñ.
+  //! \brief æ‹¡å¤§ç¸®å°ã®å¤‰æ›è¡Œåˆ—ã‚’è¿”ã™.
+  //!   \param s æ‹¡å¤§ç‡ã® GLfloat å‹ã® 3 è¦ç´ ã®é…åˆ—å¤‰æ•° (x, y, z).
+  //!   \return æ‹¡å¤§ç¸®å°ã®å¤‰æ›è¡Œåˆ—.
   inline GgMatrix ggScale(const GLfloat *s)
   {
     GgMatrix m;
     return m.loadScale(s[0], s[1], s[2]);
   }
 
-  //! \brief x ²’†S‚Ì‰ñ“]‚Ì•ÏŠ·s—ñ‚ğ•Ô‚·.
-  //!   \param a ‰ñ“]Šp.
-  //!   \return x ²’†S‚É a ‚¾‚¯‰ñ“]‚·‚é•ÏŠ·s—ñ.
+  //! \brief æ‹¡å¤§ç¸®å°ã®å¤‰æ›è¡Œåˆ—ã‚’è¿”ã™.
+  //!   \param s æ‹¡å¤§ç‡ã® GgVector å‹ã®å¤‰æ•°.
+  //!   \return æ‹¡å¤§ç¸®å°ã®å¤‰æ›è¡Œåˆ—.
+  inline GgMatrix ggScale(const GgVector &s)
+  {
+    GgMatrix m;
+    return m.loadScale(s[0], s[1], s[2], s[3]);
+  }
+
+  //! \brief x è»¸ä¸­å¿ƒã®å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’è¿”ã™.
+  //!   \param a å›è»¢è§’.
+  //!   \return x è»¸ä¸­å¿ƒã« a ã ã‘å›è»¢ã™ã‚‹å¤‰æ›è¡Œåˆ—.
   inline GgMatrix ggRotateX(GLfloat a)
   {
     GgMatrix m;
     return m.loadRotateX(a);
   }
 
-  //! \brief y ²’†S‚Ì‰ñ“]‚Ì•ÏŠ·s—ñ‚ğ•Ô‚·.
-  //!   \param a ‰ñ“]Šp.
-  //!   \return y ²’†S‚É a ‚¾‚¯‰ñ“]‚·‚é•ÏŠ·s—ñ.
+  //! \brief y è»¸ä¸­å¿ƒã®å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’è¿”ã™.
+  //!   \param a å›è»¢è§’.
+  //!   \return y è»¸ä¸­å¿ƒã« a ã ã‘å›è»¢ã™ã‚‹å¤‰æ›è¡Œåˆ—.
   inline GgMatrix ggRotateY(GLfloat a)
   {
     GgMatrix m;
     return m.loadRotateY(a);
   }
 
-  //! \brief z ²’†S‚Ì‰ñ“]‚Ì•ÏŠ·s—ñ‚ğ•Ô‚·.
-  //!   \param a ‰ñ“]Šp.
-  //!   \return z ²’†S‚É a ‚¾‚¯‰ñ“]‚·‚é•ÏŠ·s—ñ.
+  //! \brief z è»¸ä¸­å¿ƒã®å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’è¿”ã™.
+  //!   \param a å›è»¢è§’.
+  //!   \return z è»¸ä¸­å¿ƒã« a ã ã‘å›è»¢ã™ã‚‹å¤‰æ›è¡Œåˆ—.
   inline GgMatrix ggRotateZ(GLfloat a)
   {
     GgMatrix m;
     return m.loadRotateZ(a);
   }
 
-  //! \brief (x, y, z) •ûŒü‚ÌƒxƒNƒgƒ‹‚ğ²‚Æ‚·‚é‰ñ“]‚Ì•ÏŠ·s—ñ‚ğæ‚¶‚½Œ‹‰Ê‚ğ•Ô‚·.
-  //!   \param x ‰ñ“]²‚Ì x ¬•ª.
-  //!   \param y ‰ñ“]²‚Ì y ¬•ª.
-  //!   \param z ‰ñ“]²‚Ì z ¬•ª.
-  //!   \param a ‰ñ“]Šp.
-  //!   \return (x, y, z) ‚ğ²‚É‚³‚ç‚É a ‰ñ“]‚·‚é•ÏŠ·s—ñ.
+  //! \brief (x, y, z) æ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è»¸ã¨ã™ã‚‹å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’ä¹—ã˜ãŸçµæœã‚’è¿”ã™.
+  //!   \param x å›è»¢è»¸ã® x æˆåˆ†.
+  //!   \param y å›è»¢è»¸ã® y æˆåˆ†.
+  //!   \param z å›è»¢è»¸ã® z æˆåˆ†.
+  //!   \param a å›è»¢è§’.
+  //!   \return (x, y, z) ã‚’è»¸ã«ã•ã‚‰ã« a å›è»¢ã™ã‚‹å¤‰æ›è¡Œåˆ—.
   inline GgMatrix ggRotate(GLfloat x, GLfloat y, GLfloat z, GLfloat a)
   {
     GgMatrix m;
     return m.loadRotate(x, y, z, a);
   }
 
-  //! \brief r •ûŒü‚ÌƒxƒNƒgƒ‹‚ğ²‚Æ‚·‚é‰ñ“]‚Ì•ÏŠ·s—ñ‚ğæ‚¶‚½Œ‹‰Ê‚ğ•Ô‚·.
-  //!   \param r ‰ñ“]²‚ÌƒxƒNƒgƒ‹‚ğ•\‚· GLfloat Œ^‚Ì 3 —v‘f‚Ì”z—ñ.
-  //!   \param a ‰ñ“]Šp.
-  //!   \return r ‚ğ²‚É a ‚¾‚¯‰ñ“]‚·‚é•ÏŠ·s—ñ.
+  //! \brief r æ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è»¸ã¨ã™ã‚‹å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’ä¹—ã˜ãŸçµæœã‚’è¿”ã™.
+  //!   \param r å›è»¢è»¸ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¡¨ã™ GLfloat å‹ã® 3 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+  //!   \param a å›è»¢è§’.
+  //!   \return r ã‚’è»¸ã« a ã ã‘å›è»¢ã™ã‚‹å¤‰æ›è¡Œåˆ—.
   inline GgMatrix ggRotate(const GLfloat *r, GLfloat a)
   {
     GgMatrix m;
     return m.loadRotate(r[0], r[1], r[2], a);
   }
 
-  //! \brief r •ûŒü‚ÌƒxƒNƒgƒ‹‚ğ²‚Æ‚·‚é‰ñ“]‚Ì•ÏŠ·s—ñ‚ğæ‚¶‚½Œ‹‰Ê‚ğ•Ô‚·.
-  //!   \param r ‰ñ“]²‚ÌƒxƒNƒgƒ‹‚Æ‰ñ“]Šp‚ğ•\‚· GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
-  //!   \return (r[0], r[1], r[2]) ‚ğ²‚É r[3] ‚¾‚¯‰ñ“]‚·‚é•ÏŠ·s—ñ.
+  //! \brief r æ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è»¸ã¨ã™ã‚‹å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’ä¹—ã˜ãŸçµæœã‚’è¿”ã™.
+  //!   \param r å›è»¢è»¸ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¡¨ã™ GgVector å‹ã®å¤‰æ•°.
+  //!   \param a å›è»¢è§’.
+  //!   \return r ã‚’è»¸ã« a ã ã‘å›è»¢ã™ã‚‹å¤‰æ›è¡Œåˆ—.
+  inline GgMatrix ggRotate(const GgVector &r, GLfloat a)
+  {
+    GgMatrix m;
+    return m.loadRotate(r[0], r[1], r[2], a);
+  }
+
+  //! \brief r æ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è»¸ã¨ã™ã‚‹å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’ä¹—ã˜ãŸçµæœã‚’è¿”ã™.
+  //!   \param r å›è»¢è»¸ã®ãƒ™ã‚¯ãƒˆãƒ«ã¨å›è»¢è§’ã‚’è¡¨ã™ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+  //!   \return (r[0], r[1], r[2]) ã‚’è»¸ã« r[3] ã ã‘å›è»¢ã™ã‚‹å¤‰æ›è¡Œåˆ—.
   inline GgMatrix ggRotate(const GLfloat *r)
   {
     GgMatrix m;
     return m.loadRotate(r[0], r[1], r[2], r[3]);
   }
 
-  //! \brief ƒrƒ…[•ÏŠ·s—ñ‚ğ•Ô‚·.
-  //!   \param ex ‹“_‚ÌˆÊ’u‚Ì x À•W’l.
-  //!   \param ey ‹“_‚ÌˆÊ’u‚Ì y À•W’l.
-  //!   \param ez ‹“_‚ÌˆÊ’u‚Ì z À•W’l.
-  //!   \param tx –Ú•W“_‚ÌˆÊ’u‚Ì x À•W’l.
-  //!   \param ty –Ú•W“_‚ÌˆÊ’u‚Ì y À•W’l.
-  //!   \param tz –Ú•W“_‚ÌˆÊ’u‚Ì z À•W’l.
-  //!   \param ux ã•ûŒü‚ÌƒxƒNƒgƒ‹‚Ì x ¬•ª.
-  //!   \param uy ã•ûŒü‚ÌƒxƒNƒgƒ‹‚Ì y ¬•ª.
-  //!   \param uz ã•ûŒü‚ÌƒxƒNƒgƒ‹‚Ì z ¬•ª.
-  //!   \return ‹‚ß‚½ƒrƒ…[•ÏŠ·s—ñ.
+  //! \brief r æ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è»¸ã¨ã™ã‚‹å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’ä¹—ã˜ãŸçµæœã‚’è¿”ã™.
+  //!   \param r å›è»¢è»¸ã®ãƒ™ã‚¯ãƒˆãƒ«ã¨å›è»¢è§’ã‚’è¡¨ã™ GgVector å‹ã®å¤‰æ•°.
+  //!   \return (r[0], r[1], r[2]) ã‚’è»¸ã« r[3] ã ã‘å›è»¢ã™ã‚‹å¤‰æ›è¡Œåˆ—.
+  inline GgMatrix ggRotate(const GgVector &r)
+  {
+    GgMatrix m;
+    return m.loadRotate(r[0], r[1], r[2], r[3]);
+  }
+
+  //! \brief ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã‚’è¿”ã™.
+  //!   \param ex è¦–ç‚¹ã®ä½ç½®ã® x åº§æ¨™å€¤.
+  //!   \param ey è¦–ç‚¹ã®ä½ç½®ã® y åº§æ¨™å€¤.
+  //!   \param ez è¦–ç‚¹ã®ä½ç½®ã® z åº§æ¨™å€¤.
+  //!   \param tx ç›®æ¨™ç‚¹ã®ä½ç½®ã® x åº§æ¨™å€¤.
+  //!   \param ty ç›®æ¨™ç‚¹ã®ä½ç½®ã® y åº§æ¨™å€¤.
+  //!   \param tz ç›®æ¨™ç‚¹ã®ä½ç½®ã® z åº§æ¨™å€¤.
+  //!   \param ux ä¸Šæ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã® x æˆåˆ†.
+  //!   \param uy ä¸Šæ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã® y æˆåˆ†.
+  //!   \param uz ä¸Šæ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã® z æˆåˆ†.
+  //!   \return æ±‚ã‚ãŸãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—.
   inline GgMatrix ggLookat(
-    GLfloat ex, GLfloat ey, GLfloat ez,     // ‹“_‚ÌˆÊ’u
-    GLfloat tx, GLfloat ty, GLfloat tz,     // –Ú•W“_‚ÌˆÊ’u
-    GLfloat ux, GLfloat uy, GLfloat uz      // ã•ûŒü‚ÌƒxƒNƒgƒ‹
+    GLfloat ex, GLfloat ey, GLfloat ez,     // è¦–ç‚¹ã®ä½ç½®
+    GLfloat tx, GLfloat ty, GLfloat tz,     // ç›®æ¨™ç‚¹ã®ä½ç½®
+    GLfloat ux, GLfloat uy, GLfloat uz      // ä¸Šæ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«
   )
   {
     GgMatrix m;
     return m.loadLookat(ex, ey, ez, tx, ty, tz, ux, uy, uz);
   }
 
-  //! \brief ƒrƒ…[•ÏŠ·s—ñ‚ğ•Ô‚·.
-  //!   \param e ‹“_‚ÌˆÊ’u‚Ì”z—ñ•Ï”.
-  //!   \param t –Ú•W“_‚ÌˆÊ’u‚Ì”z—ñ•Ï”.
-  //!   \param u ã•ûŒü‚ÌƒxƒNƒgƒ‹‚Ì‚Ì”z—ñ•Ï”.
-  //!   \return ‹‚ß‚½ƒrƒ…[•ÏŠ·s—ñ.
+  //! \brief ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã‚’è¿”ã™.
+  //!   \param e è¦–ç‚¹ã®ä½ç½®ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 3 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+  //!   \param t ç›®æ¨™ç‚¹ã®ä½ç½®ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 3 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+  //!   \param u ä¸Šæ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 3 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+  //!   \return æ±‚ã‚ãŸãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—.
   inline GgMatrix ggLookat(
-    const GLfloat *e,                       // ‹“_‚ÌˆÊ’u
-    const GLfloat *t,                       // –Ú•W“_‚ÌˆÊ’u
-    const GLfloat *u                        // ã•ûŒü‚ÌƒxƒNƒgƒ‹
+    const GLfloat *e,                       // è¦–ç‚¹ã®ä½ç½®
+    const GLfloat *t,                       // ç›®æ¨™ç‚¹ã®ä½ç½®
+    const GLfloat *u                        // ä¸Šæ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«
   )
   {
     GgMatrix m;
     return m.loadLookat(e[0], e[1], e[2], t[0], t[1], t[2], u[0], u[1], u[2]);
   }
 
-  //! \brief ’¼Œğ“Š‰e•ÏŠ·s—ñ‚ğ•Ô‚·.
-  //!   \param left ƒEƒBƒ“ƒhƒE‚Ì¶’[‚ÌˆÊ’u.
-  //!   \param right ƒEƒBƒ“ƒhƒE‚Ì‰E’[‚ÌˆÊ’u.
-  //!   \param bottom ƒEƒBƒ“ƒhƒE‚Ì‰º’[‚ÌˆÊ’u.
-  //!   \param top ƒEƒBƒ“ƒhƒE‚Ìã’[‚ÌˆÊ’u.
-  //!   \param zNear ‹“_‚©‚ç‘O•û–Ê‚Ü‚Å‚ÌˆÊ’u.
-  //!   \param zFar ‹“_‚©‚çŒã•û–Ê‚Ü‚Å‚ÌˆÊ’u.
-  //!   \return ‹‚ß‚½’¼Œğ“Š‰e•ÏŠ·s—ñ.
+  //! \brief ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã‚’è¿”ã™.
+  //!   \param e è¦–ç‚¹ã®ä½ç½®ã‚’æ ¼ç´ã—ãŸ GgVector å‹ã®å¤‰æ•°.
+  //!   \param t ç›®æ¨™ç‚¹ã®ä½ç½®ã‚’æ ¼ç´ã—ãŸ GgVector å‹ã®å¤‰æ•°.
+  //!   \param u ä¸Šæ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’æ ¼ç´ã—ãŸ GgVector å‹ã®å¤‰æ•°.
+  //!   \return æ±‚ã‚ãŸãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—.
+  inline GgMatrix ggLookat(
+    const GgVector &e,                      // è¦–ç‚¹ã®ä½ç½®
+    const GgVector &t,                      // ç›®æ¨™ç‚¹ã®ä½ç½®
+    const GgVector &u                       // ä¸Šæ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«
+  )
+  {
+    GgMatrix m;
+    return m.loadLookat(e[0], e[1], e[2], t[0], t[1], t[2], u[0], u[1], u[2]);
+  }
+
+  //! \brief ç›´äº¤æŠ•å½±å¤‰æ›è¡Œåˆ—ã‚’è¿”ã™.
+  //!   \param left ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å·¦ç«¯ã®ä½ç½®.
+  //!   \param right ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å³ç«¯ã®ä½ç½®.
+  //!   \param bottom ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä¸‹ç«¯ã®ä½ç½®.
+  //!   \param top ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä¸Šç«¯ã®ä½ç½®.
+  //!   \param zNear è¦–ç‚¹ã‹ã‚‰å‰æ–¹é¢ã¾ã§ã®ä½ç½®.
+  //!   \param zFar è¦–ç‚¹ã‹ã‚‰å¾Œæ–¹é¢ã¾ã§ã®ä½ç½®.
+  //!   \return æ±‚ã‚ãŸç›´äº¤æŠ•å½±å¤‰æ›è¡Œåˆ—.
   inline GgMatrix ggOrthogonal(GLfloat left, GLfloat right,
     GLfloat bottom, GLfloat top,
     GLfloat zNear, GLfloat zFar)
@@ -2321,14 +2624,14 @@ namespace gg
     return m.loadOrthogonal(left, right, bottom, top, zNear, zFar);
   }
 
-  //! \brief “§‹“§‹“Š‰e•ÏŠ·s—ñ‚ğ•Ô‚·.
-  //!   \param left ƒEƒBƒ“ƒhƒE‚Ì¶’[‚ÌˆÊ’u.
-  //!   \param right ƒEƒBƒ“ƒhƒE‚Ì‰E’[‚ÌˆÊ’u.
-  //!   \param bottom ƒEƒBƒ“ƒhƒE‚Ì‰º’[‚ÌˆÊ’u.
-  //!   \param top ƒEƒBƒ“ƒhƒE‚Ìã’[‚ÌˆÊ’u.
-  //!   \param zNear ‹“_‚©‚ç‘O•û–Ê‚Ü‚Å‚ÌˆÊ’u.
-  //!   \param zFar ‹“_‚©‚çŒã•û–Ê‚Ü‚Å‚ÌˆÊ’u.
-  //!   \return ‹‚ß‚½“§‹“Š‰e•ÏŠ·s—ñ.
+  //! \brief é€è¦–é€è¦–æŠ•å½±å¤‰æ›è¡Œåˆ—ã‚’è¿”ã™.
+  //!   \param left ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å·¦ç«¯ã®ä½ç½®.
+  //!   \param right ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å³ç«¯ã®ä½ç½®.
+  //!   \param bottom ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä¸‹ç«¯ã®ä½ç½®.
+  //!   \param top ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä¸Šç«¯ã®ä½ç½®.
+  //!   \param zNear è¦–ç‚¹ã‹ã‚‰å‰æ–¹é¢ã¾ã§ã®ä½ç½®.
+  //!   \param zFar è¦–ç‚¹ã‹ã‚‰å¾Œæ–¹é¢ã¾ã§ã®ä½ç½®.
+  //!   \return æ±‚ã‚ãŸé€è¦–æŠ•å½±å¤‰æ›è¡Œåˆ—.
   inline GgMatrix ggFrustum(GLfloat left, GLfloat right,
     GLfloat bottom, GLfloat top,
     GLfloat zNear, GLfloat zFar)
@@ -2337,12 +2640,12 @@ namespace gg
     return m.loadFrustum(left, right, bottom, top, zNear, zFar);
   }
 
-  //! \brief ‰æŠp‚ğw’è‚µ‚Ä“§‹“Š‰e•ÏŠ·s—ñ‚ğ•Ô‚·.
-  //!   \param fovy y •ûŒü‚Ì‰æŠp.
-  //!   \param aspect c‰¡”ä.
-  //!   \param zNear ‹“_‚©‚ç‘O•û–Ê‚Ü‚Å‚ÌˆÊ’u.
-  //!   \param zFar ‹“_‚©‚çŒã•û–Ê‚Ü‚Å‚ÌˆÊ’u.
-  //!   \return ‹‚ß‚½“§‹“Š‰e•ÏŠ·s—ñ.
+  //! \brief ç”»è§’ã‚’æŒ‡å®šã—ã¦é€è¦–æŠ•å½±å¤‰æ›è¡Œåˆ—ã‚’è¿”ã™.
+  //!   \param fovy y æ–¹å‘ã®ç”»è§’.
+  //!   \param aspect ç¸¦æ¨ªæ¯”.
+  //!   \param zNear è¦–ç‚¹ã‹ã‚‰å‰æ–¹é¢ã¾ã§ã®ä½ç½®.
+  //!   \param zFar è¦–ç‚¹ã‹ã‚‰å¾Œæ–¹é¢ã¾ã§ã®ä½ç½®.
+  //!   \return æ±‚ã‚ãŸé€è¦–æŠ•å½±å¤‰æ›è¡Œåˆ—.
   inline GgMatrix ggPerspective(GLfloat fovy, GLfloat aspect,
     GLfloat zNear, GLfloat zFar)
   {
@@ -2350,95 +2653,102 @@ namespace gg
     return m.loadPerspective(fovy, aspect, zNear, zFar);
   }
 
-  //! \brief “]’us—ñ‚ğ•Ô‚·.
-  //!   \param m Œ³‚Ì•ÏŠ·s—ñ.
-  //!   \return m ‚Ì“]’us—ñ.
+  //! \brief è»¢ç½®è¡Œåˆ—ã‚’è¿”ã™.
+  //!   \param m å…ƒã®å¤‰æ›è¡Œåˆ—.
+  //!   \return m ã®è»¢ç½®è¡Œåˆ—.
   inline GgMatrix ggTranspose(const GgMatrix &m)
   {
     return m.transpose();
   }
 
-  //! \brief ‹ts—ñ‚ğ•Ô‚·.
-  //!   \param m Œ³‚Ì•ÏŠ·s—ñ.
-  //!   \return m ‚Ì‹ts—ñ.
+  //! \brief é€†è¡Œåˆ—ã‚’è¿”ã™.
+  //!   \param m å…ƒã®å¤‰æ›è¡Œåˆ—.
+  //!   \return m ã®é€†è¡Œåˆ—.
   inline GgMatrix ggInvert(const GgMatrix &m)
   {
     return m.invert();
   }
 
-  //! \brief –@ü•ÏŠ·s—ñ‚ğ•Ô‚·.
-  //!   \param m Œ³‚Ì•ÏŠ·s—ñ.
-  //!   \return m ‚Ì–@ü•ÏŠ·s—ñ.
+  //! \brief æ³•ç·šå¤‰æ›è¡Œåˆ—ã‚’è¿”ã™.
+  //!   \param m å…ƒã®å¤‰æ›è¡Œåˆ—.
+  //!   \return m ã®æ³•ç·šå¤‰æ›è¡Œåˆ—.
   inline GgMatrix ggNormal(const GgMatrix &m)
   {
     return m.normal();
   }
 
   /*!
-  ** \brief lŒ³”.
+  ** \brief å››å…ƒæ•°.
   */
   class GgQuaternion
   {
-    // lŒ³”‚Ì—v‘f
+    // å››å…ƒæ•°ã®è¦ç´ 
     GgVector quaternion;
 
-    // GgQuaternion Œ^‚ÌlŒ³” p ‚ÆlŒ³” q ‚ÌÏ‚ğlŒ³” r ‚É‹‚ß‚é
+    // GgQuaternion å‹ã®å››å…ƒæ•° p ã¨å››å…ƒæ•° q ã®ç©ã‚’å››å…ƒæ•° r ã«æ±‚ã‚ã‚‹
     void multiply(GLfloat *r, const GLfloat *p, const GLfloat *q) const;
 
-    // GgQuaternion Œ^‚ÌlŒ³” q ‚ª•\‚·‰ñ“]‚Ì•ÏŠ·s—ñ‚ğ m ‚É‹‚ß‚é
+    // GgQuaternion å‹ã®å››å…ƒæ•° q ãŒè¡¨ã™å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’ m ã«æ±‚ã‚ã‚‹
     void toMatrix(GLfloat *m, const GLfloat *q) const;
 
-    // ‰ñ“]‚Ì•ÏŠ·s—ñ m ‚ª•\‚·lŒ³”‚ğ q ‚É‹‚ß‚é
+    // å›è»¢ã®å¤‰æ›è¡Œåˆ— m ãŒè¡¨ã™å››å…ƒæ•°ã‚’ q ã«æ±‚ã‚ã‚‹
     void toQuaternion(GLfloat *q, const GLfloat *m) const;
 
-    // ‹…–ÊüŒ`•âŠÔ q ‚Æ r ‚ğ t ‚Å•âŠÔ‚µ‚½lŒ³”‚ğ p ‚É‹‚ß‚é
+    // çƒé¢ç·šå½¢è£œé–“ q ã¨ r ã‚’ t ã§è£œé–“ã—ãŸå››å…ƒæ•°ã‚’ p ã«æ±‚ã‚ã‚‹
     void slerp(GLfloat *p, const GLfloat *q, const GLfloat *r, GLfloat t) const;
 
   public:
 
-    //! \brief ƒfƒXƒgƒ‰ƒNƒ^.
-    ~GgQuaternion() {}
-
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
+    //! \brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
     GgQuaternion() {}
 
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    //!   \param x lŒ³”‚Ì x —v‘f.
-    //!   \param y lŒ³”‚Ì y —v‘f.
-    //!   \param z lŒ³”‚Ì z —v‘f.
-    //!   \param w lŒ³”‚Ì w —v‘f.
+    //! \brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    //!   \param x å››å…ƒæ•°ã® x è¦ç´ .
+    //!   \param y å››å…ƒæ•°ã® y è¦ç´ .
+    //!   \param z å››å…ƒæ•°ã® z è¦ç´ .
+    //!   \param w å››å…ƒæ•°ã® w è¦ç´ .
     GgQuaternion(GLfloat x, GLfloat y, GLfloat z, GLfloat w)
     {
       load(x, y, z, w);
     }
 
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    //!   \param a GLfloat Œ^‚Ì GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ‚ÉŠi”[‚µ‚½lŒ³”.
+    //! \brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    //!   \param v å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GgVector å‹ã®å¤‰æ•°.
+    GgQuaternion(const GgVector &v)
+    {
+      load(v);
+    }
+
+    //! \brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    //!   \param a å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
     GgQuaternion(const GLfloat *a)
     {
       load(a);
     }
 
-    //! \brief ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    //!   \param q GgQuaternion Œ^‚ÌlŒ³”.
+    //! \brief ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    //!   \param q GgQuaternion å‹ã®å››å…ƒæ•°.
     GgQuaternion(const GgQuaternion &q)
     {
       load(q);
     }
 
-    //! \brief lŒ³”‚Ìƒmƒ‹ƒ€‚ğ‹‚ß‚é.
-    //!   \return lŒ³”‚Ìƒmƒ‹ƒ€.
+    //! \brief ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    ~GgQuaternion() {}
+
+    //! \brief å››å…ƒæ•°ã®ãƒãƒ«ãƒ ã‚’æ±‚ã‚ã‚‹.
+    //!   \return å››å…ƒæ•°ã®ãƒãƒ«ãƒ .
     GLfloat norm() const
     {
       return ggLength4(quaternion.data());
     }
 
-    //! \brief lŒ³”‚ğŠi”[‚·‚é.
-    //!   \param x lŒ³”‚Ì x —v‘f.
-    //!   \param y lŒ³”‚Ì y —v‘f.
-    //!   \param z lŒ³”‚Ì z —v‘f.
-    //!   \param w lŒ³”‚Ì w —v‘f.
-    //!   \return İ’è‚µ‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param x å››å…ƒæ•°ã® x è¦ç´ .
+    //!   \param y å››å…ƒæ•°ã® y è¦ç´ .
+    //!   \param z å››å…ƒæ•°ã® z è¦ç´ .
+    //!   \param w å››å…ƒæ•°ã® w è¦ç´ .
+    //!   \return è¨­å®šã—ãŸå››å…ƒæ•°.
     GgQuaternion &load(GLfloat x, GLfloat y, GLfloat z, GLfloat w)
     {
       quaternion[0] = x;
@@ -2448,28 +2758,37 @@ namespace gg
       return *this;
     }
 
-    //! \brief lŒ³”‚ğŠi”[‚·‚é.
-    //!   \param a GLfloat Œ^‚Ì GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ‚ÉŠi”[‚µ‚½lŒ³”.
-    //!   \return İ’è‚µ‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param v å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GgVector å‹ã®å¤‰æ•°.
+    //!   \return è¨­å®šã—ãŸå››å…ƒæ•°.
+    GgQuaternion &load(const GgVector &v)
+    {
+      quaternion = v;
+      return *this;
+    }
+
+    //! \brief å››å…ƒæ•°ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param a å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \return è¨­å®šã—ãŸå››å…ƒæ•°.
     GgQuaternion &load(const GLfloat *a)
     {
       return load(a[0], a[1], a[2], a[3]);
     }
 
-    //! \brief lŒ³”‚ğŠi”[‚·‚é.
-    //!   \param q GgQuaternion Œ^‚ÌlŒ³”.
-    //!   \return İ’è‚µ‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param q GgQuaternion å‹ã®å››å…ƒæ•°.
+    //!   \return è¨­å®šã—ãŸå››å…ƒæ•°.
     GgQuaternion &load(const GgQuaternion &q)
     {
-      return load(q.quaternion.data());
+      return load(q.quaternion);
     }
 
-    //! \brief lŒ³”‚É•Ê‚ÌlŒ³”‚ğ‰ÁZ‚µ‚½Œ‹‰Ê‚ğŠi”[‚·‚é.
-    //!   \param x ‰Á‚¦‚élŒ³”‚Ì x —v‘f.
-    //!   \param y ‰Á‚¦‚élŒ³”‚Ì y —v‘f.
-    //!   \param z ‰Á‚¦‚élŒ³”‚Ì z —v‘f.
-    //!   \param w ‰Á‚¦‚élŒ³”‚Ì w —v‘f.
-    //!   \return (x, y, z, w) ‚ğ‰Á‚¦‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã«åˆ¥ã®å››å…ƒæ•°ã‚’åŠ ç®—ã—ãŸçµæœã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param x åŠ ãˆã‚‹å››å…ƒæ•°ã® x è¦ç´ .
+    //!   \param y åŠ ãˆã‚‹å››å…ƒæ•°ã® y è¦ç´ .
+    //!   \param z åŠ ãˆã‚‹å››å…ƒæ•°ã® z è¦ç´ .
+    //!   \param w åŠ ãˆã‚‹å››å…ƒæ•°ã® w è¦ç´ .
+    //!   \return (x, y, z, w) ã‚’åŠ ãˆãŸå››å…ƒæ•°.
     GgQuaternion &loadAdd(GLfloat x, GLfloat y, GLfloat z, GLfloat w)
     {
       quaternion[0] += x;
@@ -2479,28 +2798,36 @@ namespace gg
       return *this;
     }
 
-    //! \brief lŒ³”‚É•Ê‚ÌlŒ³”‚ğ‰ÁZ‚µ‚½Œ‹‰Ê‚ğŠi”[‚·‚é.
-    //!   \param a GLfloat Œ^‚Ì GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ‚ÉŠi”[‚µ‚½lŒ³”.
-    //!   \return a ‚ğ‰Á‚¦‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã«åˆ¥ã®å››å…ƒæ•°ã‚’åŠ ç®—ã—ãŸçµæœã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param v å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GgVector å‹ã®å¤‰æ•°.
+    //!   \return v ã‚’åŠ ãˆãŸå››å…ƒæ•°.
+    GgQuaternion &loadAdd(const GgVector &v)
+    {
+      return loadAdd(v[0], v[1], v[2], v[3]);
+    }
+
+    //! \brief å››å…ƒæ•°ã«åˆ¥ã®å››å…ƒæ•°ã‚’åŠ ç®—ã—ãŸçµæœã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param a å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \return a ã‚’åŠ ãˆãŸå››å…ƒæ•°.
     GgQuaternion &loadAdd(const GLfloat *a)
     {
       return loadAdd(a[0], a[1], a[2], a[3]);
     }
 
-    //! \brief lŒ³”‚É•Ê‚ÌlŒ³”‚ğ‰ÁZ‚µ‚½Œ‹‰Ê‚ğŠi”[‚·‚é.
-    //!   \param q GgQuaternion Œ^‚ÌlŒ³”.
-    //!   \return q ‚ğ‰Á‚¦‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã«åˆ¥ã®å››å…ƒæ•°ã‚’åŠ ç®—ã—ãŸçµæœã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param q GgQuaternion å‹ã®å››å…ƒæ•°.
+    //!   \return q ã‚’åŠ ãˆãŸå››å…ƒæ•°.
     GgQuaternion &loadAdd(const GgQuaternion &q)
     {
-      return loadAdd(q.quaternion.data());
+      return loadAdd(q.quaternion);
     }
 
-    //! \brief lŒ³”‚©‚ç•Ê‚ÌlŒ³”‚ğŒ¸Z‚µ‚½Œ‹‰Ê‚ğŠi”[‚·‚é.
-    //!   \param x ˆø‚­lŒ³”‚Ì x —v‘f.
-    //!   \param y ˆø‚­lŒ³”‚Ì y —v‘f.
-    //!   \param z ˆø‚­lŒ³”‚Ì z —v‘f.
-    //!   \param w ˆø‚­lŒ³”‚Ì w —v‘f.
-    //!   \return (x, y, z, w) ‚ğˆø‚¢‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã‹ã‚‰åˆ¥ã®å››å…ƒæ•°ã‚’æ¸›ç®—ã—ãŸçµæœã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param x å¼•ãå››å…ƒæ•°ã® x è¦ç´ .
+    //!   \param y å¼•ãå››å…ƒæ•°ã® y è¦ç´ .
+    //!   \param z å¼•ãå››å…ƒæ•°ã® z è¦ç´ .
+    //!   \param w å¼•ãå››å…ƒæ•°ã® w è¦ç´ .
+    //!   \return (x, y, z, w) ã‚’å¼•ã„ãŸå››å…ƒæ•°.
     GgQuaternion &loadSubtract(GLfloat x, GLfloat y, GLfloat z, GLfloat w)
     {
       quaternion[0] -= x;
@@ -2510,84 +2837,108 @@ namespace gg
       return *this;
     }
 
-    //! \brief lŒ³”‚©‚ç•Ê‚ÌlŒ³”‚ğŒ¸Z‚µ‚½Œ‹‰Ê‚ğŠi”[‚·‚é.
-    //!   \param a GLfloat Œ^‚Ì GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ‚ÉŠi”[‚µ‚½lŒ³”.
-    //!   \return a ‚ğˆø‚¢‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã‹ã‚‰åˆ¥ã®å››å…ƒæ•°ã‚’æ¸›ç®—ã—ãŸçµæœã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param v å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GgVector å‹ã®å¤‰æ•°.
+    //!   \return v ã‚’å¼•ã„ãŸå››å…ƒæ•°.
+    GgQuaternion &loadSubtract(const GgVector &v)
+    {
+      return loadSubtract(v[0], v[1], v[2], v[3]);
+    }
+
+    //! \brief å››å…ƒæ•°ã‹ã‚‰åˆ¥ã®å››å…ƒæ•°ã‚’æ¸›ç®—ã—ãŸçµæœã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param a å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \return a ã‚’å¼•ã„ãŸå››å…ƒæ•°.
     GgQuaternion &loadSubtract(const GLfloat *a)
     {
       return loadSubtract(a[0], a[1], a[2], a[3]);
     }
 
-    //! \brief lŒ³”‚©‚ç•Ê‚ÌlŒ³”‚ğŒ¸Z‚µ‚½Œ‹‰Ê‚ğŠi”[‚·‚é.
-    //!   \param q GgQuaternion Œ^‚ÌlŒ³”.
-    //!   \return q ‚ğˆø‚¢‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã‹ã‚‰åˆ¥ã®å››å…ƒæ•°ã‚’æ¸›ç®—ã—ãŸçµæœã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param q GgQuaternion å‹ã®å››å…ƒæ•°.
+    //!   \return q ã‚’å¼•ã„ãŸå››å…ƒæ•°.
     GgQuaternion &loadSubtract(const GgQuaternion &q)
     {
-      return loadSubtract(q.quaternion.data());
+      return loadSubtract(q.quaternion);
     }
 
-    //! \brief lŒ³”‚É•Ê‚ÌlŒ³”‚ğæZ‚µ‚½Œ‹‰Ê‚ğŠi”[‚·‚é.
-    //!   \param x Š|‚¯‚élŒ³”‚Ì x —v‘f.
-    //!   \param y Š|‚¯‚élŒ³”‚Ì y —v‘f.
-    //!   \param z Š|‚¯‚élŒ³”‚Ì z —v‘f.
-    //!   \param w Š|‚¯‚élŒ³”‚Ì w —v‘f.
-    //!   \return (x, y, z, w) ‚ğŠ|‚¯‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã«åˆ¥ã®å››å…ƒæ•°ã‚’ä¹—ç®—ã—ãŸçµæœã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param x æ›ã‘ã‚‹å››å…ƒæ•°ã® x è¦ç´ .
+    //!   \param y æ›ã‘ã‚‹å››å…ƒæ•°ã® y è¦ç´ .
+    //!   \param z æ›ã‘ã‚‹å››å…ƒæ•°ã® z è¦ç´ .
+    //!   \param w æ›ã‘ã‚‹å››å…ƒæ•°ã® w è¦ç´ .
+    //!   \return (x, y, z, w) ã‚’æ›ã‘ãŸå››å…ƒæ•°.
     GgQuaternion &loadMultiply(GLfloat x, GLfloat y, GLfloat z, GLfloat w)
     {
-      const GgVector a = { x, y, z, w };
-      return loadMultiply(a.data());
+      const GLfloat a[]{ x, y, z, w };
+      return loadMultiply(a);
     }
 
-    //! \brief lŒ³”‚É•Ê‚ÌlŒ³”‚ğæZ‚µ‚½Œ‹‰Ê‚ğŠi”[‚·‚é.
-    //!   \param a GLfloat Œ^‚Ì GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ‚ÉŠi”[‚µ‚½lŒ³”.
-    //!   \return a ‚ğæ‚¶‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã«åˆ¥ã®å››å…ƒæ•°ã‚’ä¹—ç®—ã—ãŸçµæœã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param v å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GgVector å‹ã®å¤‰æ•°.
+    //!   \return v ã‚’ä¹—ã˜ãŸå››å…ƒæ•°.
+    GgQuaternion &loadMultiply(const GgVector &v)
+    {
+      return loadMultiply(v.data());
+    }
+
+    //! \brief å››å…ƒæ•°ã«åˆ¥ã®å››å…ƒæ•°ã‚’ä¹—ç®—ã—ãŸçµæœã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param a å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \return a ã‚’ä¹—ã˜ãŸå››å…ƒæ•°.
     GgQuaternion &loadMultiply(const GLfloat *a)
     {
       return load(multiply(a));
     }
 
-    //! \brief lŒ³”‚É•Ê‚ÌlŒ³”‚ğæZ‚µ‚½Œ‹‰Ê‚ğŠi”[‚·‚é.
-    //!   \param q GgQuaternion Œ^‚ÌlŒ³”.
-    //!   \return q ‚ğæ‚¶‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã«åˆ¥ã®å››å…ƒæ•°ã‚’ä¹—ç®—ã—ãŸçµæœã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param q GgQuaternion å‹ã®å››å…ƒæ•°.
+    //!   \return q ã‚’ä¹—ã˜ãŸå››å…ƒæ•°.
     GgQuaternion &loadMultiply(const GgQuaternion &q)
     {
-      return loadMultiply(q.quaternion.data());
+      return loadMultiply(q.quaternion);
     }
 
-    //! \brief lŒ³‚ğ•Ê‚ÌlŒ³”‚ÅœZ‚µ‚½Œ‹‰Ê‚ğŠi”[‚·‚é.
-    //!   \param x Š„‚élŒ³”‚Ì x —v‘f.
-    //!   \param y Š„‚élŒ³”‚Ì y —v‘f.
-    //!   \param z Š„‚élŒ³”‚Ì z —v‘f.
-    //!   \param w Š„‚élŒ³”‚Ì w —v‘f.
-    //!   \return (x, y, z, w) ‚ğŠ„‚Á‚½lŒ³”.
+    //! \brief å››å…ƒã‚’åˆ¥ã®å››å…ƒæ•°ã§é™¤ç®—ã—ãŸçµæœã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param x å‰²ã‚‹å››å…ƒæ•°ã® x è¦ç´ .
+    //!   \param y å‰²ã‚‹å››å…ƒæ•°ã® y è¦ç´ .
+    //!   \param z å‰²ã‚‹å››å…ƒæ•°ã® z è¦ç´ .
+    //!   \param w å‰²ã‚‹å››å…ƒæ•°ã® w è¦ç´ .
+    //!   \return (x, y, z, w) ã‚’å‰²ã£ãŸå››å…ƒæ•°.
     GgQuaternion &loadDivide(GLfloat x, GLfloat y, GLfloat z, GLfloat w)
     {
-      const GgVector a = { x, y, z, w };
-      return loadDivide(a.data());
+      const GLfloat a[] { x, y, z, w };
+      return loadDivide(a);
     }
 
-    //! \brief lŒ³‚ğ•Ê‚ÌlŒ³”‚ÅœZ‚µ‚½Œ‹‰Ê‚ğŠi”[‚·‚é.
-    //!   \param a GLfloat Œ^‚Ì GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ‚ÉŠi”[‚µ‚½lŒ³”.
-    //!   \return a ‚ÅŠ„‚Á‚½lŒ³”.
+    //! \brief å››å…ƒã‚’åˆ¥ã®å››å…ƒæ•°ã§é™¤ç®—ã—ãŸçµæœã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param v å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GgVector å‹ã®å¤‰æ•°.
+    //!   \return v ã§å‰²ã£ãŸå››å…ƒæ•°.
+    GgQuaternion &loadDivide(const GgVector &v)
+    {
+      return loadDivide(v.data());
+    }
+
+    //! \brief å››å…ƒã‚’åˆ¥ã®å››å…ƒæ•°ã§é™¤ç®—ã—ãŸçµæœã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param a å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \return a ã§å‰²ã£ãŸå››å…ƒæ•°.
     GgQuaternion &loadDivide(const GLfloat *a)
     {
       return load(divide(a));
     }
 
-    //! \brief lŒ³‚ğ•Ê‚ÌlŒ³”‚ÅœZ‚µ‚½Œ‹‰Ê‚ğŠi”[‚·‚é.
-    //!   \param q GgQuaternion Œ^‚ÌlŒ³”.
-    //!   \return q ‚ÅŠ„‚Á‚½lŒ³”.
+    //! \brief å››å…ƒã‚’åˆ¥ã®å››å…ƒæ•°ã§é™¤ç®—ã—ãŸçµæœã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param q GgQuaternion å‹ã®å››å…ƒæ•°.
+    //!   \return q ã§å‰²ã£ãŸå››å…ƒæ•°.
     GgQuaternion &loadDivide(const GgQuaternion &q)
     {
-      return loadDivide(q.quaternion.data());
+      return loadDivide(q.quaternion);
     }
 
-    //! \brief lŒ³”‚É•Ê‚ÌlŒ³”‚ğ‰ÁZ‚µ‚½Œ‹‰Ê‚ğ•Ô‚·.
-    //!   \param x ‰Á‚¦‚élŒ³”‚Ì x —v‘f.
-    //!   \param y ‰Á‚¦‚élŒ³”‚Ì y —v‘f.
-    //!   \param z ‰Á‚¦‚élŒ³”‚Ì z —v‘f.
-    //!   \param w ‰Á‚¦‚élŒ³”‚Ì w —v‘f.
-    //!   \return (x, y, z, w) ‚ğ‰Á‚¦‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã«åˆ¥ã®å››å…ƒæ•°ã‚’åŠ ç®—ã—ãŸçµæœã‚’è¿”ã™.
+    //!   \param x åŠ ãˆã‚‹å››å…ƒæ•°ã® x è¦ç´ .
+    //!   \param y åŠ ãˆã‚‹å››å…ƒæ•°ã® y è¦ç´ .
+    //!   \param z åŠ ãˆã‚‹å››å…ƒæ•°ã® z è¦ç´ .
+    //!   \param w åŠ ãˆã‚‹å››å…ƒæ•°ã® w è¦ç´ .
+    //!   \return (x, y, z, w) ã‚’åŠ ãˆãŸå››å…ƒæ•°.
     GgQuaternion add(GLfloat x, GLfloat y, GLfloat z, GLfloat w) const
     {
       GgQuaternion s;
@@ -2598,28 +2949,36 @@ namespace gg
       return s;
     }
 
-    //! \brief lŒ³”‚É•Ê‚ÌlŒ³”‚ğ‰ÁZ‚µ‚½Œ‹‰Ê‚ğ•Ô‚·.
-    //!   \param a GLfloat Œ^‚Ì GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ‚ÉŠi”[‚µ‚½lŒ³”.
-    //!   \return a ‚ğ‰Á‚¦‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã«åˆ¥ã®å››å…ƒæ•°ã‚’åŠ ç®—ã—ãŸçµæœã‚’è¿”ã™.
+    //!   \param v å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GgVector å‹ã®å¤‰æ•°.
+    //!   \return v ã‚’åŠ ãˆãŸå››å…ƒæ•°.
+    GgQuaternion add(const GgVector &v) const
+    {
+      return add(v[0], v[1], v[2], v[3]);
+    }
+
+    //! \brief å››å…ƒæ•°ã«åˆ¥ã®å››å…ƒæ•°ã‚’åŠ ç®—ã—ãŸçµæœã‚’è¿”ã™.
+    //!   \param a å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \return a ã‚’åŠ ãˆãŸå››å…ƒæ•°.
     GgQuaternion add(const GLfloat *a) const
     {
       return add(a[0], a[1], a[2], a[3]);
     }
 
-    //! \brief lŒ³”‚É•Ê‚ÌlŒ³”‚ğ‰ÁZ‚µ‚½Œ‹‰Ê‚ğ•Ô‚·.
-    //!   \param q GgQuaternion Œ^‚ÌlŒ³”.
-    //!   \return q ‚ğ‰Á‚¦‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã«åˆ¥ã®å››å…ƒæ•°ã‚’åŠ ç®—ã—ãŸçµæœã‚’è¿”ã™.
+    //!   \param q GgQuaternion å‹ã®å››å…ƒæ•°.
+    //!   \return q ã‚’åŠ ãˆãŸå››å…ƒæ•°.
     GgQuaternion add(const GgQuaternion &q) const
     {
-      return add(q.quaternion.data());
+      return add(q.quaternion);
     }
 
-    //! \brief lŒ³”‚©‚ç•Ê‚ÌlŒ³”‚ğŒ¸Z‚µ‚½Œ‹‰Ê‚ğ•Ô‚·.
-    //!   \param x ˆø‚­lŒ³”‚Ì x —v‘f.
-    //!   \param y ˆø‚­lŒ³”‚Ì y —v‘f.
-    //!   \param z ˆø‚­lŒ³”‚Ì z —v‘f.
-    //!   \param w ˆø‚­lŒ³”‚Ì w —v‘f.
-    //!   \return (x, y, z, w) ‚ğˆø‚¢‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã‹ã‚‰åˆ¥ã®å››å…ƒæ•°ã‚’æ¸›ç®—ã—ãŸçµæœã‚’è¿”ã™.
+    //!   \param x å¼•ãå››å…ƒæ•°ã® x è¦ç´ .
+    //!   \param y å¼•ãå››å…ƒæ•°ã® y è¦ç´ .
+    //!   \param z å¼•ãå››å…ƒæ•°ã® z è¦ç´ .
+    //!   \param w å¼•ãå››å…ƒæ•°ã® w è¦ç´ .
+    //!   \return (x, y, z, w) ã‚’å¼•ã„ãŸå››å…ƒæ•°.
     GgQuaternion subtract(GLfloat x, GLfloat y, GLfloat z, GLfloat w) const
     {
       GgQuaternion s;
@@ -2630,37 +2989,53 @@ namespace gg
       return s;
     }
 
-    //! \brief lŒ³”‚©‚ç•Ê‚ÌlŒ³”‚ğŒ¸Z‚µ‚½Œ‹‰Ê‚ğ•Ô‚·.
-    //!   \param a GLfloat Œ^‚Ì GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ‚ÉŠi”[‚µ‚½lŒ³”.
-    //!   \return a ‚ğˆø‚¢‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã‹ã‚‰åˆ¥ã®å››å…ƒæ•°ã‚’æ¸›ç®—ã—ãŸçµæœã‚’è¿”ã™.
+    //!   \param v å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GgVector å‹ã®å¤‰æ•°.
+    //!   \return v ã‚’å¼•ã„ãŸå››å…ƒæ•°.
+    GgQuaternion subtract(const GgVector &v) const
+    {
+      return subtract(v[0], v[1], v[2], v[3]);
+    }
+
+    //! \brief å››å…ƒæ•°ã‹ã‚‰åˆ¥ã®å››å…ƒæ•°ã‚’æ¸›ç®—ã—ãŸçµæœã‚’è¿”ã™.
+    //!   \param a å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \return a ã‚’å¼•ã„ãŸå››å…ƒæ•°.
     GgQuaternion subtract(const GLfloat *a) const
     {
       return subtract(a[0], a[1], a[2], a[3]);
     }
 
-    //! \brief lŒ³”‚©‚ç•Ê‚ÌlŒ³”‚ğŒ¸Z‚µ‚½Œ‹‰Ê‚ğ•Ô‚·.
-    //!   \param q GgQuaternion Œ^‚ÌlŒ³”.
-    //!   \return q ‚ğˆø‚¢‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã‹ã‚‰åˆ¥ã®å››å…ƒæ•°ã‚’æ¸›ç®—ã—ãŸçµæœã‚’è¿”ã™.
+    //!   \param q GgQuaternion å‹ã®å››å…ƒæ•°.
+    //!   \return q ã‚’å¼•ã„ãŸå››å…ƒæ•°.
     GgQuaternion subtract(const GgQuaternion &q) const
     {
-      return subtract(q.quaternion.data());
+      return subtract(q.quaternion);
     }
 
-    //! \brief lŒ³”‚É•Ê‚ÌlŒ³”‚ğæZ‚µ‚½Œ‹‰Ê‚ğ•Ô‚·.
-    //!   \param x Š|‚¯‚élŒ³”‚Ì x —v‘f.
-    //!   \param y Š|‚¯‚élŒ³”‚Ì y —v‘f.
-    //!   \param z Š|‚¯‚élŒ³”‚Ì z —v‘f.
-    //!   \param w Š|‚¯‚élŒ³”‚Ì w —v‘f.
-    //!   \return (x, y, z, w) ‚ğŠ|‚¯‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã«åˆ¥ã®å››å…ƒæ•°ã‚’ä¹—ç®—ã—ãŸçµæœã‚’è¿”ã™.
+    //!   \param x æ›ã‘ã‚‹å››å…ƒæ•°ã® x è¦ç´ .
+    //!   \param y æ›ã‘ã‚‹å››å…ƒæ•°ã® y è¦ç´ .
+    //!   \param z æ›ã‘ã‚‹å››å…ƒæ•°ã® z è¦ç´ .
+    //!   \param w æ›ã‘ã‚‹å››å…ƒæ•°ã® w è¦ç´ .
+    //!   \return (x, y, z, w) ã‚’æ›ã‘ãŸå››å…ƒæ•°.
     GgQuaternion multiply(GLfloat x, GLfloat y, GLfloat z, GLfloat w) const
     {
-      const GgVector a = { x, y, z, w };
-      return multiply(a.data());
+      const GLfloat a[]{ x, y, z, w };
+      return multiply(a);
     }
 
-    //! \brief lŒ³”‚É•Ê‚ÌlŒ³”‚ğæZ‚µ‚½Œ‹‰Ê‚ğ•Ô‚·.
-    //!   \param a GLfloat Œ^‚Ì GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ‚ÉŠi”[‚µ‚½lŒ³”.
-    //!   \return a ‚ğŠ|‚¯‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã«åˆ¥ã®å››å…ƒæ•°ã‚’ä¹—ç®—ã—ãŸçµæœã‚’è¿”ã™.
+    //!   \param v å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GgVector å‹ã®å¤‰æ•°.
+    //!   \return v ã‚’æ›ã‘ãŸå››å…ƒæ•°.
+    GgQuaternion multiply(const GgVector &v) const
+    {
+      return multiply(v.data());
+    }
+
+    //! \brief å››å…ƒæ•°ã«åˆ¥ã®å››å…ƒæ•°ã‚’ä¹—ç®—ã—ãŸçµæœã‚’è¿”ã™.
+    //!   \param a å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \return a ã‚’æ›ã‘ãŸå››å…ƒæ•°.
     GgQuaternion multiply(const GLfloat *a) const
     {
       GgQuaternion s;
@@ -2668,29 +3043,37 @@ namespace gg
       return s;
     }
 
-    //! \brief lŒ³”‚É•Ê‚ÌlŒ³”‚ğæZ‚µ‚½Œ‹‰Ê‚ğ•Ô‚·.
-    //!   \param q GgQuaternion Œ^‚ÌlŒ³”.
-    //!   \return q ‚ğŠ|‚¯‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã«åˆ¥ã®å››å…ƒæ•°ã‚’ä¹—ç®—ã—ãŸçµæœã‚’è¿”ã™.
+    //!   \param q GgQuaternion å‹ã®å››å…ƒæ•°.
+    //!   \return q ã‚’æ›ã‘ãŸå››å…ƒæ•°.
     GgQuaternion multiply(const GgQuaternion &q) const
     {
-      return multiply(q.quaternion.data());
+      return multiply(q.quaternion);
     }
 
-    //! \brief lŒ³”‚ğ•Ê‚ÌlŒ³”‚ÅœZ‚µ‚½Œ‹‰Ê‚ğ•Ô‚·.
-    //!   \param x Š„‚élŒ³”‚Ì x —v‘f.
-    //!   \param y Š„‚élŒ³”‚Ì y —v‘f.
-    //!   \param z Š„‚élŒ³”‚Ì z —v‘f.
-    //!   \param w Š„‚élŒ³”‚Ì w —v‘f.
-    //!   \return (x, y, z, w) ‚ğŠ„‚Á‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã‚’åˆ¥ã®å››å…ƒæ•°ã§é™¤ç®—ã—ãŸçµæœã‚’è¿”ã™.
+    //!   \param x å‰²ã‚‹å››å…ƒæ•°ã® x è¦ç´ .
+    //!   \param y å‰²ã‚‹å››å…ƒæ•°ã® y è¦ç´ .
+    //!   \param z å‰²ã‚‹å››å…ƒæ•°ã® z è¦ç´ .
+    //!   \param w å‰²ã‚‹å››å…ƒæ•°ã® w è¦ç´ .
+    //!   \return (x, y, z, w) ã‚’å‰²ã£ãŸå››å…ƒæ•°.
     GgQuaternion divide(GLfloat x, GLfloat y, GLfloat z, GLfloat w) const
     {
-      const GgVector a = { x, y, z, w };
-      return divide(a.data());
+      const GLfloat a[]{ x, y, z, w };
+      return divide(a);
     }
 
-    //! \brief lŒ³”‚ğ•Ê‚ÌlŒ³”‚ÅœZ‚µ‚½Œ‹‰Ê‚ğ•Ô‚·.
-    //!   \param a GLfloat Œ^‚Ì GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ‚ÉŠi”[‚µ‚½lŒ³”.
-    //!   \return a ‚ÅŠ„‚Á‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã‚’åˆ¥ã®å››å…ƒæ•°ã§é™¤ç®—ã—ãŸçµæœã‚’è¿”ã™.
+    //!   \param v å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GgVector å‹ã®å¤‰æ•°.
+    //!   \return v ã§å‰²ã£ãŸå››å…ƒæ•°.
+    GgQuaternion divide(const GgVector &v) const
+    {
+      return divide(v.data());
+    }
+
+    //! \brief å››å…ƒæ•°ã‚’åˆ¥ã®å››å…ƒæ•°ã§é™¤ç®—ã—ãŸçµæœã‚’è¿”ã™.
+    //!   \param a å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \return a ã§å‰²ã£ãŸå››å…ƒæ•°.
     GgQuaternion divide(const GLfloat *a) const
     {
       GgQuaternion s, ia;
@@ -2699,15 +3082,15 @@ namespace gg
       return s;
     }
 
-    //! \brief lŒ³”‚ğ•Ê‚ÌlŒ³”‚ÅœZ‚µ‚½Œ‹‰Ê‚ğ•Ô‚·.
-    //!   \param q GgQuaternion Œ^‚ÌlŒ³”.
-    //!   \return q ‚ÅŠ„‚Á‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã‚’åˆ¥ã®å››å…ƒæ•°ã§é™¤ç®—ã—ãŸçµæœã‚’è¿”ã™.
+    //!   \param q GgQuaternion å‹ã®å››å…ƒæ•°.
+    //!   \return q ã§å‰²ã£ãŸå››å…ƒæ•°.
     GgQuaternion divide(const GgQuaternion &q) const
     {
-      return divide(q.quaternion.data());
+      return divide(q.quaternion);
     }
 
-    // ‰‰Zq
+    // æ¼”ç®—å­
     GgQuaternion &operator=(const GLfloat *a)
     {
       return load(a);
@@ -2781,241 +3164,241 @@ namespace gg
       return operator/(q.quaternion.data());
     }
 
-    //! \brief ‰ñ“]‚Ì•ÏŠ·s—ñ‚ğ•\‚·lŒ³”‚ğŠi”[‚·‚é.
-    //!   \param a GLfloat Œ^‚Ì 16 —v‘f‚Ì•ÏŠ·s—ñ.
-    //!   \return a ‚É‚æ‚é‰ñ“]‚Ì•ÏŠ·‚É‘Š“–‚·‚élŒ³”.
+    //! \brief å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’è¡¨ã™å››å…ƒæ•°ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param a GLfloat å‹ã® 16 è¦ç´ ã®å¤‰æ›è¡Œåˆ—.
+    //!   \return a ã«ã‚ˆã‚‹å›è»¢ã®å¤‰æ›ã«ç›¸å½“ã™ã‚‹å››å…ƒæ•°.
     GgQuaternion &loadMatrix(const GLfloat *a)
     {
       toQuaternion(quaternion.data(), a);
       return *this;
     }
 
-    //! \brief ‰ñ“]‚Ì•ÏŠ·s—ñ m ‚ğ•\‚·lŒ³”‚ğŠi”[‚·‚é.
-    //!   \param m Ggmatrix Œ^‚Ì•ÏŠ·s—ñ.
-    //!   \return m ‚É‚æ‚é‰ñ“]‚Ì•ÏŠ·‚É‘Š“–‚·‚élŒ³”.
+    //! \brief å›è»¢ã®å¤‰æ›è¡Œåˆ— m ã‚’è¡¨ã™å››å…ƒæ•°ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param m Ggmatrix å‹ã®å¤‰æ›è¡Œåˆ—.
+    //!   \return m ã«ã‚ˆã‚‹å›è»¢ã®å¤‰æ›ã«ç›¸å½“ã™ã‚‹å››å…ƒæ•°.
     GgQuaternion &loadMatrix(const GgMatrix &m)
     {
       return loadMatrix(m.get());
     }
 
-    //! \brief ’PˆÊŒ³‚ğŠi”[‚·‚é.
-    //!   \return Ši”[‚³‚ê‚½’PˆÊŒ³.
+    //! \brief å˜ä½å…ƒã‚’æ ¼ç´ã™ã‚‹.
+    //!   \return æ ¼ç´ã•ã‚ŒãŸå˜ä½å…ƒ.
     GgQuaternion &loadIdentity()
     {
       return load(0.0f, 0.0f, 0.0f, 1.0f);
     }
 
-    //! \brief (x, y, z) ‚ğ²‚Æ‚µ‚ÄŠp“x a ‰ñ“]‚·‚élŒ³”‚ğŠi”[‚·‚é.
-    //!   \param x ²ƒxƒNƒgƒ‹‚Ì x ¬•ª.
-    //!   \param y ²ƒxƒNƒgƒ‹‚Ì y ¬•ª.
-    //!   \param z ²ƒxƒNƒgƒ‹‚Ì z ¬•ª.
-    //!   \param a ‰ñ“]Šp.
-    //!   \return Ši”[‚³‚ê‚½‰ñ“]‚ğ•\‚·lŒ³”.
+    //! \brief (x, y, z) ã‚’è»¸ã¨ã—ã¦è§’åº¦ a å›è»¢ã™ã‚‹å››å…ƒæ•°ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param x è»¸ãƒ™ã‚¯ãƒˆãƒ«ã® x æˆåˆ†.
+    //!   \param y è»¸ãƒ™ã‚¯ãƒˆãƒ«ã® y æˆåˆ†.
+    //!   \param z è»¸ãƒ™ã‚¯ãƒˆãƒ«ã® z æˆåˆ†.
+    //!   \param a å›è»¢è§’.
+    //!   \return æ ¼ç´ã•ã‚ŒãŸå›è»¢ã‚’è¡¨ã™å››å…ƒæ•°.
     GgQuaternion &loadRotate(GLfloat x, GLfloat y, GLfloat z, GLfloat a);
 
-    //! \brief (v[0], v[1], v[2]) ‚ğ²‚Æ‚µ‚ÄŠp“x a ‰ñ“]‚·‚élŒ³”‚ğŠi”[‚·‚é.
-    //!   \param v ²ƒxƒNƒgƒ‹‚ğ•\‚· GLfloat Œ^‚Ì 3 —v‘f‚Ì”z—ñ.
-    //!   \param a ‰ñ“]Šp.
-    //!   \return Ši”[‚³‚ê‚½‰ñ“]‚ğ•\‚·lŒ³”.
+    //! \brief (v[0], v[1], v[2]) ã‚’è»¸ã¨ã—ã¦è§’åº¦ a å›è»¢ã™ã‚‹å››å…ƒæ•°ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param v è»¸ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¡¨ã™ GLfloat å‹ã® 3 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \param a å›è»¢è§’.
+    //!   \return æ ¼ç´ã•ã‚ŒãŸå›è»¢ã‚’è¡¨ã™å››å…ƒæ•°.
     GgQuaternion &loadRotate(const GLfloat *v, GLfloat a)
     {
       return loadRotate(v[0], v[1], v[2], a);
     }
 
-    //! \brief (v[0], v[1], v[2]) ‚ğ²‚Æ‚µ‚ÄŠp“x v[3] ‰ñ“]‚·‚élŒ³”‚ğŠi”[‚·‚é.
-    //!   \param v ²ƒxƒNƒgƒ‹‚Æ‰ñ“]Šp‚ğŠi”[‚µ‚½ GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
-    //!   \return Ši”[‚³‚ê‚½‰ñ“]‚ğ•\‚·lŒ³”.
+    //! \brief (v[0], v[1], v[2]) ã‚’è»¸ã¨ã—ã¦è§’åº¦ v[3] å›è»¢ã™ã‚‹å››å…ƒæ•°ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param v è»¸ãƒ™ã‚¯ãƒˆãƒ«ã¨å›è»¢è§’ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \return æ ¼ç´ã•ã‚ŒãŸå›è»¢ã‚’è¡¨ã™å››å…ƒæ•°.
     GgQuaternion &loadRotate(const GLfloat *v)
     {
       return loadRotate(v[0], v[1], v[2], v[3]);
     }
 
-    //! \brief x ²’†S‚ÉŠp“x a ‰ñ“]‚·‚élŒ³”‚ğŠi”[‚·‚é.
-    //!   \param a ‰ñ“]Šp.
-    //!   \return Ši”[‚³‚ê‚½‰ñ“]‚ğ•\‚·lŒ³”.
+    //! \brief x è»¸ä¸­å¿ƒã«è§’åº¦ a å›è»¢ã™ã‚‹å››å…ƒæ•°ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param a å›è»¢è§’.
+    //!   \return æ ¼ç´ã•ã‚ŒãŸå›è»¢ã‚’è¡¨ã™å››å…ƒæ•°.
     GgQuaternion &loadRotateX(GLfloat a);
 
-    //! \brief y ²’†S‚ÉŠp“x a ‰ñ“]‚·‚élŒ³”‚ğŠi”[‚·‚é.
-    //!   \param a ‰ñ“]Šp.
-    //!   \return Ši”[‚³‚ê‚½‰ñ“]‚ğ•\‚·lŒ³”.
+    //! \brief y è»¸ä¸­å¿ƒã«è§’åº¦ a å›è»¢ã™ã‚‹å››å…ƒæ•°ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param a å›è»¢è§’.
+    //!   \return æ ¼ç´ã•ã‚ŒãŸå›è»¢ã‚’è¡¨ã™å››å…ƒæ•°.
     GgQuaternion &loadRotateY(GLfloat a);
 
-    //! \brief z ²’†S‚ÉŠp“x a ‰ñ“]‚·‚élŒ³”‚ğŠi”[‚·‚é.
-    //!   \param v ²ƒxƒNƒgƒ‹‚ğ•\‚· GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
-    //!   \return Ši”[‚³‚ê‚½‰ñ“]‚ğ•\‚·lŒ³”.
+    //! \brief z è»¸ä¸­å¿ƒã«è§’åº¦ a å›è»¢ã™ã‚‹å››å…ƒæ•°ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param v è»¸ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¡¨ã™ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \return æ ¼ç´ã•ã‚ŒãŸå›è»¢ã‚’è¡¨ã™å››å…ƒæ•°.
     GgQuaternion &loadRotateZ(GLfloat a);
 
-    //! \brief lŒ³”‚ğ (x, y, z) ‚ğ²‚Æ‚µ‚ÄŠp“x a ‰ñ“]‚µ‚½lŒ³”‚ğ•Ô‚·.
-    //!   \param x ²ƒxƒNƒgƒ‹‚Ì x ¬•ª.
-    //!   \param y ²ƒxƒNƒgƒ‹‚Ì y ¬•ª.
-    //!   \param z ²ƒxƒNƒgƒ‹‚Ì z ¬•ª.
-    //!   \param a ‰ñ“]Šp.
-    //!   \return ‰ñ“]‚µ‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã‚’ (x, y, z) ã‚’è»¸ã¨ã—ã¦è§’åº¦ a å›è»¢ã—ãŸå››å…ƒæ•°ã‚’è¿”ã™.
+    //!   \param x è»¸ãƒ™ã‚¯ãƒˆãƒ«ã® x æˆåˆ†.
+    //!   \param y è»¸ãƒ™ã‚¯ãƒˆãƒ«ã® y æˆåˆ†.
+    //!   \param z è»¸ãƒ™ã‚¯ãƒˆãƒ«ã® z æˆåˆ†.
+    //!   \param a å›è»¢è§’.
+    //!   \return å›è»¢ã—ãŸå››å…ƒæ•°.
     GgQuaternion rotate(GLfloat x, GLfloat y, GLfloat z, GLfloat a) const
     {
       GgQuaternion q;
       return multiply(q.loadRotate(x, y, z, a));
     }
 
-    //! \brief lŒ³”‚ğ (v[0], v[1], v[2]) ‚ğ²‚Æ‚µ‚ÄŠp“x a ‰ñ“]‚µ‚½lŒ³”‚ğ•Ô‚·.
-    //!   \param v ²ƒxƒNƒgƒ‹‚ğ•\‚· GLfloat Œ^‚Ì 3 —v‘f‚Ì”z—ñ.
-    //!   \param a ‰ñ“]Šp.
-    //!   \return ‰ñ“]‚µ‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã‚’ (v[0], v[1], v[2]) ã‚’è»¸ã¨ã—ã¦è§’åº¦ a å›è»¢ã—ãŸå››å…ƒæ•°ã‚’è¿”ã™.
+    //!   \param v è»¸ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¡¨ã™ GLfloat å‹ã® 3 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \param a å›è»¢è§’.
+    //!   \return å›è»¢ã—ãŸå››å…ƒæ•°.
     GgQuaternion rotate(const GLfloat *v, GLfloat a) const
     {
       return rotate(v[0], v[1], v[2], a);
     }
 
-    //! \brief lŒ³”‚ğ (v[0], v[1], v[2]) ‚ğ²‚Æ‚µ‚ÄŠp“x v[3] ‰ñ“]‚µ‚½lŒ³”‚ğ•Ô‚·.
-    //!   \param v ²ƒxƒNƒgƒ‹‚ğ•\‚· GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
-    //!   \return ‰ñ“]‚µ‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã‚’ (v[0], v[1], v[2]) ã‚’è»¸ã¨ã—ã¦è§’åº¦ v[3] å›è»¢ã—ãŸå››å…ƒæ•°ã‚’è¿”ã™.
+    //!   \param v è»¸ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¡¨ã™ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \return å›è»¢ã—ãŸå››å…ƒæ•°.
     GgQuaternion rotate(const GLfloat *v) const
     {
       return rotate(v[0], v[1], v[2], v[3]);
     }
 
-    //! \brief lŒ³”‚ğ x ²’†S‚ÉŠp“x a ‰ñ“]‚µ‚½lŒ³”‚ğ•Ô‚·.
-    //!   \param a ‰ñ“]Šp.
-    //!   \return ‰ñ“]‚µ‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã‚’ x è»¸ä¸­å¿ƒã«è§’åº¦ a å›è»¢ã—ãŸå››å…ƒæ•°ã‚’è¿”ã™.
+    //!   \param a å›è»¢è§’.
+    //!   \return å›è»¢ã—ãŸå››å…ƒæ•°.
     GgQuaternion rotateX(GLfloat a) const
     {
       return rotate(1.0f, 0.0f, 0.0f, a);
     }
 
-    //! \brief lŒ³”‚ğ y ²’†S‚ÉŠp“x a ‰ñ“]‚µ‚½lŒ³”‚ğ•Ô‚·.
-    //!   \param a ‰ñ“]Šp.
-    //!   \return ‰ñ“]‚µ‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã‚’ y è»¸ä¸­å¿ƒã«è§’åº¦ a å›è»¢ã—ãŸå››å…ƒæ•°ã‚’è¿”ã™.
+    //!   \param a å›è»¢è§’.
+    //!   \return å›è»¢ã—ãŸå››å…ƒæ•°.
     GgQuaternion rotateY(GLfloat a) const
     {
       return rotate(0.0f, 1.0f, 0.0f, a);
     }
 
-    //! \brief lŒ³”‚ğ z ²’†S‚ÉŠp“x a ‰ñ“]‚µ‚½lŒ³”‚ğ•Ô‚·.
-    //!   \param a ‰ñ“]Šp.
-    //!   \return ‰ñ“]‚µ‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã‚’ z è»¸ä¸­å¿ƒã«è§’åº¦ a å›è»¢ã—ãŸå››å…ƒæ•°ã‚’è¿”ã™.
+    //!   \param a å›è»¢è§’.
+    //!   \return å›è»¢ã—ãŸå››å…ƒæ•°.
     GgQuaternion rotateZ(GLfloat a) const
     {
       return rotate(0.0f, 0.0f, 1.0f, a);
     }
 
-    //! \brief ƒIƒCƒ‰[Šp (heading, pitch, roll) ‚Å—^‚¦‚ç‚ê‚½‰ñ“]‚ğ•\‚·lŒ³”‚ğŠi”[‚·‚é.
-    //!   \param heading y ²’†S‚Ì‰ñ“]Šp.
-    //!   \param pitch x ²’†S‚Ì‰ñ“]Šp.
-    //!   \param roll z ²’†S‚Ì‰ñ“]Šp.
-    //!   \return Ši”[‚µ‚½‰ñ“]‚ğ•\‚·lŒ³”.
+    //! \brief ã‚ªã‚¤ãƒ©ãƒ¼è§’ (heading, pitch, roll) ã§ä¸ãˆã‚‰ã‚ŒãŸå›è»¢ã‚’è¡¨ã™å››å…ƒæ•°ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param heading y è»¸ä¸­å¿ƒã®å›è»¢è§’.
+    //!   \param pitch x è»¸ä¸­å¿ƒã®å›è»¢è§’.
+    //!   \param roll z è»¸ä¸­å¿ƒã®å›è»¢è§’.
+    //!   \return æ ¼ç´ã—ãŸå›è»¢ã‚’è¡¨ã™å››å…ƒæ•°.
     GgQuaternion &loadEuler(GLfloat heading, GLfloat pitch, GLfloat roll);
 
-    //! \brief ƒIƒCƒ‰[Šp (e[0], e[1], e[2]) ‚Å—^‚¦‚ç‚ê‚½‰ñ“]‚ğ•\‚·lŒ³”‚ğŠi”[‚·‚é.
-    //!   \param e ƒIƒCƒ‰[Šp‚ğ•\‚· GLfloat Œ^‚Ì 3 —v‘f‚Ì”z—ñ (heading, pitch, roll).
-    //!   \return Ši”[‚µ‚½‰ñ“]‚ğ•\‚·lŒ³”.
+    //! \brief ã‚ªã‚¤ãƒ©ãƒ¼è§’ (e[0], e[1], e[2]) ã§ä¸ãˆã‚‰ã‚ŒãŸå›è»¢ã‚’è¡¨ã™å››å…ƒæ•°ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param e ã‚ªã‚¤ãƒ©ãƒ¼è§’ã‚’è¡¨ã™ GLfloat å‹ã® 3 è¦ç´ ã®é…åˆ—å¤‰æ•° (heading, pitch, roll).
+    //!   \return æ ¼ç´ã—ãŸå›è»¢ã‚’è¡¨ã™å››å…ƒæ•°.
     GgQuaternion &loadEuler(const GLfloat *e)
     {
       return loadEuler(e[0], e[1], e[2]);
     }
 
-    //! \brief lŒ³”‚ğƒIƒCƒ‰[Šp (heading, pitch, roll) ‚Å‰ñ“]‚µ‚½lŒ³”‚ğ•Ô‚·.
-    //!   \param heading y ²’†S‚Ì‰ñ“]Šp.
-    //!   \param pitch x ²’†S‚Ì‰ñ“]Šp.
-    //!   \param roll z ²’†S‚Ì‰ñ“]Šp.
-    //!   \return ‰ñ“]‚µ‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã‚’ã‚ªã‚¤ãƒ©ãƒ¼è§’ (heading, pitch, roll) ã§å›è»¢ã—ãŸå››å…ƒæ•°ã‚’è¿”ã™.
+    //!   \param heading y è»¸ä¸­å¿ƒã®å›è»¢è§’.
+    //!   \param pitch x è»¸ä¸­å¿ƒã®å›è»¢è§’.
+    //!   \param roll z è»¸ä¸­å¿ƒã®å›è»¢è§’.
+    //!   \return å›è»¢ã—ãŸå››å…ƒæ•°.
     GgQuaternion euler(GLfloat heading, GLfloat pitch, GLfloat roll) const
     {
       GgQuaternion r;
       return multiply(r.loadEuler(heading, pitch, roll));
     }
 
-    //! \brief lŒ³”‚ğƒIƒCƒ‰[Šp (e[0], e[1], e[2]) ‚Å‰ñ“]‚µ‚½lŒ³”‚ğ•Ô‚·.
-    //!   \param e ƒIƒCƒ‰[Šp‚ğ•\‚· GLfloat Œ^‚Ì 3 —v‘f‚Ì”z—ñ (heading, pitch, roll).
-    //!   \return ‰ñ“]‚µ‚½lŒ³”.
+    //! \brief å››å…ƒæ•°ã‚’ã‚ªã‚¤ãƒ©ãƒ¼è§’ (e[0], e[1], e[2]) ã§å›è»¢ã—ãŸå››å…ƒæ•°ã‚’è¿”ã™.
+    //!   \param e ã‚ªã‚¤ãƒ©ãƒ¼è§’ã‚’è¡¨ã™ GLfloat å‹ã® 3 è¦ç´ ã®é…åˆ—å¤‰æ•° (heading, pitch, roll).
+    //!   \return å›è»¢ã—ãŸå››å…ƒæ•°.
     GgQuaternion euler(const GLfloat *e) const
     {
       return euler(e[0], e[1], e[2]);
     }
 
-    //! \brief ‹…–ÊüŒ`•âŠÔ‚ÌŒ‹‰Ê‚ğŠi”[‚·‚é.
-    //!   \param a lŒ³”‚ğŠi”[‚µ‚½ GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
-    //!   \param b lŒ³”‚ğŠi”[‚µ‚½ GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
-    //!   \param t •âŠÔƒpƒ‰ƒ[ƒ^.
-    //!   \return Ši”[‚µ‚½ a, b ‚ğ t ‚Å“à•ª‚µ‚½lŒ³”.
+    //! \brief çƒé¢ç·šå½¢è£œé–“ã®çµæœã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param a å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \param b å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \param t è£œé–“ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿.
+    //!   \return æ ¼ç´ã—ãŸ a, b ã‚’ t ã§å†…åˆ†ã—ãŸå››å…ƒæ•°.
     GgQuaternion &loadSlerp(const GLfloat *a, const GLfloat *b, GLfloat t)
     {
       slerp(quaternion.data(), a, b, t);
       return *this;
     }
 
-    //! \brief ‹…–ÊüŒ`•âŠÔ‚ÌŒ‹‰Ê‚ğŠi”[‚·‚é.
-    //!   \param q GgQuaternion Œ^‚ÌlŒ³”.
-    //!   \param r GgQuaternion Œ^‚ÌlŒ³”.
-    //!   \param t •âŠÔƒpƒ‰ƒ[ƒ^.
-    //!   \return Ši”[‚µ‚½ q, r ‚ğ t ‚Å“à•ª‚µ‚½lŒ³”.
+    //! \brief çƒé¢ç·šå½¢è£œé–“ã®çµæœã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param q GgQuaternion å‹ã®å››å…ƒæ•°.
+    //!   \param r GgQuaternion å‹ã®å››å…ƒæ•°.
+    //!   \param t è£œé–“ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿.
+    //!   \return æ ¼ç´ã—ãŸ q, r ã‚’ t ã§å†…åˆ†ã—ãŸå››å…ƒæ•°.
     GgQuaternion &loadSlerp(const GgQuaternion &q, const GgQuaternion &r, GLfloat t)
     {
       return loadSlerp(q.quaternion.data(), r.quaternion.data(), t);
     }
 
-    //! \brief ‹…–ÊüŒ`•âŠÔ‚ÌŒ‹‰Ê‚ğŠi”[‚·‚é.
-    //!   \param q GgQuaternion Œ^‚ÌlŒ³”.
-    //!   \param a lŒ³”‚ğŠi”[‚µ‚½ GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
-    //!   \param t •âŠÔƒpƒ‰ƒ[ƒ^.
-    //!   \return Ši”[‚µ‚½ q, a ‚ğ t ‚Å“à•ª‚µ‚½lŒ³”.
+    //! \brief çƒé¢ç·šå½¢è£œé–“ã®çµæœã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param q GgQuaternion å‹ã®å››å…ƒæ•°.
+    //!   \param a å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \param t è£œé–“ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿.
+    //!   \return æ ¼ç´ã—ãŸ q, a ã‚’ t ã§å†…åˆ†ã—ãŸå››å…ƒæ•°.
     GgQuaternion &loadSlerp(const GgQuaternion &q, const GLfloat *a, GLfloat t)
     {
       return loadSlerp(q.quaternion.data(), a, t);
     }
 
-    //! \brief ‹…–ÊüŒ`•âŠÔ‚ÌŒ‹‰Ê‚ğŠi”[‚·‚é.
-    //!   \param a lŒ³”‚ğŠi”[‚µ‚½ GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
-    //!   \param q GgQuaternion Œ^‚ÌlŒ³”.
-    //!   \param t •âŠÔƒpƒ‰ƒ[ƒ^.
-    //!   \return Ši”[‚µ‚½ a, q ‚ğ t ‚Å“à•ª‚µ‚½lŒ³”.
+    //! \brief çƒé¢ç·šå½¢è£œé–“ã®çµæœã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param a å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \param q GgQuaternion å‹ã®å››å…ƒæ•°.
+    //!   \param t è£œé–“ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿.
+    //!   \return æ ¼ç´ã—ãŸ a, q ã‚’ t ã§å†…åˆ†ã—ãŸå››å…ƒæ•°.
     GgQuaternion &loadSlerp(const GLfloat *a, const GgQuaternion &q, GLfloat t)
     {
       return loadSlerp(a, q.quaternion.data(), t);
     }
 
-    //! \brief ˆø”‚Éw’è‚µ‚½lŒ³”‚ğ³‹K‰»‚µ‚ÄŠi”[‚·‚é.
-    //!   \param a lŒ³”‚ğŠi”[‚µ‚½ GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
-    //!   \return ³‹K‰»‚³‚ê‚½lŒ³”.
+    //! \brief å¼•æ•°ã«æŒ‡å®šã—ãŸå››å…ƒæ•°ã‚’æ­£è¦åŒ–ã—ã¦æ ¼ç´ã™ã‚‹.
+    //!   \param a å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \return æ­£è¦åŒ–ã•ã‚ŒãŸå››å…ƒæ•°.
     GgQuaternion &loadNormalize(const GLfloat *a);
 
-    //! \brief ˆø”‚Éw’è‚µ‚½lŒ³”‚ğ³‹K‰»‚µ‚ÄŠi”[‚·‚é.
-    //!   \param q GgQuaternion Œ^‚ÌlŒ³”.
-    //!   \return ³‹K‰»‚³‚ê‚½lŒ³”.
+    //! \brief å¼•æ•°ã«æŒ‡å®šã—ãŸå››å…ƒæ•°ã‚’æ­£è¦åŒ–ã—ã¦æ ¼ç´ã™ã‚‹.
+    //!   \param q GgQuaternion å‹ã®å››å…ƒæ•°.
+    //!   \return æ­£è¦åŒ–ã•ã‚ŒãŸå››å…ƒæ•°.
     GgQuaternion &loadNormalize(const GgQuaternion &q)
     {
       return loadNormalize(q.quaternion.data());
     }
 
-    //! \brief ˆø”‚Éw’è‚µ‚½lŒ³”‚Ì‹¤–ğlŒ³”‚ğŠi”[‚·‚é.
-    //!   \param a lŒ³”‚ğŠi”[‚µ‚½ GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
-    //!   \return ‹¤–ğlŒ³”.
+    //! \brief å¼•æ•°ã«æŒ‡å®šã—ãŸå››å…ƒæ•°ã®å…±å½¹å››å…ƒæ•°ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param a å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \return å…±å½¹å››å…ƒæ•°.
     GgQuaternion &loadConjugate(const GLfloat *a);
 
-    //! \brief ˆø”‚Éw’è‚µ‚½lŒ³”‚Ì‹¤–ğlŒ³”‚ğŠi”[‚·‚é.
-    //!   \param q GgQuaternion Œ^‚ÌlŒ³”.
-    //!   \return ‹¤–ğlŒ³”.
+    //! \brief å¼•æ•°ã«æŒ‡å®šã—ãŸå››å…ƒæ•°ã®å…±å½¹å››å…ƒæ•°ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param q GgQuaternion å‹ã®å››å…ƒæ•°.
+    //!   \return å…±å½¹å››å…ƒæ•°.
     GgQuaternion &loadConjugate(const GgQuaternion &q)
     {
       return loadConjugate(q.quaternion.data());
     }
 
-    //! \brief ˆø”‚Éw’è‚µ‚½lŒ³”‚Ì‹tŒ³‚ğŠi”[‚·‚é.
-    //!   \param a lŒ³”‚ğŠi”[‚µ‚½ GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
-    //!   \return lŒ³”‚Ì‹tŒ³.
+    //! \brief å¼•æ•°ã«æŒ‡å®šã—ãŸå››å…ƒæ•°ã®é€†å…ƒã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param a å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \return å››å…ƒæ•°ã®é€†å…ƒ.
     GgQuaternion &loadInvert(const GLfloat *a);
 
-    //! \brief ˆø”‚Éw’è‚µ‚½lŒ³”‚Ì‹tŒ³‚ğŠi”[‚·‚é.
-    //!   \param q GgQuaternion Œ^‚ÌlŒ³”.
-    //!   \return lŒ³”‚Ì‹tŒ³.
+    //! \brief å¼•æ•°ã«æŒ‡å®šã—ãŸå››å…ƒæ•°ã®é€†å…ƒã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param q GgQuaternion å‹ã®å››å…ƒæ•°.
+    //!   \return å››å…ƒæ•°ã®é€†å…ƒ.
     GgQuaternion &loadInvert(const GgQuaternion &q)
     {
       return loadInvert(q.quaternion.data());
     }
 
-    //! \brief ‹…–ÊüŒ`•âŠÔ‚ÌŒ‹‰Ê‚ğ•Ô‚·.
-    //!   \param a lŒ³”‚ğŠi”[‚µ‚½ GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
-    //!   \param t •âŠÔƒpƒ‰ƒ[ƒ^.
-    //!   \return lŒ³”‚ğ a ‚É‘Î‚µ‚Ä t ‚Å“à•ª‚µ‚½Œ‹‰Ê.
+    //! \brief çƒé¢ç·šå½¢è£œé–“ã®çµæœã‚’è¿”ã™.
+    //!   \param a å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    //!   \param t è£œé–“ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿.
+    //!   \return å››å…ƒæ•°ã‚’ a ã«å¯¾ã—ã¦ t ã§å†…åˆ†ã—ãŸçµæœ.
     GgQuaternion slerp(GLfloat *a, GLfloat t) const
     {
       GgQuaternion p;
@@ -3023,10 +3406,10 @@ namespace gg
       return p;
     }
 
-    //! \brief ‹…–ÊüŒ`•âŠÔ‚ÌŒ‹‰Ê‚ğ•Ô‚·.
-    //!   \param q GgQuaternion Œ^‚ÌlŒ³”.
-    //!   \param t •âŠÔƒpƒ‰ƒ[ƒ^.
-    //!   \return lŒ³”‚ğ q ‚É‘Î‚µ‚Ä t ‚Å“à•ª‚µ‚½Œ‹‰Ê.
+    //! \brief çƒé¢ç·šå½¢è£œé–“ã®çµæœã‚’è¿”ã™.
+    //!   \param q GgQuaternion å‹ã®å››å…ƒæ•°.
+    //!   \param t è£œé–“ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿.
+    //!   \return å››å…ƒæ•°ã‚’ q ã«å¯¾ã—ã¦ t ã§å†…åˆ†ã—ãŸçµæœ.
     GgQuaternion slerp(const GgQuaternion &q, GLfloat t) const
     {
       GgQuaternion p;
@@ -3034,8 +3417,8 @@ namespace gg
       return p;
     }
 
-    //! \brief ³‹K‰»‚·‚é.
-    //!   \return ³‹K‰»‚³‚ê‚½lŒ³”.
+    //! \brief æ­£è¦åŒ–ã™ã‚‹.
+    //!   \return æ­£è¦åŒ–ã•ã‚ŒãŸå››å…ƒæ•°.
     GgQuaternion normalize() const
     {
       GgQuaternion q;
@@ -3043,8 +3426,8 @@ namespace gg
       return q;
     }
 
-    //! \brief ‹¤–ğlŒ³”‚É•ÏŠ·‚·‚é.
-    //!   \return ‹¤–ğlŒ³”.
+    //! \brief å…±å½¹å››å…ƒæ•°ã«å¤‰æ›ã™ã‚‹.
+    //!   \return å…±å½¹å››å…ƒæ•°.
     GgQuaternion conjugate() const
     {
       GgQuaternion q;
@@ -3052,8 +3435,8 @@ namespace gg
       return q;
     }
 
-    //! \brief ‹tŒ³‚É•ÏŠ·‚·‚é.
-    //!   \return lŒ³”‚Ì‹tŒ³.
+    //! \brief é€†å…ƒã«å¤‰æ›ã™ã‚‹.
+    //!   \return å››å…ƒæ•°ã®é€†å…ƒ.
     GgQuaternion invert() const
     {
       GgQuaternion q;
@@ -3061,15 +3444,15 @@ namespace gg
       return q;
     }
 
-    //! \brief lŒ³”‚ğæ‚èo‚·.
-    //!   \return lŒ³”‚ğ•\‚· GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
+    //! \brief å››å…ƒæ•°ã‚’å–ã‚Šå‡ºã™.
+    //!   \return å››å…ƒæ•°ã‚’è¡¨ã™ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
     const GLfloat *get() const
     {
       return quaternion.data();
     }
 
-    //! \brief lŒ³”‚ğæ‚èo‚·.
-    //!   \param a lŒ³”‚ğŠi”[‚·‚é GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
+    //! \brief å››å…ƒæ•°ã‚’å–ã‚Šå‡ºã™.
+    //!   \param a å››å…ƒæ•°ã‚’æ ¼ç´ã™ã‚‹ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
     void get(GLfloat *a) const
     {
       a[0] = quaternion[0];
@@ -3078,22 +3461,22 @@ namespace gg
       a[3] = quaternion[3];
     }
 
-    //! \brief lŒ³”‚ª•\‚·‰ñ“]‚Ì•ÏŠ·s—ñ‚ğ a ‚É‹‚ß‚é.
-    //!   \param a ‰ñ“]‚Ì•ÏŠ·s—ñ‚ğŠi”[‚·‚é GLfloat Œ^‚Ì 16 —v‘f‚Ì”z—ñ.
+    //! \brief å››å…ƒæ•°ãŒè¡¨ã™å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’ a ã«æ±‚ã‚ã‚‹.
+    //!   \param a å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹ GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°.
     void getMatrix(GLfloat *a) const
     {
       toMatrix(a, quaternion.data());
     }
 
-    //! \brief lŒ³”‚ª•\‚·‰ñ“]‚Ì•ÏŠ·s—ñ‚ğ m ‚É‹‚ß‚é.
-    //!   \param m ‰ñ“]‚Ì•ÏŠ·s—ñ‚ğŠi”[‚·‚é GgMatrix Œ^‚Ì•Ï”.
+    //! \brief å››å…ƒæ•°ãŒè¡¨ã™å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’ m ã«æ±‚ã‚ã‚‹.
+    //!   \param m å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹ GgMatrix å‹ã®å¤‰æ•°.
     void getMatrix(GgMatrix &m) const
     {
       getMatrix(m.array.data());
     }
 
-    //! \brief lŒ³”‚ª•\‚·‰ñ“]‚Ì•ÏŠ·s—ñ‚ğæ‚èo‚·.
-    //!   \return ‰ñ“]‚Ì•ÏŠ·‚ğ•\‚· GgMatrix Œ^‚Ì•ÏŠ·s—ñ.
+    //! \brief å››å…ƒæ•°ãŒè¡¨ã™å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’å–ã‚Šå‡ºã™.
+    //!   \return å›è»¢ã®å¤‰æ›ã‚’è¡¨ã™ GgMatrix å‹ã®å¤‰æ›è¡Œåˆ—.
     GgMatrix getMatrix() const
     {
       GgMatrix m;
@@ -3101,8 +3484,8 @@ namespace gg
       return m;
     }
 
-    //! \brief lŒ³”‚Ì‹¤–ğ‚ª•\‚·‰ñ“]‚Ì•ÏŠ·s—ñ‚ğ a ‚É‹‚ß‚é.
-    //!   \param a ‰ñ“]‚Ì•ÏŠ·s—ñ‚ğŠi”[‚·‚é GLfloat Œ^‚Ì 16 —v‘f‚Ì”z—ñ.
+    //! \brief å››å…ƒæ•°ã®å…±å½¹ãŒè¡¨ã™å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’ a ã«æ±‚ã‚ã‚‹.
+    //!   \param a å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹ GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°.
     void getConjugateMatrix(GLfloat *a) const
     {
       GgQuaternion c;
@@ -3110,15 +3493,15 @@ namespace gg
       toMatrix(a, c.quaternion.data());
     }
 
-    //! \brief lŒ³”‚Ì‹¤–ğ‚ª•\‚·‰ñ“]‚Ì•ÏŠ·s—ñ‚ğ m ‚É‹‚ß‚é.
-    //!   \param m ‰ñ“]‚Ì•ÏŠ·s—ñ‚ğŠi”[‚·‚é GgMatrix Œ^‚Ì•Ï”.
+    //! \brief å››å…ƒæ•°ã®å…±å½¹ãŒè¡¨ã™å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’ m ã«æ±‚ã‚ã‚‹.
+    //!   \param m å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’æ ¼ç´ã™ã‚‹ GgMatrix å‹ã®å¤‰æ•°.
     void getConjugateMatrix(GgMatrix &m) const
     {
       getConjugateMatrix(m.array.data());
     }
 
-    //! \brief lŒ³”‚Ì‹¤–ğ‚ª•\‚·‰ñ“]‚Ì•ÏŠ·s—ñ‚ğæ‚èo‚·.
-    //!   \return ‰ñ“]‚Ì•ÏŠ·‚ğ•\‚· GgMatrix Œ^‚Ì•ÏŠ·s—ñ.
+    //! \brief å››å…ƒæ•°ã®å…±å½¹ãŒè¡¨ã™å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’å–ã‚Šå‡ºã™.
+    //!   \return å›è»¢ã®å¤‰æ›ã‚’è¡¨ã™ GgMatrix å‹ã®å¤‰æ›è¡Œåˆ—.
     GgMatrix getConjugateMatrix() const
     {
       GgMatrix m;
@@ -3127,54 +3510,54 @@ namespace gg
     }
   };
 
-  //! \brief lŒ³”‚ğ•Ô‚·
-  //!   \param x lŒ³”‚Ì x —v‘f.
-  //!   \param y lŒ³”‚Ì y —v‘f.
-  //!   \param z lŒ³”‚Ì z —v‘f.
-  //!   \param w lŒ³”‚Ì w —v‘f.
-  //! \return lŒ³”.
+  //! \brief å››å…ƒæ•°ã‚’è¿”ã™
+  //!   \param x å››å…ƒæ•°ã® x è¦ç´ .
+  //!   \param y å››å…ƒæ•°ã® y è¦ç´ .
+  //!   \param z å››å…ƒæ•°ã® z è¦ç´ .
+  //!   \param w å››å…ƒæ•°ã® w è¦ç´ .
+  //! \return å››å…ƒæ•°.
   inline GgQuaternion ggQuaternion(GLfloat x, GLfloat y, GLfloat z, GLfloat w)
   {
     GgQuaternion q;
     return q.load(x, y, z, w);
   }
 
-  //! \brief lŒ³”‚ğ•Ô‚·
-  //!   \param a GLfloat Œ^‚Ì GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ‚ÉŠi”[‚µ‚½lŒ³”.
-  //!   \return lŒ³”.
+  //! \brief å››å…ƒæ•°ã‚’è¿”ã™
+  //!   \param a GLfloat å‹ã® GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°ã«æ ¼ç´ã—ãŸå››å…ƒæ•°.
+  //!   \return å››å…ƒæ•°.
   inline GgQuaternion ggQuaternion(const GLfloat *a)
   {
     return ggQuaternion(a[0], a[1], a[2], a[3]);
   }
 
-  //! \brief ’PˆÊlŒ³”‚ğ•Ô‚·
-  //! \return ’PˆÊlŒ³”.
+  //! \brief å˜ä½å››å…ƒæ•°ã‚’è¿”ã™
+  //! \return å˜ä½å››å…ƒæ•°.
   inline GgQuaternion ggIdentityQuaternion()
   {
     GgQuaternion q;
     return q.loadIdentity();
   }
 
-  //! \brief ‰ñ“]‚Ì•ÏŠ·s—ñ m ‚ğ•\‚·lŒ³”‚ğ•Ô‚·.
-  //!   \param m GLfloat Œ^‚Ì 16 —v‘f‚Ì”z—ñ.
-  //!   \return m ‚É‚æ‚é‰ñ“]‚Ì•ÏŠ·‚É‘Š“–‚·‚élŒ³”.
+  //! \brief å›è»¢ã®å¤‰æ›è¡Œåˆ— m ã‚’è¡¨ã™å››å…ƒæ•°ã‚’è¿”ã™.
+  //!   \param m GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+  //!   \return m ã«ã‚ˆã‚‹å›è»¢ã®å¤‰æ›ã«ç›¸å½“ã™ã‚‹å››å…ƒæ•°.
   inline GgQuaternion ggMatrixQuaternion(const GLfloat *a)
   {
     GgQuaternion q;
     return q.loadMatrix(a);
   }
 
-  //! \brief ‰ñ“]‚Ì•ÏŠ·s—ñ m ‚ğ•\‚·lŒ³”‚ğ•Ô‚·.
-  //!   \param m GgMatrix Œ^‚Ì•ÏŠ·s—ñ.
-  //!   \return m ‚É‚æ‚é‰ñ“]‚Ì•ÏŠ·‚É‘Š“–‚·‚élŒ³”.
+  //! \brief å›è»¢ã®å¤‰æ›è¡Œåˆ— m ã‚’è¡¨ã™å››å…ƒæ•°ã‚’è¿”ã™.
+  //!   \param m GgMatrix å‹ã®å¤‰æ›è¡Œåˆ—.
+  //!   \return m ã«ã‚ˆã‚‹å›è»¢ã®å¤‰æ›ã«ç›¸å½“ã™ã‚‹å››å…ƒæ•°.
   inline GgQuaternion ggMatrixQuaternion(const GgMatrix &m)
   {
     return ggMatrixQuaternion(m.get());
   }
 
-  //! \brief lŒ³” q ‚Ì‰ñ“]‚Ì•ÏŠ·s—ñ‚ğ•Ô‚·.
-  //!   \param q Œ³‚ÌlŒ³”.
-  //!   \return lŒ³” q ‚ª•\‚·‰ñ“]‚É‘Š“–‚·‚é GgMatrix Œ^‚Ì•ÏŠ·s—ñ.
+  //! \brief å››å…ƒæ•° q ã®å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’è¿”ã™.
+  //!   \param q å…ƒã®å››å…ƒæ•°.
+  //!   \return å››å…ƒæ•° q ãŒè¡¨ã™å›è»¢ã«ç›¸å½“ã™ã‚‹ GgMatrix å‹ã®å¤‰æ›è¡Œåˆ—.
   inline GgMatrix ggQuaternionMatrix(const GgQuaternion &q)
   {
     GLfloat m[16];
@@ -3183,9 +3566,9 @@ namespace gg
     return t.load(m);
   }
 
-  //! \brief lŒ³” q ‚Ì‰ñ“]‚Ì“]’u‚µ‚½•ÏŠ·s—ñ‚ğ•Ô‚·.
-  //!   \param q Œ³‚ÌlŒ³”.
-  //!   \return lŒ³” q ‚ª•\‚·‰ñ“]‚É‘Š“–‚·‚é“]’u‚µ‚½ GgMatrix Œ^‚Ì•ÏŠ·s—ñ.
+  //! \brief å››å…ƒæ•° q ã®å›è»¢ã®è»¢ç½®ã—ãŸå¤‰æ›è¡Œåˆ—ã‚’è¿”ã™.
+  //!   \param q å…ƒã®å››å…ƒæ•°.
+  //!   \return å››å…ƒæ•° q ãŒè¡¨ã™å›è»¢ã«ç›¸å½“ã™ã‚‹è»¢ç½®ã—ãŸ GgMatrix å‹ã®å¤‰æ›è¡Œåˆ—.
   inline GgMatrix ggQuaternionTransposeMatrix(const GgQuaternion &q)
   {
     GLfloat m[16];
@@ -3194,691 +3577,893 @@ namespace gg
     return t.loadTranspose(m);
   }
 
-  //! \brief (x, y, z) ‚ğ²‚Æ‚µ‚ÄŠp“x a ‰ñ“]‚·‚élŒ³”‚ğ•Ô‚·.
-  //!   \param x ²ƒxƒNƒgƒ‹‚Ì x ¬•ª.
-  //!   \param y ²ƒxƒNƒgƒ‹‚Ì y ¬•ª.
-  //!   \param z ²ƒxƒNƒgƒ‹‚Ì z ¬•ª.
-  //!   \param a ‰ñ“]Šp.
-  //!   \return ‰ñ“]‚ğ•\‚·lŒ³”.
+  //! \brief (x, y, z) ã‚’è»¸ã¨ã—ã¦è§’åº¦ a å›è»¢ã™ã‚‹å››å…ƒæ•°ã‚’è¿”ã™.
+  //!   \param x è»¸ãƒ™ã‚¯ãƒˆãƒ«ã® x æˆåˆ†.
+  //!   \param y è»¸ãƒ™ã‚¯ãƒˆãƒ«ã® y æˆåˆ†.
+  //!   \param z è»¸ãƒ™ã‚¯ãƒˆãƒ«ã® z æˆåˆ†.
+  //!   \param a å›è»¢è§’.
+  //!   \return å›è»¢ã‚’è¡¨ã™å››å…ƒæ•°.
   inline GgQuaternion ggRotateQuaternion(GLfloat x, GLfloat y, GLfloat z, GLfloat a)
   {
     GgQuaternion q;
     return q.loadRotate(x, y, z, a);
   }
 
-  //! \brief (v[0], v[1], v[2]) ‚ğ²‚Æ‚µ‚ÄŠp“x a ‰ñ“]‚·‚élŒ³”‚ğ•Ô‚·.
-  //!   \param v ²ƒxƒNƒgƒ‹‚ğ•\‚· GLfloat Œ^‚Ì 3 —v‘f‚Ì”z—ñ.
-  //!   \param a ‰ñ“]Šp.
-  //!   \return ‰ñ“]‚ğ•\‚·lŒ³”.
+  //! \brief (v[0], v[1], v[2]) ã‚’è»¸ã¨ã—ã¦è§’åº¦ a å›è»¢ã™ã‚‹å››å…ƒæ•°ã‚’è¿”ã™.
+  //!   \param v è»¸ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¡¨ã™ GLfloat å‹ã® 3 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+  //!   \param a å›è»¢è§’.
+  //!   \return å›è»¢ã‚’è¡¨ã™å››å…ƒæ•°.
   inline GgQuaternion ggRotateQuaternion(const GLfloat *v, GLfloat a)
   {
     return ggRotateQuaternion(v[0], v[1], v[2], a);
   }
 
-  //! \brief (v[0], v[1], v[2]) ‚ğ²‚Æ‚µ‚ÄŠp“x v[3] ‰ñ“]‚·‚élŒ³”‚ğ•Ô‚·.
-  //!   \param v ²ƒxƒNƒgƒ‹‚ğ•\‚· GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
-  //!   \return ‰ñ“]‚ğ•\‚·lŒ³”.
+  //! \brief (v[0], v[1], v[2]) ã‚’è»¸ã¨ã—ã¦è§’åº¦ v[3] å›è»¢ã™ã‚‹å››å…ƒæ•°ã‚’è¿”ã™.
+  //!   \param v è»¸ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¡¨ã™ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+  //!   \return å›è»¢ã‚’è¡¨ã™å››å…ƒæ•°.
   inline GgQuaternion ggRotateQuaternion(const GLfloat *v)
   {
     return ggRotateQuaternion(v[0], v[1], v[2], v[3]);
   }
 
-  //! \brief ƒIƒCƒ‰[Šp (heading, pitch, roll) ‚Å—^‚¦‚ç‚ê‚½‰ñ“]‚ğ•\‚·lŒ³”‚ğ•Ô‚·.
-  //!   \param heading y ²’†S‚Ì‰ñ“]Šp.
-  //!   \param pitch x ²’†S‚Ì‰ñ“]Šp.
-  //!   \param roll z ²’†S‚Ì‰ñ“]Šp.
-  //!   \return ‰ñ“]‚ğ•\‚·lŒ³”.
+  //! \brief ã‚ªã‚¤ãƒ©ãƒ¼è§’ (heading, pitch, roll) ã§ä¸ãˆã‚‰ã‚ŒãŸå›è»¢ã‚’è¡¨ã™å››å…ƒæ•°ã‚’è¿”ã™.
+  //!   \param heading y è»¸ä¸­å¿ƒã®å›è»¢è§’.
+  //!   \param pitch x è»¸ä¸­å¿ƒã®å›è»¢è§’.
+  //!   \param roll z è»¸ä¸­å¿ƒã®å›è»¢è§’.
+  //!   \return å›è»¢ã‚’è¡¨ã™å››å…ƒæ•°.
   inline GgQuaternion ggEulerQuaternion(GLfloat heading, GLfloat pitch, GLfloat roll)
   {
     GgQuaternion q;
     return q.loadEuler(heading, pitch, roll);
   }
 
-  //! \brief ƒIƒCƒ‰[Šp (e[0], e[1], e[2]) ‚Å—^‚¦‚ç‚ê‚½‰ñ“]‚ğ•\‚·lŒ³”‚ğ•Ô‚·.
-  //!   \param e ƒIƒCƒ‰[Šp‚ğ•\‚· GLfloat Œ^‚Ì 3 —v‘f‚Ì”z—ñ (heading, pitch, roll).
-  //!   \return ‰ñ“]‚ğ•\‚·lŒ³”.
+  //! \brief ã‚ªã‚¤ãƒ©ãƒ¼è§’ (e[0], e[1], e[2]) ã§ä¸ãˆã‚‰ã‚ŒãŸå›è»¢ã‚’è¡¨ã™å››å…ƒæ•°ã‚’è¿”ã™.
+  //!   \param e ã‚ªã‚¤ãƒ©ãƒ¼è§’ã‚’è¡¨ã™ GLfloat å‹ã® 3 è¦ç´ ã®é…åˆ—å¤‰æ•° (heading, pitch, roll).
+  //!   \return å›è»¢ã‚’è¡¨ã™å››å…ƒæ•°.
   inline GgQuaternion ggEulerQuaternion(const GLfloat *e)
   {
     return ggEulerQuaternion(e[0], e[1], e[2]);
   }
 
-  //! \brief “ñ‚Â‚ÌlŒ³”‚Ì‹…–ÊüŒ`•âŠÔ‚ÌŒ‹‰Ê‚ğ•Ô‚·.
-  //!   \param a lŒ³”‚ğŠi”[‚µ‚½ GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
-  //!   \param b lŒ³”‚ğŠi”[‚µ‚½ GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
-  //!   \param t •âŠÔƒpƒ‰ƒ[ƒ^.
-  //!   \return a, b ‚ğ t ‚Å“à•ª‚µ‚½lŒ³”.
+  //! \brief äºŒã¤ã®å››å…ƒæ•°ã®çƒé¢ç·šå½¢è£œé–“ã®çµæœã‚’è¿”ã™.
+  //!   \param a å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+  //!   \param b å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+  //!   \param t è£œé–“ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿.
+  //!   \return a, b ã‚’ t ã§å†…åˆ†ã—ãŸå››å…ƒæ•°.
   inline GgQuaternion ggSlerp(const GLfloat *a, const GLfloat *b, GLfloat t)
   {
     GgQuaternion r;
     return r.loadSlerp(a, b, t);
   }
 
-  //! \brief “ñ‚Â‚ÌlŒ³”‚Ì‹…–ÊüŒ`•âŠÔ‚ÌŒ‹‰Ê‚ğ•Ô‚·.
-  //!   \param q GgQuaternion Œ^‚ÌlŒ³”.
-  //!   \param r GgQuaternion Œ^‚ÌlŒ³”.
-  //!   \param t •âŠÔƒpƒ‰ƒ[ƒ^.
-  //!   \return q, r ‚ğ t ‚Å“à•ª‚µ‚½lŒ³”.
+  //! \brief äºŒã¤ã®å››å…ƒæ•°ã®çƒé¢ç·šå½¢è£œé–“ã®çµæœã‚’è¿”ã™.
+  //!   \param q GgQuaternion å‹ã®å››å…ƒæ•°.
+  //!   \param r GgQuaternion å‹ã®å››å…ƒæ•°.
+  //!   \param t è£œé–“ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿.
+  //!   \return q, r ã‚’ t ã§å†…åˆ†ã—ãŸå››å…ƒæ•°.
   inline GgQuaternion ggSlerp(const GgQuaternion &q, const GgQuaternion &r, GLfloat t)
   {
     return ggSlerp(q.get(), r.get(), t);
   }
 
-  //! \brief “ñ‚Â‚ÌlŒ³”‚Ì‹…–ÊüŒ`•âŠÔ‚ÌŒ‹‰Ê‚ğ•Ô‚·.
-  //!   \param q GgQuaternion Œ^‚ÌlŒ³”.
-  //!   \param a lŒ³”‚ğŠi”[‚µ‚½ GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
-  //!   \param t •âŠÔƒpƒ‰ƒ[ƒ^.
-  //!   \return q, a ‚ğ t ‚Å“à•ª‚µ‚½lŒ³”.
+  //! \brief äºŒã¤ã®å››å…ƒæ•°ã®çƒé¢ç·šå½¢è£œé–“ã®çµæœã‚’è¿”ã™.
+  //!   \param q GgQuaternion å‹ã®å››å…ƒæ•°.
+  //!   \param a å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+  //!   \param t è£œé–“ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿.
+  //!   \return q, a ã‚’ t ã§å†…åˆ†ã—ãŸå››å…ƒæ•°.
   inline GgQuaternion ggSlerp(const GgQuaternion &q, const GLfloat *a, GLfloat t)
   {
     return ggSlerp(q.get(), a, t);
   }
 
-  //! \brief “ñ‚Â‚ÌlŒ³”‚Ì‹…–ÊüŒ`•âŠÔ‚ÌŒ‹‰Ê‚ğ•Ô‚·.
-  //!   \param a lŒ³”‚ğŠi”[‚µ‚½ GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
-  //!   \param q GgQuaternion Œ^‚ÌlŒ³”.
-  //!   \param t •âŠÔƒpƒ‰ƒ[ƒ^.
-  //!   \return a, q ‚ğ t ‚Å“à•ª‚µ‚½lŒ³”.
+  //! \brief äºŒã¤ã®å››å…ƒæ•°ã®çƒé¢ç·šå½¢è£œé–“ã®çµæœã‚’è¿”ã™.
+  //!   \param a å››å…ƒæ•°ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+  //!   \param q GgQuaternion å‹ã®å››å…ƒæ•°.
+  //!   \param t è£œé–“ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿.
+  //!   \return a, q ã‚’ t ã§å†…åˆ†ã—ãŸå››å…ƒæ•°.
   inline GgQuaternion ggSlerp(const GLfloat *a, const GgQuaternion &q, GLfloat t)
   {
     return ggSlerp(a, q.get(), t);
   }
 
-  //! \brief lŒ³”‚Ìƒmƒ‹ƒ€‚ğ•Ô‚·.
-  //!   \param q GgQuaternion Œ^‚ÌlŒ³”.
-  //!   \return lŒ³” q ‚Ìƒmƒ‹ƒ€.
+  //! \brief å››å…ƒæ•°ã®ãƒãƒ«ãƒ ã‚’è¿”ã™.
+  //!   \param q GgQuaternion å‹ã®å››å…ƒæ•°.
+  //!   \return å››å…ƒæ•° q ã®ãƒãƒ«ãƒ .
   inline GLfloat ggNorm(const GgQuaternion &q)
   {
     return q.norm();
   }
 
-  //! \brief ³‹K‰»‚µ‚½lŒ³”‚ğ•Ô‚·.
-  //!   \param q GgQuaternion Œ^‚ÌlŒ³”.
-  //!   \return lŒ³” q ‚ğ³‹K‰»‚µ‚½lŒ³”.
+  //! \brief æ­£è¦åŒ–ã—ãŸå››å…ƒæ•°ã‚’è¿”ã™.
+  //!   \param q GgQuaternion å‹ã®å››å…ƒæ•°.
+  //!   \return å››å…ƒæ•° q ã‚’æ­£è¦åŒ–ã—ãŸå››å…ƒæ•°.
   inline GgQuaternion ggNormalize(const GgQuaternion &q)
   {
     return q.normalize();
   }
 
-  //! \brief ‹¤–ğlŒ³”‚ğ•Ô‚·.
-  //!   \param q GgQuaternion Œ^‚ÌlŒ³”.
-  //!   \return lŒ³” q ‚Ì‹¤–ğlŒ³”.
+  //! \brief å…±å½¹å››å…ƒæ•°ã‚’è¿”ã™.
+  //!   \param q GgQuaternion å‹ã®å››å…ƒæ•°.
+  //!   \return å››å…ƒæ•° q ã®å…±å½¹å››å…ƒæ•°.
   inline GgQuaternion ggConjugate(const GgQuaternion &q)
   {
     return q.conjugate();
   }
 
-  //! \brief lŒ³”‚Ì‹tŒ³‚ğ‹‚ß‚é.
-  //!   \param q GgQuaternion Œ^‚ÌlŒ³”.
-  //!   \return lŒ³” q ‚Ì‹tŒ³.
+  //! \brief å››å…ƒæ•°ã®é€†å…ƒã‚’æ±‚ã‚ã‚‹.
+  //!   \param q GgQuaternion å‹ã®å››å…ƒæ•°.
+  //!   \return å››å…ƒæ•° q ã®é€†å…ƒ.
   inline GgQuaternion ggInvert(const GgQuaternion &q)
   {
     return q.invert();
   }
 
   /*!
-  ** \brief ŠÈˆÕƒgƒ‰ƒbƒNƒ{[ƒ‹ˆ—.
+  ** \brief ç°¡æ˜“ãƒˆãƒ©ãƒƒã‚¯ãƒœãƒ¼ãƒ«å‡¦ç†.
   */
   class GgTrackball
   {
-    float cx, cy;                           // ƒhƒ‰ƒbƒOŠJnˆÊ’u
-    bool drag;                              // ƒhƒ‰ƒbƒO’†‚©”Û‚©
-    float sx, sy;                           // ƒ}ƒEƒX‚Ìâ‘ÎˆÊ’u¨ƒEƒBƒ“ƒhƒE“à‚Å‚Ì‘Š‘ÎˆÊ’u‚ÌŠ·ZŒW”
-    GgQuaternion cq;                        // ‰ñ“]‚Ì‰Šú’l (lŒ³”)
-    GgQuaternion tq;                        // ƒhƒ‰ƒbƒO’†‚Ì‰ñ“] (lŒ³”)
-    GgMatrix rt;                            // ‰ñ“]‚Ì•ÏŠ·s—ñ
+    bool drag;        // ãƒ‰ãƒ©ãƒƒã‚°ä¸­ã‹å¦ã‹
+    float start[2];   // ãƒ‰ãƒ©ãƒƒã‚°é–‹å§‹ä½ç½®
+    float scale[2];   // ãƒã‚¦ã‚¹ã®çµ¶å¯¾ä½ç½®â†’ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å†…ã§ã®ç›¸å¯¾ä½ç½®ã®æ›ç®—ä¿‚æ•°
+    GgQuaternion cq;  // å›è»¢ã®åˆæœŸå€¤ (å››å…ƒæ•°)
+    GgQuaternion tq;  // ãƒ‰ãƒ©ãƒƒã‚°ä¸­ã®å›è»¢ (å››å…ƒæ•°)
+    GgMatrix rt;      // å›è»¢ã®å¤‰æ›è¡Œåˆ—
 
   public:
 
-    //! \brief ƒfƒXƒgƒ‰ƒNƒ^.
-    virtual ~GgTrackball() {}
-
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
+    //! \brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
     GgTrackball()
     {
       reset();
     }
 
-    //! \brief ƒgƒ‰ƒbƒNƒ{[ƒ‹ˆ—‚·‚éƒ}ƒEƒX‚ÌˆÚ“®”ÍˆÍ‚ğw’è‚·‚é.
-    //!   \brief ƒEƒBƒ“ƒhƒE‚ÌƒŠƒTƒCƒY‚ÉŒÄ‚Ño‚·.
-    //!   \param w —Ìˆæ‚Ì•.
-    //!   \param h —Ìˆæ‚Ì‚‚³.
+    //! \brief ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    virtual ~GgTrackball() {}
+
+    //! \brief ãƒˆãƒ©ãƒƒã‚¯ãƒœãƒ¼ãƒ«å‡¦ç†ã™ã‚‹ãƒã‚¦ã‚¹ã®ç§»å‹•ç¯„å›²ã‚’æŒ‡å®šã™ã‚‹.
+    //!   \brief ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ãƒªã‚µã‚¤ã‚ºæ™‚ã«å‘¼ã³å‡ºã™.
+    //!   \param w é ˜åŸŸã®æ¨ªå¹….
+    //!   \param h é ˜åŸŸã®é«˜ã•.
     void region(float w, float h);
 
-    //! \brief ƒgƒ‰ƒbƒNƒ{[ƒ‹ˆ—‚·‚éƒ}ƒEƒX‚ÌˆÚ“®”ÍˆÍ‚ğw’è‚·‚é.
-    //!   \brief ƒEƒBƒ“ƒhƒE‚ÌƒŠƒTƒCƒY‚ÉŒÄ‚Ño‚·.
-    //!   \param w —Ìˆæ‚Ì•.
-    //!   \param h —Ìˆæ‚Ì‚‚³.
+    //! \brief ãƒˆãƒ©ãƒƒã‚¯ãƒœãƒ¼ãƒ«å‡¦ç†ã™ã‚‹ãƒã‚¦ã‚¹ã®ç§»å‹•ç¯„å›²ã‚’æŒ‡å®šã™ã‚‹.
+    //!   \brief ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ãƒªã‚µã‚¤ã‚ºæ™‚ã«å‘¼ã³å‡ºã™.
+    //!   \param w é ˜åŸŸã®æ¨ªå¹….
+    //!   \param h é ˜åŸŸã®é«˜ã•.
     void region(int w, int h)
     {
       region(static_cast<float>(w), static_cast<float>(h));
     }
 
-    //! \brief ƒgƒ‰ƒbƒNƒ{[ƒ‹ˆ—‚ğŠJn‚·‚é.
-    //!   \brief ƒ}ƒEƒX‚Ìƒhƒ‰ƒbƒOŠJn (ƒ}ƒEƒXƒ{ƒ^ƒ“‚ğ‰Ÿ‚µ‚½‚Æ‚«) ‚ÉŒÄ‚Ño‚·.
-    //!   \param x Œ»İ‚Ìƒ}ƒEƒX‚Ì x À•W.
-    //!   \param y Œ»İ‚Ìƒ}ƒEƒX‚Ì y À•W.
-    void start(float x, float y);
+    //! \brief ãƒˆãƒ©ãƒƒã‚¯ãƒœãƒ¼ãƒ«å‡¦ç†ã‚’é–‹å§‹ã™ã‚‹.
+    //!   \brief ãƒã‚¦ã‚¹ã®ãƒ‰ãƒ©ãƒƒã‚°é–‹å§‹æ™‚ (ãƒã‚¦ã‚¹ãƒœã‚¿ãƒ³ã‚’æŠ¼ã—ãŸã¨ã) ã«å‘¼ã³å‡ºã™.
+    //!   \param x ç¾åœ¨ã®ãƒã‚¦ã‚¹ã® x åº§æ¨™.
+    //!   \param y ç¾åœ¨ã®ãƒã‚¦ã‚¹ã® y åº§æ¨™.
+    void begin(float x, float y);
 
-    //! \brief ‰ñ“]‚Ì•ÏŠ·s—ñ‚ğŒvZ‚·‚é.
-    //!   \brief ƒ}ƒEƒX‚Ìƒhƒ‰ƒbƒO’†‚ÉŒÄ‚Ño‚·.
-    //!   \param x Œ»İ‚Ìƒ}ƒEƒX‚Ì x À•W.
-    //!   \param y Œ»İ‚Ìƒ}ƒEƒX‚Ì y À•W.
+    //! \brief å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’è¨ˆç®—ã™ã‚‹.
+    //!   \brief ãƒã‚¦ã‚¹ã®ãƒ‰ãƒ©ãƒƒã‚°ä¸­ã«å‘¼ã³å‡ºã™.
+    //!   \param x ç¾åœ¨ã®ãƒã‚¦ã‚¹ã® x åº§æ¨™.
+    //!   \param y ç¾åœ¨ã®ãƒã‚¦ã‚¹ã® y åº§æ¨™.
     void motion(float x, float y);
 
-    //! \brief ƒgƒ‰ƒbƒNƒ{[ƒ‹‚Ì‰ñ“]Šp‚ğC³‚·‚é.
-    //!   \param q C³•ª‚Ì‰ñ“]Šp‚ÌlŒ³”.
+    //! \brief ãƒˆãƒ©ãƒƒã‚¯ãƒœãƒ¼ãƒ«ã®å›è»¢è§’ã‚’ä¿®æ­£ã™ã‚‹.
+    //!   \param q ä¿®æ­£åˆ†ã®å›è»¢è§’ã®å››å…ƒæ•°.
     void rotate(const GgQuaternion &q);
 
-    //! \brief ƒgƒ‰ƒbƒNƒ{[ƒ‹ˆ—‚ğ’â~‚·‚é.
-    //!   \brief ƒ}ƒEƒX‚Ìƒhƒ‰ƒbƒOI—¹ (ƒ}ƒEƒXƒ{ƒ^ƒ“‚ğ—£‚µ‚½‚Æ‚«) ‚ÉŒÄ‚Ño‚·.
-    //!   \param x Œ»İ‚Ìƒ}ƒEƒX‚Ì x À•W.
-    //!   \param y Œ»İ‚Ìƒ}ƒEƒX‚Ì y À•W.
-    void stop(float x, float y);
+    //! \brief ãƒˆãƒ©ãƒƒã‚¯ãƒœãƒ¼ãƒ«å‡¦ç†ã‚’åœæ­¢ã™ã‚‹.
+    //!   \brief ãƒã‚¦ã‚¹ã®ãƒ‰ãƒ©ãƒƒã‚°çµ‚äº†æ™‚ (ãƒã‚¦ã‚¹ãƒœã‚¿ãƒ³ã‚’é›¢ã—ãŸã¨ã) ã«å‘¼ã³å‡ºã™.
+    //!   \param x ç¾åœ¨ã®ãƒã‚¦ã‚¹ã® x åº§æ¨™.
+    //!   \param y ç¾åœ¨ã®ãƒã‚¦ã‚¹ã® y åº§æ¨™.
+    void end(float x, float y);
 
-    //! \brief ƒgƒ‰ƒbƒNƒ{[ƒ‹‚ğƒŠƒZƒbƒg‚·‚é
+    //! \brief ãƒˆãƒ©ãƒƒã‚¯ãƒœãƒ¼ãƒ«ã‚’ãƒªã‚»ãƒƒãƒˆã™ã‚‹
     void reset();
 
-    //! \brief Œ»İ‚Ì‰ñ“]‚Ì•ÏŠ·s—ñ‚ğæ‚èo‚·.
-    //!   \return ‰ñ“]‚Ì•ÏŠ·‚ğ•\‚· GLfloat Œ^‚Ì 16 —v‘f‚Ì”z—ñ.
-    const GLfloat *get() const
+    //! \brief ãƒˆãƒ©ãƒƒã‚¯ãƒœãƒ¼ãƒ«å‡¦ç†ã®é–‹å§‹ä½ç½®ã‚’å–ã‚Šå‡ºã™.
+    //!   \return ãƒˆãƒ©ãƒƒã‚¯ãƒœãƒ¼ãƒ«ã®é–‹å§‹ä½ç½®ã®ãƒã‚¤ãƒ³ã‚¿.
+    const GLfloat *getStart() const
     {
-      return rt.get();
+      return static_cast<const GLfloat *>(start);
     }
 
-    //! \brief Œ»İ‚Ì‰ñ“]‚Ì•ÏŠ·s—ñ‚ğæ‚èo‚·.
-    //!   \return ‰ñ“]‚Ì•ÏŠ·‚ğ•\‚· GgMatrix Œ^‚Ì•ÏŠ·s—ñ.
+    //! \brief ãƒˆãƒ©ãƒƒã‚¯ãƒœãƒ¼ãƒ«å‡¦ç†ã®é–‹å§‹ä½ç½®ã‚’å–ã‚Šå‡ºã™.
+    //!   \param direction 0 ãªã‚‰ x æ–¹å‘, 1 ãªã‚‰ y æ–¹å‘.
+    GLfloat getStart(int direction) const
+    {
+      return static_cast<GLfloat>(start[direction]);
+    }
+
+    //! \brief ãƒˆãƒ©ãƒƒã‚¯ãƒœãƒ¼ãƒ«å‡¦ç†ã®é–‹å§‹ä½ç½®ã‚’å–ã‚Šå‡ºã™.
+    //!   \param \position ãƒˆãƒ©ãƒƒã‚¯ãƒœãƒ¼ãƒ«ã®é–‹å§‹ä½ç½®ã‚’æ ¼ç´ã™ã‚‹ 2 è¦ç´ ã®é…åˆ—.
+    void getStart(GLfloat *position) const
+    {
+      position[0] = start[0];
+      position[1] = start[1];
+    }
+
+    //! \brief ãƒˆãƒ©ãƒƒã‚¯ãƒœãƒ¼ãƒ«å‡¦ç†ã®æ›ç®—ä¿‚æ•°ã‚’å–ã‚Šå‡ºã™.
+    //!   \return ãƒˆãƒ©ãƒƒã‚¯ãƒœãƒ¼ãƒ«ã®æ›ç®—ä¿‚æ•°ã®ãƒã‚¤ãƒ³ã‚¿.
+    const GLfloat *getScale() const
+    {
+      return static_cast<const GLfloat *>(scale);
+    }
+
+    //! \brief ãƒˆãƒ©ãƒƒã‚¯ãƒœãƒ¼ãƒ«å‡¦ç†ã®æ›ç®—ä¿‚æ•°ã‚’å–ã‚Šå‡ºã™.
+    //!   \param direction 0 ãªã‚‰ x æ–¹å‘, 1 ãªã‚‰ y æ–¹å‘.
+    GLfloat getScale(int direction) const
+    {
+      return static_cast<GLfloat>(scale[direction]);
+    }
+
+    //! \brief ãƒˆãƒ©ãƒƒã‚¯ãƒœãƒ¼ãƒ«å‡¦ç†ã®æ›ç®—ä¿‚æ•°ã‚’å–ã‚Šå‡ºã™.
+    //!   \param \factor ãƒˆãƒ©ãƒƒã‚¯ãƒœãƒ¼ãƒ«ã®æ›ç®—ä¿‚æ•°ã‚’æ ¼ç´ã™ã‚‹ 2 è¦ç´ ã®é…åˆ—.
+    void getScale(GLfloat *factor) const
+    {
+      factor[0] = scale[0];
+      factor[1] = scale[1];
+    }
+
+    //! \brief ç¾åœ¨ã®å›è»¢ã®å››å…ƒæ•°ã‚’å–ã‚Šå‡ºã™.
+    //!   \return å›è»¢ã®å¤‰æ›ã‚’è¡¨ã™ Quaternion å‹ã®å››å…ƒæ•°.
+    const GgQuaternion &getQuaternion() const
+    {
+      return tq;
+    }
+
+    //! \brief ç¾åœ¨ã®å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’å–ã‚Šå‡ºã™.
+    //!   \return å›è»¢ã®å¤‰æ›ã‚’è¡¨ã™ GgMatrix å‹ã®å¤‰æ›è¡Œåˆ—.
     const GgMatrix &getMatrix() const
     {
       return rt;
     }
 
-    //! \brief Œ»İ‚Ì‰ñ“]‚ÌlŒ³”‚ğæ‚èo‚·.
-    //!   \return ‰ñ“]‚Ì•ÏŠ·‚ğ•\‚· Quaternion Œ^‚ÌlŒ³”.
-    const GgQuaternion &getQuaternion() const
+    //! \brief ç¾åœ¨ã®å›è»¢ã®å¤‰æ›è¡Œåˆ—ã‚’å–ã‚Šå‡ºã™.
+    //!   \return å›è»¢ã®å¤‰æ›ã‚’è¡¨ã™ GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—.
+    const GLfloat *get() const
     {
-      return tq;
+      return rt.get();
     }
   };
 
   /*!
-  ** \brief QÆƒJƒEƒ“ƒ^.
+  ** \brief ãƒ†ã‚¯ã‚¹ãƒãƒ£.
   **
-  **   •¡”‚Ì‘®«ƒf[ƒ^ŠÔ‚Å‹¤—L‚³‚ê‚éƒŠƒ\[ƒX‚ÌŠm•Û‚Æ‰ğ•ú‚ğŠÇ—‚·‚é
-  */
-  class GgCounter
-  {
-    // QÆƒJƒEƒ“ƒg
-    unsigned int count;
-
-    // ƒfƒXƒgƒ‰ƒNƒ^
-    ~GgCounter() {}
-
-    // ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-    GgCounter()
-      : count(1) {}
-
-    // QÆƒJƒEƒ“ƒg‚ğ‘®«ƒf[ƒ^ƒNƒ‰ƒX‚©‚ç’¼Ú‘€ì‚Å‚«‚é‚æ‚¤‚É‚·‚é
-    friend class GgAttribute;
-  };
-
-  /*!
-  ** \brief ‘®«ƒf[ƒ^.
-  **
-  **   ƒeƒNƒXƒ`ƒƒ‚ÆƒVƒF[ƒ_‚ÌŠî’êƒNƒ‰ƒX.
-  **   ƒCƒ“ƒXƒ^ƒ“ƒX‚Í•¡”‚ÌƒIƒuƒWƒFƒNƒg‚©‚çQÆ‚³‚ê‚é‚±‚Æ‚ğ‘z’è‚·‚é.
-  **   ‚»‚Ì‚½‚ß‚±‚ÌƒNƒ‰ƒX‚Å‚ÍQÆƒJƒEƒ“ƒg‚ğŠÇ—‚·‚é.
-  */
-  class GgAttribute
-  {
-    // QÆƒJƒEƒ“ƒ^
-    GgCounter *ref;
-
-  protected:
-
-    //! \brief —Bˆê‚ÌƒIƒuƒWƒFƒNƒg‚©‚Ç‚¤‚©’²‚×‚é.
-    //!   \return —Bˆê‚ÌƒIƒuƒWƒFƒNƒg‚È‚ç^.
-    bool unique() const
-    {
-      return ref->count == 1;
-    }
-
-    //! \brief QÆƒJƒEƒ“ƒ^‚ÌV‹Kì¬.
-    //!   \return —Bˆê‚ÌƒIƒuƒWƒFƒNƒg‚È‚ç^.
-    bool reset()
-    {
-      // —Bˆê‚ÌƒIƒuƒWƒFƒNƒg‚©‚Ç‚¤‚©’²‚×‚é
-      bool status(--ref->count == 0);
-
-      // Œ³‚ÌQÆƒJƒEƒ“ƒ^‚ÌŠÇ—‘ÎÛ‚©‚çŠO‚·
-      if (status) delete ref;
-
-      // V‚µ‚¢QÆƒJƒEƒ“ƒ^‚ğì¬‚µ‚Ä, ‚»‚ê‚É•t‚¯‘Ö‚¦‚é
-      ref = new GgCounter;
-
-      // Œ³‚ÌƒIƒuƒWƒFƒNƒg‚Ìó‘Ô‚ğ•Ô‚·
-      return status;
-    }
-
-  public:
-
-    //! \brief ƒfƒXƒgƒ‰ƒNƒ^.
-    virtual ~GgAttribute()
-    {
-      // QÆƒJƒEƒ“ƒ^‚ğŒ¸‚¶‚Ä 0 ‚É‚È‚Á‚½‚çQÆƒJƒEƒ“ƒ^‚ğíœ‚·‚é
-      if (--ref->count == 0) delete ref;
-    }
-
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    GgAttribute()
-      : ref(new GgCounter) {}
-
-    //! \brief ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    GgAttribute(const GgAttribute &o)
-      : ref(o.ref)
-    {
-      ++ref->count;
-    }
-
-    // ‘ã“ü
-    GgAttribute &operator=(const GgAttribute &o)
-    {
-      if (&o != this) ++(ref = o.ref)->count;
-
-      return *this;
-    }
-  };
-
-  /*!
-  ** \brief ƒeƒNƒXƒ`ƒƒ.
-  **
-  **   ƒJƒ‰[‰æ‘œ‚ğ“Ç‚İ‚ñ‚ÅƒeƒNƒXƒ`ƒƒƒ}ƒbƒv‚ğì¬‚·‚é.
+  **   ç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã‚“ã§ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒãƒƒãƒ—ã‚’ä½œæˆã™ã‚‹.
   */
   class GgTexture
-    : public GgAttribute
   {
-    // ƒeƒNƒXƒ`ƒƒ–¼
+    // ãƒ†ã‚¯ã‚¹ãƒãƒ£å
     GLuint texture;
+
+    // ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ç¸¦æ¨ªã®ç”»ç´ æ•°
+    GLsizei size[2];
 
   public:
 
-    //! \brief ƒfƒXƒgƒ‰ƒNƒ^.
+    //! \brief ãƒ¡ãƒ¢ãƒªä¸Šã®ãƒ‡ãƒ¼ã‚¿ã‹ã‚‰ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆã™ã‚‹ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    //!   \param image ãƒ†ã‚¯ã‚¹ãƒãƒ£ã¨ã—ã¦ç”¨ã„ã‚‹ç”»åƒãƒ‡ãƒ¼ã‚¿, nullptr ãªã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã¾ãªã„.
+    //!   \param width ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®æ¨ªã®ç”»ç´ æ•°.
+    //!   \param height ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ç¸¦ã®ç”»ç´ æ•°.
+    //!   \param format èª­ã¿è¾¼ã‚€ç”»åƒã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ.
+    //!   \param type ç”»åƒã®ãƒ‡ãƒ¼ã‚¿å‹.
+    //!   \param internal ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å†…éƒ¨ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ.
+    //!   \param wrap ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ©ãƒƒãƒ”ãƒ³ã‚°ãƒ¢ãƒ¼ãƒ‰, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ GL_CLAMP_TO_EDGE.
+    GgTexture(const GLvoid *image, GLsizei width, GLsizei height,
+      GLenum format = GL_BGR, GLenum type = GL_UNSIGNED_BYTE,
+      GLenum internal = GL_RGBA, GLenum wrap = GL_CLAMP_TO_EDGE)
+      : texture(ggLoadTexture(image, width, height, format, type, internal, wrap))
+      , size{ width, height }
+    {}
+
+    //! \brief ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
     virtual ~GgTexture()
     {
-      // QÆ‚µ‚Ä‚¢‚éƒIƒuƒWƒFƒNƒg‚ªˆê‚Â‚¾‚¯‚È‚çƒeƒNƒXƒ`ƒƒ‚ğíœ‚·‚é
-      if (unique())
-      {
-        glBindTexture(GL_TEXTURE_2D, 0);
-        glDeleteTextures(1, &texture);
-      }
+      glBindTexture(GL_TEXTURE_2D, 0);
+      glDeleteTextures(1, &texture);
     }
 
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    GgTexture()
-    {
-      glGenTextures(1, &texture);
-    }
+    // ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã‚’å°ã˜ã‚‹
+    GgTexture(const GgTexture &o) = delete;
 
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    GgTexture(GLuint tex)
-      : texture(tex) {}
+    // ä»£å…¥æ¼”ç®—å­ã‚’å°ã˜ã‚‹
+    GgTexture &operator=(const GgTexture &o) = delete;
 
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    //!   \param width ƒeƒNƒXƒ`ƒƒ‚Ì•.
-    //!   \param height ƒeƒNƒXƒ`ƒƒ‚Ì‚‚³.
-    //!   \param internal ƒeƒNƒXƒ`ƒƒ‚Ì“à•”ƒtƒH[ƒ}ƒbƒg.
-    //!   \param format “Ç‚İ‚ŞƒeƒNƒXƒ`ƒƒ‚ÌƒtƒH[ƒ}ƒbƒg.
-    //!   \param image ƒeƒNƒXƒ`ƒƒ‚Æ‚µ‚Ä—p‚¢‚é‰æ‘œƒf[ƒ^ (0 ‚È‚çƒf[ƒ^‚ğ“Ç‚İ‚Ü‚¸ƒeƒNƒXƒ`ƒƒƒƒ‚ƒŠ‚ÌŠm•Û‚¾‚¯‚ğs‚¤)
-    GgTexture(GLsizei width, GLsizei height, GLenum internal = GL_RGBA, GLenum format = GL_RGBA,
-      const GLvoid *image = nullptr)
-      : texture(ggLoadTexture(width, height, internal, format, image)) {}
-
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    //!   \param name ƒeƒNƒXƒ`ƒƒƒƒ‚ƒŠ‚É“Ç‚İ‚Ş TGA ƒtƒH[ƒ}ƒbƒg‚Ì‰æ‘œƒtƒ@ƒCƒ‹–¼.
-    //!   \param internal ƒeƒNƒXƒ`ƒƒ‚Ì“à•”ƒtƒH[ƒ}ƒbƒg.
-    GgTexture(const char *name, GLenum internal = GL_RGBA)
-      : texture(ggLoadImage(name, internal)) {}
-
-    // ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    GgTexture(const GgTexture &o)
-      : GgAttribute(o), texture(o.texture) {}
-
-    // ‘ã“ü
-    GgTexture &operator=(const GgTexture &o)
-    {
-      if (&o != this)
-      {
-        GgAttribute::operator=(o);
-        texture = o.texture;
-      }
-      return *this;
-    }
-
-    //! \brief ƒeƒNƒXƒ`ƒƒ‚Ìg—pŠJn (‚±‚ÌƒeƒNƒXƒ`ƒƒ‚ğg—p‚·‚éÛ‚ÉŒÄ‚Ño‚·).
-    void use() const
+    //! \brief ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ä½¿ç”¨é–‹å§‹ (ã“ã®ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½¿ç”¨ã™ã‚‹éš›ã«å‘¼ã³å‡ºã™).
+    void bind() const
     {
       glBindTexture(GL_TEXTURE_2D, texture);
     }
 
-    //! \brief ƒeƒNƒXƒ`ƒƒ‚Ìg—pI—¹ (‚±‚ÌƒeƒNƒXƒ`ƒƒ‚ğg—p‚µ‚È‚­‚È‚Á‚½‚çŒÄ‚Ño‚·).
-    void unuse() const
+    //! \brief ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ä½¿ç”¨çµ‚äº† (ã“ã®ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½¿ç”¨ã—ãªããªã£ãŸã‚‰å‘¼ã³å‡ºã™).
+    void unbind() const
     {
       glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    //! \brief g—p‚µ‚Ä‚¢‚éƒeƒNƒXƒ`ƒƒ‚ÌƒeƒNƒXƒ`ƒƒ–¼‚ğ“¾‚é.
-    //!   \return ƒeƒNƒXƒ`ƒƒ–¼.
-    GLuint get() const
+    //! \brief ä½¿ç”¨ã—ã¦ã„ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®æ¨ªã®ç”»ç´ æ•°ã‚’å–ã‚Šå‡ºã™.
+    //!   \return ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®æ¨ªã®ç”»ç´ æ•°.
+    GLsizei getWidth() const
+    {
+      return size[0];
+    }
+
+    //! \brief ä½¿ç”¨ã—ã¦ã„ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ç¸¦ã®ç”»ç´ æ•°ã‚’å–ã‚Šå‡ºã™.
+    //!   \return ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ç¸¦ã®ç”»ç´ æ•°.
+    GLsizei getHeight() const
+    {
+      return size[1];
+    }
+
+    //! \brief ä½¿ç”¨ã—ã¦ã„ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ã‚µã‚¤ã‚ºã‚’å–ã‚Šå‡ºã™.
+    //!   \param ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ã‚µã‚¤ã‚ºã‚’æ ¼ç´ã™ã‚‹ GLsizei å‹ã® 2 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+    void getSize(GLsizei *size) const
+    {
+      size[0] = getWidth();
+      size[1] = getHeight();
+    }
+
+    //! \brief ä½¿ç”¨ã—ã¦ã„ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ã‚µã‚¤ã‚ºã‚’å–ã‚Šå‡ºã™.
+    //!   \return ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ã‚µã‚¤ã‚ºã‚’æ ¼ç´ã—ãŸé…åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿.
+    const GLsizei *getSize() const
+    {
+      return size;
+    }
+
+    //! \brief ä½¿ç”¨ã—ã¦ã„ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ†ã‚¯ã‚¹ãƒãƒ£åã‚’å¾—ã‚‹.
+    //!   \return ãƒ†ã‚¯ã‚¹ãƒãƒ£å.
+    GLuint getTexture() const
     {
       return texture;
     }
   };
 
   /*!
-  ** \brief –@üƒ}ƒbƒv.
+  ** \brief ã‚«ãƒ©ãƒ¼ãƒãƒƒãƒ—.
   **
-  **   ‚‚³ƒ}ƒbƒviƒOƒŒƒCƒXƒP[ƒ‹‰æ‘œj‚ğ“Ç‚İ‚ñ‚Å–@üƒ}ƒbƒv‚ğì¬‚·‚é.
+  **  ã‚«ãƒ©ãƒ¼ç”»åƒã‚’èª­ã¿è¾¼ã‚“ã§ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆã™ã‚‹.
   */
-  class GgNormalTexture
-    : public GgTexture
+  class GgColorTexture
   {
+    // ãƒ†ã‚¯ã‚¹ãƒãƒ£
+    std::shared_ptr<GgTexture> texture;
+
   public:
 
-    //! \brief ƒfƒXƒgƒ‰ƒNƒ^.
-    virtual ~GgNormalTexture() {}
+    //! \brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    GgColorTexture() {}
 
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    GgNormalTexture() {}
-
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    //!   \param name ‰æ‘œƒtƒ@ƒCƒ‹–¼ (1 ƒ`ƒƒƒlƒ‹‚Ì TGA ‰æ‘œ).
-    //!   \param nz –@üƒ}ƒbƒv‚Ì z ¬•ª‚Ì’l.
-    GgNormalTexture(const char *name, float nz = 1.0f)
-      : GgTexture(ggLoadHeight(name, nz)) {}
-
-    //! \brief ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    GgNormalTexture(const GgNormalTexture &o)
-      : GgTexture(o) {}
-
-    // ‘ã“ü
-    GgNormalTexture &operator=(const GgNormalTexture &o)
+    //! \brief ãƒ¡ãƒ¢ãƒªä¸Šã®ãƒ‡ãƒ¼ã‚¿ã‹ã‚‰ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆã™ã‚‹ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    //!   \param image ãƒ†ã‚¯ã‚¹ãƒãƒ£ã¨ã—ã¦ç”¨ã„ã‚‹ç”»åƒãƒ‡ãƒ¼ã‚¿, nullptr ãªã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã¾ãªã„.
+    //!   \param width èª­ã¿è¾¼ã‚€ç”»åƒã®æ¨ªã®ç”»ç´ æ•°.
+    //!   \param height èª­ã¿è¾¼ã‚€ç”»åƒã®ç¸¦ã®ç”»ç´ æ•°.
+    //!   \param format èª­ã¿è¾¼ã‚€ç”»åƒã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ.
+    //!   \param type èª­ã¿è¾¼ã‚€ç”»åƒã®ãƒ‡ãƒ¼ã‚¿å‹.
+    //!   \param internal ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å†…éƒ¨ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ.
+    //!   \param wrap ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ©ãƒƒãƒ”ãƒ³ã‚°ãƒ¢ãƒ¼ãƒ‰.
+    GgColorTexture(const GLvoid *image, GLsizei width, GLsizei height,
+      GLenum format = GL_BGR, GLenum type = GL_UNSIGNED_BYTE,
+      GLenum internal = GL_RGB, GLenum wrap = GL_CLAMP_TO_EDGE)
     {
-      GgTexture::operator=(o);
-      return *this;
+      load(image, width, height, format, type, internal, wrap);
     }
+
+    //! \brief ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã‚“ã§ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆã™ã‚‹ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    //!   \param name èª­ã¿è¾¼ã‚€ãƒ•ã‚¡ã‚¤ãƒ«å.
+    //!   \param internal glTexImage2D() ã«æŒ‡å®šã™ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å†…éƒ¨ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ. 0 ãªã‚‰å¤–éƒ¨ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã«åˆã‚ã›ã‚‹.
+    GgColorTexture(const char *name, GLenum internal = 0, GLenum wrap = GL_CLAMP_TO_EDGE)
+    {
+      load(name, internal, wrap);
+    }
+
+    //! \brief ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    virtual ~GgColorTexture() {}
+
+    //! \brief ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆã—ã¦ãƒ¡ãƒ¢ãƒªä¸Šã®ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã‚€.
+    //!   \param image ãƒ†ã‚¯ã‚¹ãƒãƒ£ã¨ã—ã¦ç”¨ã„ã‚‹ç”»åƒãƒ‡ãƒ¼ã‚¿, nullptr ãªã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã¾ãªã„.
+    //!   \param width ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®æ¨ªã®ç”»ç´ æ•°.
+    //!   \param height ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ç¸¦ã®ç”»ç´ æ•°.
+    //!   \param format èª­ã¿è¾¼ã‚€ç”»åƒã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ.
+    //!   \param type èª­ã¿è¾¼ã‚€ç”»åƒã®ãƒ‡ãƒ¼ã‚¿å‹.
+    //!   \param internal ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å†…éƒ¨ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ.
+    //!   \param wrap ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ©ãƒƒãƒ”ãƒ³ã‚°ãƒ¢ãƒ¼ãƒ‰.
+    void load(const GLvoid *image, GLsizei width, GLsizei height,
+      GLenum format = GL_BGR, GLenum type = GL_UNSIGNED_BYTE,
+      GLenum internal = GL_RGB, GLenum wrap = GL_CLAMP_TO_EDGE)
+    {
+      // ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆã™ã‚‹
+      texture.reset(new GgTexture(image, width, height, format, type, internal, wrap));
+    }
+
+    //! \brief ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆã—ã¦ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã‚€.
+    //!   \param name èª­ã¿è¾¼ã‚€ãƒ•ã‚¡ã‚¤ãƒ«å.
+    //!   \param internal glTexImage2D() ã«æŒ‡å®šã™ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å†…éƒ¨ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ. 0 ãªã‚‰å¤–éƒ¨ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã«åˆã‚ã›ã‚‹.
+    //!   \return ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ä½œæˆã«æˆåŠŸã™ã‚Œã° true, å¤±æ•—ã™ã‚Œã° false.
+    void load(const char *name, GLenum internal = 0, GLenum wrap = GL_CLAMP_TO_EDGE);
   };
 
   /*!
-  ** \brief ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg.
+  ** \brief æ³•ç·šãƒãƒƒãƒ—.
   **
-  **   ’¸“_‘®«^’¸“_ƒCƒ“ƒfƒbƒNƒX^ƒ†ƒjƒtƒH[ƒ€•Ï”‚ğŠi”[‚·‚éƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚ÌŠî’êƒNƒ‰ƒX.
+  **   é«˜ã•ãƒãƒƒãƒ—ï¼ˆã‚°ãƒ¬ã‚¤ã‚¹ã‚±ãƒ¼ãƒ«ç”»åƒï¼‰ã‚’èª­ã¿è¾¼ã‚“ã§æ³•ç·šãƒãƒƒãƒ—ã®ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆã™ã‚‹.
   */
-  template <typename T>
-  class GgBuffer
-    : public GgAttribute
+  class GgNormalTexture
   {
-    // ƒ^[ƒQƒbƒg
-    GLenum target;
-
-    // ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg
-    GLuint buffer;
-
-    // ƒf[ƒ^”
-    GLuint count;
-
-    // ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚ÌƒAƒ‰ƒCƒƒ“ƒg‚ğl—¶‚µ‚½ƒuƒƒbƒNƒTƒCƒY
-    const GLsizeiptr blocksize;
+    // ãƒ†ã‚¯ã‚¹ãƒãƒ£
+    std::shared_ptr<GgTexture> texture;
 
   public:
 
-    //! \brief ƒfƒXƒgƒ‰ƒNƒ^.
+    //! \brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    GgNormalTexture() {}
+
+    //! \brief ãƒ¡ãƒ¢ãƒªä¸Šã®ãƒ‡ãƒ¼ã‚¿ã‹ã‚‰æ³•ç·šãƒãƒƒãƒ—ã®ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆã™ã‚‹ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    //!   \param image ãƒ†ã‚¯ã‚¹ãƒãƒ£ã¨ã—ã¦ç”¨ã„ã‚‹ç”»åƒãƒ‡ãƒ¼ã‚¿, nullptr ãªã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã¾ãªã„.
+    //!   \param width ãƒ†ã‚¯ã‚¹ãƒãƒ£ã¨ã—ã¦ç”¨ã„ã‚‹ç”»åƒãƒ‡ãƒ¼ã‚¿ã®æ¨ªå¹….
+    //!   \param height ãƒ†ã‚¯ã‚¹ãƒãƒ£ã¨ã—ã¦ç”¨ã„ã‚‹ç”»åƒãƒ‡ãƒ¼ã‚¿ã®é«˜ã•.
+    //!   \param format ãƒ†ã‚¯ã‚¹ãƒãƒ£ã¨ã—ã¦ç”¨ã„ã‚‹ç”»åƒãƒ‡ãƒ¼ã‚¿ã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ (GL_RED, GL_RG, GL_RGB, GL_RGBA).
+    //!   \param nz æ³•ç·šãƒãƒƒãƒ—ã® z æˆåˆ†ã®å€¤.
+    //!   \param internal ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å†…éƒ¨ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ.
+    GgNormalTexture(const GLubyte *image, GLsizei width, GLsizei height, GLenum format = GL_RED, float nz = 1.0f,
+      GLenum internal = GL_RGBA)
+    {
+      // æ³•ç·šãƒãƒƒãƒ—ã®ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆã™ã‚‹
+      load(image, width, height, format, nz, internal);
+    }
+
+    //! \brief ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã‚“ã§æ³•ç·šãƒãƒƒãƒ—ã®ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆã™ã‚‹ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    //!   \param name ç”»åƒãƒ•ã‚¡ã‚¤ãƒ«å.
+    //!   \param nz æ³•ç·šãƒãƒƒãƒ—ã® z æˆåˆ†ã®å€¤.
+    //!   \param internal ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å†…éƒ¨ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ.
+    GgNormalTexture(const char *name, float nz = 1.0f, GLenum internal = GL_RGBA)
+    {
+      // æ³•ç·šãƒãƒƒãƒ—ã®ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆã™ã‚‹
+      load(name, nz, internal);
+    }
+
+    //! \brief ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    virtual ~GgNormalTexture() {}
+
+    //! \brief ãƒ¡ãƒ¢ãƒªä¸Šã®ãƒ‡ãƒ¼ã‚¿ã‹ã‚‰æ³•ç·šãƒãƒƒãƒ—ã®ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆã™ã‚‹.
+    //!   \param hmap ãƒ†ã‚¯ã‚¹ãƒãƒ£ã¨ã—ã¦ç”¨ã„ã‚‹ç”»åƒãƒ‡ãƒ¼ã‚¿, nullptr ãªã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã¾ãªã„.
+    //!   \param width ãƒ†ã‚¯ã‚¹ãƒãƒ£ã¨ã—ã¦ç”¨ã„ã‚‹ç”»åƒãƒ‡ãƒ¼ã‚¿ã®æ¨ªå¹….
+    //!   \param height ãƒ†ã‚¯ã‚¹ãƒãƒ£ã¨ã—ã¦ç”¨ã„ã‚‹ç”»åƒãƒ‡ãƒ¼ã‚¿ã®é«˜ã•.
+    //!   \param format ãƒ†ã‚¯ã‚¹ãƒãƒ£ã¨ã—ã¦ç”¨ã„ã‚‹ç”»åƒãƒ‡ãƒ¼ã‚¿ã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ (GL_RED, GL_RG, GL_RGB, GL_RGBA).
+    //!   \param nz æ³•ç·šãƒãƒƒãƒ—ã® z æˆåˆ†ã®å€¤.
+    //!   \param internal ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å†…éƒ¨ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ.
+    void load(const GLubyte *hmap, GLsizei width, GLsizei height, GLenum format = GL_RED, float nz = 1.0f,
+      GLenum internal = GL_RGBA)
+    {
+      // æ³•ç·šãƒãƒƒãƒ—
+      std::vector<GgVector> nmap;
+
+      // æ³•ç·šãƒãƒƒãƒ—ã‚’ä½œæˆã™ã‚‹
+      ggCreateNormalMap(hmap, width, height, format, nz, internal, nmap);
+
+      // ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆã™ã‚‹
+      texture.reset(new GgTexture(nmap.data(), width, height, GL_RGBA, GL_FLOAT, internal, GL_REPEAT));
+    }
+
+    //! \brief ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã‚“ã§æ³•ç·šãƒãƒƒãƒ—ã®ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆã™ã‚‹.
+    //!   \param name ç”»åƒãƒ•ã‚¡ã‚¤ãƒ«å (1 ãƒãƒ£ãƒãƒ«ã® TGA ç”»åƒ).
+    //!   \param nz æ³•ç·šãƒãƒƒãƒ—ã® z æˆåˆ†ã®å€¤.
+    //!   \param internal ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å†…éƒ¨ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ.
+    void load(const char *name, float nz = 1.0f, GLenum internal = GL_RGBA);
+  };
+
+  /*!
+  ** \brief ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ.
+  **
+  **   é ‚ç‚¹å±æ€§ï¼é ‚ç‚¹ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ï¼ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ å¤‰æ•°ã‚’æ ¼ç´ã™ã‚‹ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®åŸºåº•ã‚¯ãƒ©ã‚¹.
+  */
+  template <typename T>
+  class GgBuffer
+  {
+    // ã‚¿ãƒ¼ã‚²ãƒƒãƒˆ
+    const GLenum target;
+
+    // ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆã‚’è€ƒæ…®ã—ãŸãƒ‡ãƒ¼ã‚¿ã®é–“éš”
+    const GLsizei stride;
+
+    // ãƒ‡ãƒ¼ã‚¿ã®æ•°
+    const GLsizei count;
+
+    // ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+    const GLuint buffer;
+
+  public:
+
+    //! \brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    //!   \param target ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ã‚¿ãƒ¼ã‚²ãƒƒãƒˆ.
+    //!   \param data ãƒ‡ãƒ¼ã‚¿ãŒæ ¼ç´ã•ã‚Œã¦ã„ã‚‹é ˜åŸŸã®å…ˆé ­ã®ãƒã‚¤ãƒ³ã‚¿ (nullptr ãªã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’è»¢é€ã—ãªã„).
+    //!   \param count ãƒ‡ãƒ¼ã‚¿ã®æ•°.
+    //!   \param stride ãƒ‡ãƒ¼ã‚¿ã®é–“éš”.
+    //!   \param usage ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½¿ã„æ–¹.
+    GgBuffer<T>(GLenum target, const T *data, GLsizei stride, GLsizei count, GLenum usage)
+      : target(target)
+      , stride(stride)
+      , count(count)
+      , buffer([] { GLuint buffer; glGenBuffers(1, &buffer); return buffer; } ())
+    {
+      // ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ãƒ¡ãƒ¢ãƒªã‚’ç¢ºä¿ã—ã¦ãƒ‡ãƒ¼ã‚¿ã‚’è»¢é€ã™ã‚‹
+      glBindBuffer(target, buffer);
+      glBufferData(target, getStride() * count, data, usage);
+    }
+
+    //! \brief ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
     virtual ~GgBuffer<T>()
     {
-      // QÆ‚µ‚Ä‚¢‚éƒIƒuƒWƒFƒNƒg‚ªˆê‚Â‚¾‚¯‚È‚çƒoƒbƒtƒ@‚ğíœ‚·‚é
-      if (unique())
-      {
-        unbind();
-        glDeleteBuffers(1, &buffer);
-      }
-    }
-
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    GgBuffer<T>(GLsizeiptr blocksize = sizeof (T))
-      : target(0), buffer(0), count(0), blocksize(blocksize)
-    {
-      glGenBuffers(1, &buffer);
-    }
-
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    //!   \param target ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Ìƒ^[ƒQƒbƒg.
-    //!   \param data ƒf[ƒ^‚ªŠi”[‚³‚ê‚Ä‚¢‚é—Ìˆæ‚Ìæ“ª‚Ìƒ|ƒCƒ“ƒ^ (nullptr ‚È‚çƒf[ƒ^‚ğ“]‘—‚µ‚È‚¢).
-    //!   \param count ƒf[ƒ^‚Ì”.
-    //!   \param usage ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Ìg‚¢•û.
-    GgBuffer<T>(GLenum target, const T *data, GLuint count, GLenum usage = GL_STATIC_DRAW)
-      : GgBuffer<T>()
-    {
-      load(target, data, count, usage);
-    }
-
-    //! \brief ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    GgBuffer<T>(const GgBuffer<T> &o)
-      : GgAttribute(o), target(o.target), buffer(o.buffer), count(o.count), blocksize(o.blocksize) {}
-
-    //! \brief ‘ã“ü‰‰Zq.
-    GgBuffer<T> &operator=(const GgBuffer<T> &o)
-    {
-      if (&o != this)
-      {
-        GgAttribute::operator=(o);
-        target = o.target;
-        buffer = o.buffer;
-        count = o.count;
-      }
-
-      return *this;
-    }
-
-    //! \brief ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚ğŒ‹‡‚·‚é.
-    void bind() const
-    {
-      glBindBuffer(target, buffer);
-    }
-
-    //! \brief ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚ğ‰ğ•ú‚·‚é.
-    void unbind() const
-    {
+      // ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å‰Šé™¤ã™ã‚‹
       glBindBuffer(target, 0);
+      glDeleteBuffers(1, &buffer);
     }
 
-    //! \brief ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚ğƒ}ƒbƒv‚·‚é.
-    //!   \return ƒ}ƒbƒv‚µ‚½ƒƒ‚ƒŠ‚Ìæ“ª‚Ìƒ|ƒCƒ“ƒ^.
-    void *map() const
-    {
-      bind();
-      return glMapBuffer(target, GL_WRITE_ONLY);
-    }
+    // ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã‚’å°ã˜ã‚‹
+    GgBuffer<T>(const GgBuffer<T> &o) = delete;
 
-    //! \brief ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Ìw’è‚µ‚½”ÍˆÍ‚ğƒ}ƒbƒv‚·‚é.
-    //!   \param offset ƒ}ƒbƒv‚·‚é”ÍˆÍ‚Ìƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Ìæ“ª‚©‚ç‚ÌˆÊ’u.
-    //!   \param count ƒ}ƒbƒv‚·‚éƒf[ƒ^‚Ì”.
-    //!   \return ƒ}ƒbƒv‚µ‚½ƒƒ‚ƒŠ‚Ìæ“ª‚Ìƒ|ƒCƒ“ƒ^.
-    void *map(GLuint offset, GLuint count) const
-    {
-      bind();
-      return glMapBufferRange(target, getSize(offset), getSize(count), GL_WRITE_ONLY);
-    }
+    // ä»£å…¥æ¼”ç®—å­ã‚’å°ã˜ã‚‹
+    GgBuffer<T> &operator=(const GgBuffer<T> &o) = delete;
 
-    //! \brief ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚ğƒAƒ“ƒ}ƒbƒv‚·‚é.
-    void unmap() const
-    {
-      glUnmapBuffer(target);
-    }
-
-    //! \brief ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Ìƒ^[ƒQƒbƒg‚ğæ‚èo‚·.
-    //!   \return ƒ^[ƒQƒbƒg.
+    //! \brief ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã‚’å–ã‚Šå‡ºã™.
+    //!   \return ã“ã®ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ã‚¿ãƒ¼ã‚²ãƒƒãƒˆ.
     GLuint getTarget() const
     {
       return target;
     }
 
-    //! \brief ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg–¼‚ğæ‚èo‚·.
-    //!   \return ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg–¼.
+    //! \brief ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆã‚’è€ƒæ…®ã—ãŸãƒ‡ãƒ¼ã‚¿ã®é–“éš”ã‚’å–ã‚Šå‡ºã™.
+    //!   \return ã“ã®ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ãƒ‡ãƒ¼ã‚¿ã®é–“éš”.
+    GLsizeiptr getStride() const
+    {
+      return static_cast<GLsizeiptr>(stride);
+    }
+
+    //! \brief ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒä¿æŒã™ã‚‹ãƒ‡ãƒ¼ã‚¿ã®æ•°ã‚’å–ã‚Šå‡ºã™.
+    //!   \return ã“ã®ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒä¿æŒã™ã‚‹ãƒ‡ãƒ¼ã‚¿ã®æ•°.
+    GLsizei getCount() const
+    {
+      return count;
+    }
+
+    //! \brief ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆåã‚’å–ã‚Šå‡ºã™.
+    //!   \return ã“ã®ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå.
     GLuint getBuffer() const
     {
       return buffer;
     }
 
-    //! \brief ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚ª•Û‚·‚éƒf[ƒ^‚Ì”‚ğæ‚èo‚·.
-    //!   \return •Û‚·‚éƒf[ƒ^‚Ì”.
-    GLuint getCount() const
+    //! \brief ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’çµåˆã™ã‚‹.
+    void bind() const
     {
-      return count;
+      glBindBuffer(target, buffer);
     }
 
-    //! \brief ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚ÌƒuƒƒbƒN count ŒÂ•ª‚ÌƒTƒCƒY‚ğ‹‚ß‚é.
-    //!   \param count ƒuƒƒbƒN‚ÌŒÂ”.
-    //!   \return ƒuƒƒbƒN‚ÌŒÂ”•ª‚ÌƒTƒCƒY.
-    GLsizeiptr getSize(int count = 1) const
+    //! \brief ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’è§£æ”¾ã™ã‚‹.
+    void unbind() const
     {
-      return blocksize * count;
+      glBindBuffer(target, 0);
     }
 
-    //! \brief ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚ğŠm•Û‚µ‚Äƒf[ƒ^‚ğŠi”[‚·‚é.
-    //!   \param target ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Ìƒ^[ƒQƒbƒg.
-    //!   \param data ƒf[ƒ^‚ªŠi”[‚³‚ê‚Ä‚¢‚é—Ìˆæ‚Ìæ“ª‚Ìƒ|ƒCƒ“ƒ^.
-    //!   \param count ƒf[ƒ^‚Ì”.
-    //!   \param usage ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Ìg‚¢•û.
-    virtual void load(GLenum target, const T *data, GLuint count = 1, GLenum usage = GL_STATIC_DRAW)
+    //! \brief ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ãƒãƒƒãƒ—ã™ã‚‹.
+    //!   \return ãƒãƒƒãƒ—ã—ãŸãƒ¡ãƒ¢ãƒªã®å…ˆé ­ã®ãƒã‚¤ãƒ³ã‚¿.
+    void *map() const
     {
-      // ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Ìƒ^[ƒQƒbƒg‚Æƒf[ƒ^‚Ì”
-      this->target = target;
-      this->count = count;
-
-      // ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Ìƒƒ‚ƒŠ‚ğŠm•Û‚·‚é
-      bind();
-      glBufferData(target, getSize(count), data, usage);
+      glBindBuffer(target, buffer);
+      return glMapBuffer(target, GL_WRITE_ONLY);
     }
 
-    //! \brief ‚·‚Å‚ÉŠm•Û‚µ‚½ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Éƒf[ƒ^‚ğ“]‘—‚·‚é.
-    //!   \param data “]‘—Œ³‚Ìƒf[ƒ^‚ªŠi”[‚³‚ê‚Ä‚Ä‚¢‚é—Ìˆæ‚Ìæ“ª‚Ìƒ|ƒCƒ“ƒ^.
-    //!   \param count “]‘—‚·‚éƒf[ƒ^‚Ì” (0 ‚È‚çƒoƒbƒtƒ@‘S‘Ì).
-    //!   \param offset “]‘—æ‚Ìƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Ìæ“ª‚Ì—v‘f”Ô†.
-    virtual void send(const T *data, GLuint count = 0, GLuint offset = 0) const
+    //! \brief ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®æŒ‡å®šã—ãŸç¯„å›²ã‚’ãƒãƒƒãƒ—ã™ã‚‹.
+    //!   \param first ãƒãƒƒãƒ—ã™ã‚‹ç¯„å›²ã®ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®å…ˆé ­ã‹ã‚‰ã®ä½ç½®.
+    //!   \param count ãƒãƒƒãƒ—ã™ã‚‹ãƒ‡ãƒ¼ã‚¿ã®æ•° (0 ãªã‚‰ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå…¨ä½“).
+    //!   \return ãƒãƒƒãƒ—ã—ãŸãƒ¡ãƒ¢ãƒªã®å…ˆé ­ã®ãƒã‚¤ãƒ³ã‚¿.
+    void *map(GLint first, GLsizei count) const
     {
-      // count ‚ª 0 ‚È‚ç‘Sƒf[ƒ^‚ğ“]‘—‚·‚é
-      if (count == 0) count = this->count;
+      // count ãŒ 0 ãªã‚‰å…¨ãƒ‡ãƒ¼ã‚¿ã‚’ãƒãƒƒãƒ—ã™ã‚‹
+      if (count == 0) count = getCount();
+      if (first + count > getCount()) count = getCount() - first;
 
-      // ƒf[ƒ^‚ğŠù‘¶‚Ìƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚É“]‘—‚·‚é
-      bind();
-      glBufferSubData(target, getSize(offset), blocksize * count, data);
+      glBindBuffer(target, buffer);
+      return glMapBufferRange(target, getStride() * first, getStride() * count, GL_MAP_WRITE_BIT);
     }
 
-    //! \brief •Ê‚Ìƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚©‚çƒf[ƒ^‚ğ•¡Ê‚·‚é.
-    //!   \param buffer •¡ÊŒ³‚Ìƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg–¼.
-    //!   \param count •¡Ê‚·‚éƒf[ƒ^‚Ì” (0 ‚È‚çƒoƒbƒtƒ@‘S‘Ì).
-    //!   \param src_offset •¡ÊŒ³ (buffer) ‚Ìæ“ª‚Ìƒf[ƒ^‚ÌˆÊ’u.
-    //!   \param dst_offset •¡Êæ (this->buffer) ‚Ìæ“ª‚Ìƒf[ƒ^‚ÌˆÊ’u.
-    virtual void copy(GLuint buffer, GLuint count = 0, GLuint src_offset = 0, GLuint dst_offset = 0) const
+    //! \brief ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ã‚¢ãƒ³ãƒãƒƒãƒ—ã™ã‚‹.
+    void unmap() const
     {
-      // count ‚ª 0 ‚È‚ç‘Sƒf[ƒ^‚ğ•¡Ê‚·‚é
-      if (count == 0) count = this->count;
+      glUnmapBuffer(target);
+    }
 
-      glBindBuffer(GL_COPY_READ_BUFFER, buffer);
-      glBindBuffer(GL_COPY_WRITE_BUFFER, this->buffer);
+    //! \brief ã™ã§ã«ç¢ºä¿ã—ãŸãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«ãƒ‡ãƒ¼ã‚¿ã‚’è»¢é€ã™ã‚‹.
+    //!   \param data è»¢é€å…ƒã®ãƒ‡ãƒ¼ã‚¿ãŒæ ¼ç´ã•ã‚Œã¦ã¦ã„ã‚‹é ˜åŸŸã®å…ˆé ­ã®ãƒã‚¤ãƒ³ã‚¿.
+    //!   \param first è»¢é€å…ˆã®ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®å…ˆé ­ã®è¦ç´ ç•ªå·.
+    //!   \param count è»¢é€ã™ã‚‹ãƒ‡ãƒ¼ã‚¿ã®æ•° (0 ãªã‚‰ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå…¨ä½“).
+    void send(const T *data, GLint first, GLsizei count) const
+    {
+      // count ãŒ 0 ãªã‚‰å…¨ãƒ‡ãƒ¼ã‚¿ã‚’è»¢é€ã™ã‚‹
+      if (count == 0) count = getCount();
+      if (first + count > getCount()) count = getCount() - first;
+
+      // ãƒ‡ãƒ¼ã‚¿ã‚’æ—¢å­˜ã®ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«è»¢é€ã™ã‚‹
+      glBindBuffer(target, buffer);
+      glBufferSubData(target, getStride() * first, getStride() * count, data);
+    }
+
+    //! \brief ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ãƒ‡ãƒ¼ã‚¿ã‹ã‚‰æŠ½å‡ºã™ã‚‹.
+    //!   \param data æŠ½å‡ºå…ˆã®é ˜åŸŸã®å…ˆé ­ã®ãƒã‚¤ãƒ³ã‚¿.
+    //!   \param first æŠ½å‡ºå…ƒã®ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®å–ã‚Šå‡ºã™ãƒ‡ãƒ¼ã‚¿ã®é ˜åŸŸã®å…ˆé ­ã®è¦ç´ ç•ªå·.
+    //!   \param count æŠ½å‡ºã™ã‚‹ãƒ‡ãƒ¼ã‚¿ã®æ•° (0 ãªã‚‰ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå…¨ä½“).
+    void read(T *data, GLint first, GLsizei count) const
+    {
+      // count ãŒ 0 ãªã‚‰å…¨ãƒ‡ãƒ¼ã‚¿ã‚’æŠ½å‡ºã™ã‚‹
+      if (count == 0) count = getCount();
+      if (first + count > getCount()) count = getCount() - first;
+
+      // ãƒ‡ãƒ¼ã‚¿ã‚’ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‹ã‚‰æŠ½å‡ºã™ã‚‹
+      glBindBuffer(target, buffer);
+      glGetBufferSubData(target, getStride() * first, getStride() * count, data);
+    }
+
+    //! \brief åˆ¥ã®ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’è¤‡å†™ã™ã‚‹.
+    //!   \param src_buffer è¤‡å†™å…ƒã®ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå.
+    //!   \param src_first è¤‡å†™å…ƒ (src_buffer) ã®å…ˆé ­ã®ãƒ‡ãƒ¼ã‚¿ã®ä½ç½®.
+    //!   \param dst_first è¤‡å†™å…ˆ (getBuffer()) ã®å…ˆé ­ã®ãƒ‡ãƒ¼ã‚¿ã®ä½ç½®.
+    //!   \param count è¤‡å†™ã™ã‚‹ãƒ‡ãƒ¼ã‚¿ã®æ•° (0 ãªã‚‰ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå…¨ä½“).
+    void copy(GLuint src_buffer, GLint src_first = 0, GLint dst_first = 0, GLsizei count = 0) const
+    {
+      // count ãŒ 0 ãªã‚‰å…¨ãƒ‡ãƒ¼ã‚¿ã‚’è¤‡å†™ã™ã‚‹
+      if (count == 0) count = getCount();
+      if (src_first + count > getCount()) count = getCount() - src_first;
+      if (dst_first + count > getCount()) count = getCount() - dst_first;
+
+      // ãƒ‡ãƒ¼ã‚¿ã®é–“éš”
+      const GLsizeiptr stride(getStride());
+
+      glBindBuffer(GL_COPY_READ_BUFFER, src_buffer);
+      glBindBuffer(GL_COPY_WRITE_BUFFER, buffer);
       glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER,
-        getSize(src_offset), getSize(dst_offset), getSize(count));
+        stride * src_first, stride * dst_first, stride * count);
       glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
       glBindBuffer(GL_COPY_READ_BUFFER, 0);
     }
   };
 
   /*!
-  ** \brief ƒ†ƒjƒtƒH[ƒ€ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg.
+  ** \brief ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ.
   **
-  **   ƒ†ƒjƒtƒH[ƒ€•Ï”‚ğŠi”[‚·‚éƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚ÌŠî’êƒNƒ‰ƒX.
+  **   ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ å¤‰æ•°ã‚’æ ¼ç´ã™ã‚‹ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®åŸºåº•ã‚¯ãƒ©ã‚¹.
   */
   template <typename T>
   class GgUniformBuffer
-    : public GgBuffer<T>
   {
+    // ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+    std::shared_ptr<GgBuffer<T>> uniform;
+
   public:
 
-    //! \brief ƒfƒXƒgƒ‰ƒNƒ^.
-    virtual ~GgUniformBuffer<T>() {}
+    //! \brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    GgUniformBuffer<T>() {}
 
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    GgUniformBuffer<T>()
-      : GgBuffer<T>((((sizeof (T) - 1) / ggBufferAlignment) + 1) * ggBufferAlignment) {}
-
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    //!   \param data ƒf[ƒ^‚ªŠi”[‚³‚ê‚Ä‚¢‚é—Ìˆæ‚Ìæ“ª‚Ìƒ|ƒCƒ“ƒ^ (nullptr ‚È‚çƒf[ƒ^‚ğ“]‘—‚µ‚È‚¢).
-    //!   \param count ƒf[ƒ^‚Ì”.
-    //!   \param usage ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Ìg‚¢•û.
-    GgUniformBuffer<T>(const T *data, GLuint count, GLenum usage = GL_STATIC_DRAW)
-      : GgUniformBuffer<T>()
+    //! \brief ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ãƒ–ãƒ­ãƒƒã‚¯ã”ã¨ã«ãƒ‡ãƒ¼ã‚¿ã‚’è»¢é€ã™ã‚‹ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    //!   \param data ãƒ‡ãƒ¼ã‚¿ãŒæ ¼ç´ã•ã‚Œã¦ã„ã‚‹é ˜åŸŸã®å…ˆé ­ã®ãƒã‚¤ãƒ³ã‚¿ (nullptr ãªã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’è»¢é€ã—ãªã„).
+    //!   \param count ãƒ‡ãƒ¼ã‚¿ã®æ•°.
+    //!   \param usage ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½¿ã„æ–¹.
+    GgUniformBuffer<T>(const T *data, GLsizei count, GLenum usage = GL_STATIC_DRAW)
     {
       load(data, count, usage);
     }
 
-    //! \brief ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    GgUniformBuffer<T>(const GgBuffer<T> &o)
-      : GgBuffer<T>(o) {}
-
-    // ‘ã“ü
-    GgBuffer<T> &operator=(const GgBuffer<T> &o)
+    //! \brief ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®å…¨ãƒ–ãƒ­ãƒƒã‚¯ã«åŒã˜ãƒ‡ãƒ¼ã‚¿ã‚’æ ¼ç´ã™ã‚‹ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    //!   \param data æ ¼ç´ã™ã‚‹ãƒ‡ãƒ¼ã‚¿.
+    //!   \param count æ ¼ç´ã™ã‚‹æ•°.
+    //!   \param usage ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½¿ã„æ–¹.
+    GgUniformBuffer<T>(const T &data, GLsizei count, GLenum usage = GL_STATIC_DRAW)
     {
-      if (&o != this) GgBuffer<T>::operator=(o);
-      return *this;
+      load(data, count, usage);
     }
 
-    //! \brief ƒ†ƒjƒtƒH[ƒ€ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚ğŠm•Û‚µ‚Äƒf[ƒ^‚ğŠi”[‚·‚é.
-    //!   \param data ƒf[ƒ^‚ªŠi”[‚³‚ê‚Ä‚¢‚é—Ìˆæ‚Ìæ“ª‚Ìƒ|ƒCƒ“ƒ^.
-    //!   \param count ƒf[ƒ^‚Ì”.
-    //!   \param usage ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Ìg‚¢•û.
-    virtual void load(const T *data, GLuint count = 1, GLenum usage = GL_STATIC_DRAW)
-    {
-      // ƒ†ƒjƒtƒH[ƒ€ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Ìƒƒ‚ƒŠ‚ğŠm•Û‚·‚é
-      GgBuffer<T>::load(GL_UNIFORM_BUFFER, nullptr, count, usage);
+    //! \brief ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    virtual ~GgUniformBuffer<T>() {}
 
-      // ƒ†ƒjƒtƒH[ƒ€ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Å‚ÍƒuƒƒbƒN‚²‚Æ‚É“]‘—‚·‚é
-      for (GLuint i = 0; i < count; ++i)
+    //! \brief ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã‚’å–ã‚Šå‡ºã™.
+    //!   \return ã“ã®ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ã‚¿ãƒ¼ã‚²ãƒƒãƒˆ.
+    GLuint getTarget() const
+    {
+      return uniform->getTarget();
+    }
+
+    //! \brief ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆã‚’è€ƒæ…®ã—ãŸãƒ‡ãƒ¼ã‚¿ã®é–“éš”ã‚’å–ã‚Šå‡ºã™.
+    //!   \return ã“ã®ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ãƒ‡ãƒ¼ã‚¿ã®é–“éš”.
+    GLsizeiptr getStride() const
+    {
+      return  uniform->getStride();
+    }
+
+    //! \brief ãƒ‡ãƒ¼ã‚¿ã®æ•°ã‚’å–ã‚Šå‡ºã™.
+    //!   \return ã“ã®ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ãƒ‡ãƒ¼ã‚¿ã®æ•°.
+    GLsizei getCount() const
+    {
+      return uniform->getCount();
+    }
+
+    //! \brief ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆåã‚’å–ã‚Šå‡ºã™.
+    //!   \return ã“ã®ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå.
+    GLuint getBuffer() const
+    {
+      return uniform->getBuffer();
+    }
+
+    //! \brief ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’çµåˆã™ã‚‹.
+    void bind() const
+    {
+      uniform->bind();
+    }
+
+    //! \brief ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’è§£æ”¾ã™ã‚‹.
+    void unbind() const
+    {
+      uniform->unbind();
+    }
+
+    //! \brief ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ãƒãƒƒãƒ—ã™ã‚‹.
+    //!   \return ãƒãƒƒãƒ—ã—ãŸãƒ¡ãƒ¢ãƒªã®å…ˆé ­ã®ãƒã‚¤ãƒ³ã‚¿.
+    void *map() const
+    {
+      return uniform->map();
+    }
+
+    //! \brief ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®æŒ‡å®šã—ãŸç¯„å›²ã‚’ãƒãƒƒãƒ—ã™ã‚‹.
+    //!   \param first ãƒãƒƒãƒ—ã™ã‚‹ç¯„å›²ã®ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®å…ˆé ­ã‹ã‚‰ã®ä½ç½®.
+    //!   \param count ãƒãƒƒãƒ—ã™ã‚‹ãƒ‡ãƒ¼ã‚¿ã®æ•° (0 ãªã‚‰ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå…¨ä½“).
+    //!   \return ãƒãƒƒãƒ—ã—ãŸãƒ¡ãƒ¢ãƒªã®å…ˆé ­ã®ãƒã‚¤ãƒ³ã‚¿.
+    void *map(GLint first, GLsizei count) const
+    {
+      return uniform->map(first, count);
+    }
+
+    //! \brief ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ã‚¢ãƒ³ãƒãƒƒãƒ—ã™ã‚‹.
+    void unmap() const
+    {
+      uniform->unmap();
+    }
+
+    //! \brief ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç¢ºä¿ã—ã¦ãƒ–ãƒ­ãƒƒã‚¯ã”ã¨ã«ãƒ‡ãƒ¼ã‚¿ã‚’è»¢é€ã™ã‚‹.
+    //!   \param data ãƒ‡ãƒ¼ã‚¿ãŒæ ¼ç´ã•ã‚Œã¦ã„ã‚‹é ˜åŸŸã®å…ˆé ­ã®ãƒã‚¤ãƒ³ã‚¿ (nullptr ãªã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’è»¢é€ã—ãªã„).
+    //!   \param count ãƒ‡ãƒ¼ã‚¿ã®æ•°.
+    //!   \param usage ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½¿ã„æ–¹.
+    void load(const T *data, GLsizei count, GLenum usage = GL_STATIC_DRAW)
+    {
+      // ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆä¸Šã®ãƒ‡ãƒ¼ã‚¿ã®é–“éš”
+      const GLsizei stride((((sizeof (T) - 1) / ggBufferAlignment) + 1) * ggBufferAlignment);
+
+      // ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç¢ºä¿ã™ã‚‹
+      uniform.reset(new GgBuffer<T>(GL_UNIFORM_BUFFER, nullptr, stride, count, usage));
+
+      // ç¢ºä¿ã—ãŸãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«ãƒ‡ãƒ¼ã‚¿ã‚’è»¢é€ã™ã‚‹
+      if (data) send(data, 0, sizeof (T), 0, count);
+    }
+
+    //! \brief ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç¢ºä¿ã—ã¦å…¨ã¦ã®ãƒ–ãƒ­ãƒƒã‚¯ã«åŒã˜ãƒ‡ãƒ¼ã‚¿ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param data æ ¼ç´ã™ã‚‹ãƒ‡ãƒ¼ã‚¿.
+    //!   \param count æ ¼ç´ã™ã‚‹æ•°.
+    //!   \param usage ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½¿ã„æ–¹.
+    void load(const T &data, GLsizei count, GLenum usage = GL_STATIC_DRAW)
+    {
+      // ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆä¸Šã®ãƒ‡ãƒ¼ã‚¿ã®é–“éš”
+      const GLsizei stride((((sizeof (T) - 1) / ggBufferAlignment) + 1) * ggBufferAlignment);
+
+      // ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç¢ºä¿ã™ã‚‹
+      uniform.reset(new GgBuffer<T>(GL_UNIFORM_BUFFER, nullptr, stride, count, usage));
+
+      // ç¢ºä¿ã—ãŸãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«ãƒ‡ãƒ¼ã‚¿ã‚’è»¢é€ã™ã‚‹
+      fill(&data, 0, sizeof (T), 0, count);
+    }
+
+    //! \brief ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç¢ºä¿ã—ã¦ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ãƒ–ãƒ­ãƒƒã‚¯ã”ã¨ã®ãƒ¡ãƒ³ãƒã‚’åŒã˜ãƒ‡ãƒ¼ã‚¿ã§åŸ‹ã‚ã‚‹.
+    //!   \param data ãƒ‡ãƒ¼ã‚¿ãŒæ ¼ç´ã•ã‚Œã¦ã„ã‚‹é ˜åŸŸã®å…ˆé ­ã®ãƒã‚¤ãƒ³ã‚¿.
+    //!   \param offset æ ¼ç´å…ˆã®ãƒ¡ãƒ³ãƒã®ãƒ–ãƒ­ãƒƒã‚¯ã®å…ˆé ­ã‹ã‚‰ã®ãƒã‚¤ãƒˆã‚ªãƒ•ã‚»ãƒƒãƒˆ.
+    //!   \param size æ ¼ç´ã™ã‚‹ãƒ‡ãƒ¼ã‚¿ã®ä¸€å€‹ã‚ãŸã‚Šã®ãƒã‚¤ãƒˆæ•°.
+    //!   \param first æ ¼ç´å…ˆã®ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ãƒ–ãƒ­ãƒƒã‚¯ã®å…ˆé ­ã®ç•ªå·.
+    //!   \param count æ ¼ç´ã™ã‚‹ãƒ‡ãƒ¼ã‚¿ã®æ•°.
+    void send(const GLvoid *data, GLint offset = 0, GLsizei size = sizeof (T), GLint first = 0, GLsizei count = 0) const
+    {
+      // count ãŒ 0 ãªã‚‰å…¨ãƒ‡ãƒ¼ã‚¿ã‚’è»¢é€ã™ã‚‹
+      if (count == 0) count = getCount();
+      if (first + count > getCount()) count = getCount() - first;
+
+      // è»¢é€å…ƒã®ãƒ‡ãƒ¼ã‚¿ã®å…ˆé ­
+      const char *source(reinterpret_cast<const char *>(data));
+
+      // ã‚¿ãƒ¼ã‚²ãƒƒãƒˆ
+      const GLuint target(getTarget());
+
+      // ãƒ‡ãƒ¼ã‚¿ã®é–“éš”
+      const GLsizeiptr stride(getStride());
+
+      // first ç•ªç›®ã®ãƒ–ãƒ­ãƒƒã‚¯ã‹ã‚‰ count å€‹ã®å„ãƒ–ãƒ­ãƒƒã‚¯ã®å…ˆé ­ã‹ã‚‰ offset ãƒã‚¤ãƒˆã®ä½ç½®ã«ãƒ‡ãƒ¼ã‚¿ã‚’è»¢é€ã™ã‚‹
+      bind();
+      for (GLsizei i = 0; i < count; ++i)
       {
-        glBufferSubData(GgBuffer<T>::getTarget(),
-          GgBuffer<T>::getSize(i), GgBuffer<T>::getSize(1), data + i);
+        glBufferSubData(target, stride * (first + i) + offset, size, source + size * i);
       }
     }
 
-    //! \brief ‚·‚Å‚ÉŠm•Û‚µ‚½ƒ†ƒjƒtƒH[ƒ€ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Éƒf[ƒ^‚ğ“]‘—‚·‚é.
-    //!   \param data “]‘—Œ³‚Ìƒf[ƒ^‚ªŠi”[‚³‚ê‚Ä‚Ä‚¢‚é—Ìˆæ‚Ìæ“ª‚Ìƒ|ƒCƒ“ƒ^.
-    //!   \param count “]‘—‚·‚éƒf[ƒ^‚Ì” (0 ‚È‚çƒoƒbƒtƒ@‘S‘Ì).
-    //!   \param offset “]‘—æ‚Ìƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Ìæ“ª‚Ì—v‘f”Ô†.
-    virtual void send(const T *data, GLuint count, GLuint offset = 0) const
+    //! \brief ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®å…¨ãƒ–ãƒ­ãƒƒã‚¯ã®ãƒ¡ãƒ³ãƒãƒ¼ã‚’åŒã˜ãƒ‡ãƒ¼ã‚¿ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param data æ ¼ç´ã™ã‚‹ãƒ‡ãƒ¼ã‚¿.
+    //!   \param offset æ ¼ç´å…ˆã®ãƒ¡ãƒ³ãƒã®ãƒ–ãƒ­ãƒƒã‚¯ã®å…ˆé ­ã‹ã‚‰ã®ãƒã‚¤ãƒˆã‚ªãƒ•ã‚»ãƒƒãƒˆ.
+    //!   \param size æ ¼ç´ã™ã‚‹ãƒ‡ãƒ¼ã‚¿ã®ä¸€å€‹ã‚ãŸã‚Šã®ãƒã‚¤ãƒˆæ•°.
+    //!   \param first æ ¼ç´å…ˆã®ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ãƒ–ãƒ­ãƒƒã‚¯ã®å…ˆé ­ã®ç•ªå·.
+    //!   \param count æ ¼ç´ã™ã‚‹ãƒ‡ãƒ¼ã‚¿ã®æ•°.
+    void fill(const GLvoid *data, GLint offset = 0, GLsizei size = sizeof (T), GLint first = 0, GLsizei count = 0) const
     {
-      // ƒ†ƒjƒtƒH[ƒ€ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Å‚ÍƒuƒƒbƒN‚²‚Æ‚É“]‘—‚·‚é
-      GgBuffer<T>::bind();
-      for (GLuint i = 0; i < count; ++i)
+      // count ãŒ 0 ãªã‚‰å…¨ãƒ‡ãƒ¼ã‚¿ã‚’è»¢é€ã™ã‚‹
+      if (count == 0) count = getCount();
+      if (first + count > getCount()) count = getCount() - first;
+
+      // ã‚¿ãƒ¼ã‚²ãƒƒãƒˆ
+      const GLuint target(getTarget());
+
+      // ãƒ‡ãƒ¼ã‚¿ã®é–“éš”
+      const GLsizeiptr stride(getStride());
+
+      // first ç•ªç›®ã®ãƒ–ãƒ­ãƒƒã‚¯ã‹ã‚‰ count å€‹ã®å„ãƒ–ãƒ­ãƒƒã‚¯ã®å…ˆé ­ã‹ã‚‰ offset ãƒã‚¤ãƒˆã®ä½ç½®ã«ãƒ‡ãƒ¼ã‚¿ã‚’è»¢é€ã™ã‚‹
+      bind();
+      for (GLsizei i = 0; i < count; ++i)
       {
-        glBufferSubData(GgBuffer<T>::getTarget(),
-          GgBuffer<T>::getSize(offset + i), GgBuffer<T>::getSize(1), data + i);
+        glBufferSubData(target, stride * (first + i) + offset, size, data);
       }
     }
 
-    //! \brief •Ê‚Ìƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚©‚çƒf[ƒ^‚ğ•¡Ê‚·‚é.
-    //!   \param buffer •¡ÊŒ³‚Ìƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg–¼.
-    //!   \param count •¡Ê‚·‚éƒf[ƒ^‚Ì” (0 ‚È‚çƒoƒbƒtƒ@‘S‘Ì).
-    //!   \param src_offset •¡ÊŒ³ (buffer) ‚Ìæ“ª‚Ìƒf[ƒ^‚ÌˆÊ’u.
-    //!   \param dst_offset •¡Êæ (this->buffer) ‚Ìæ“ª‚Ìƒf[ƒ^‚ÌˆÊ’u.
-    virtual void copy(GLuint buffer, GLuint count = 0, GLuint src_offset = 0, GLuint dst_offset = 0) const
+    //! \brief ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’æŠ½å‡ºã™ã‚‹.
+    //!   \param data æŠ½å‡ºå…ˆã®é ˜åŸŸã®å…ˆé ­ã®ãƒã‚¤ãƒ³ã‚¿.
+    //!   \param offset æŠ½å‡ºå…ƒã®ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ãƒ¡ãƒ³ãƒã®ãƒ–ãƒ­ãƒƒã‚¯ã®å…ˆé ­ã‹ã‚‰ã®ãƒã‚¤ãƒˆã‚ªãƒ•ã‚»ãƒƒãƒˆ.
+    //!   \param size æŠ½å‡ºã™ã‚‹ãƒ‡ãƒ¼ã‚¿ã®ä¸€å€‹ã‚ãŸã‚Šã®ãƒã‚¤ãƒˆæ•°.
+    //!   \param first æŠ½å‡ºå…ƒã®ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ãƒ–ãƒ­ãƒƒã‚¯ã®å…ˆé ­ã®ç•ªå·.
+    //!   \param count æŠ½å‡ºã™ã‚‹ãƒ‡ãƒ¼ã‚¿ã®æ•° (0 ãªã‚‰ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå…¨ä½“).
+    void read(GLvoid *data, GLint offset = 0, GLsizei size = sizeof (T), GLint first = 0, GLsizei count = 0) const
     {
-      // count ‚ª 0 ‚È‚ç‘Sƒf[ƒ^‚ğ•¡Ê‚·‚é
-      if (count == 0) count = this->getCount();
+      // count ãŒ 0 ãªã‚‰å…¨ãƒ‡ãƒ¼ã‚¿ã‚’è»¢é€ã™ã‚‹
+      if (count == 0) count = getCount();
+      if (first + count > getCount()) count = getCount() - first;
 
-      // ƒ†ƒjƒtƒH[ƒ€ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Å‚ÍƒuƒƒbƒN‚²‚Æ‚É“]‘—‚·‚é
-      glBindBuffer(GL_COPY_READ_BUFFER, buffer);
-      glBindBuffer(GL_COPY_WRITE_BUFFER, this->getBuffer());
-      for (GLuint i = 0; i < count; ++i)
+      // æŠ½å‡ºå…ˆã®ãƒ‡ãƒ¼ã‚¿ã®å…ˆé ­
+      char *const destination(reinterpret_cast<char *>(data));
+
+      // ã‚¿ãƒ¼ã‚²ãƒƒãƒˆ
+      const GLuint target(getTarget());
+
+      // ãƒ‡ãƒ¼ã‚¿ã®é–“éš”
+      const GLsizeiptr stride(getStride());
+
+      // ãƒ‡ãƒ¼ã‚¿ã‚’ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‹ã‚‰æŠ½å‡ºã™ã‚‹
+      bind();
+      for (GLsizei i = 0; i < count; ++i)
+      {
+        glGetBufferSubData(target, stride * (first + i) + offset, sizeof (T), destination + size * i);
+      }
+    }
+
+    //! \brief åˆ¥ã®ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’è¤‡å†™ã™ã‚‹.
+    //!   \param src_buffer è¤‡å†™å…ƒã®ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå.
+    //!   \param src_first è¤‡å†™å…ƒ (buffer) ã®å…ˆé ­ã®ãƒ‡ãƒ¼ã‚¿ã®ä½ç½®.
+    //!   \param dst_first è¤‡å†™å…ˆ (getBuffer()) ã®å…ˆé ­ã®ãƒ‡ãƒ¼ã‚¿ã®ä½ç½®.
+    //!   \param count è¤‡å†™ã™ã‚‹ãƒ‡ãƒ¼ã‚¿ã®æ•° (0 ãªã‚‰ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå…¨ä½“).
+    void copy(GLuint src_buffer, GLint src_first = 0, GLint dst_first = 0, GLsizei count = 0) const
+    {
+      // count ãŒ 0 ãªã‚‰å…¨ãƒ‡ãƒ¼ã‚¿ã‚’è¤‡å†™ã™ã‚‹
+      if (count == 0) count = getCount();
+      if (src_first + count > getCount()) count = getCount() - src_first;
+      if (dst_first + count > getCount()) count = getCount() - dst_first;
+
+      // ãƒ‡ãƒ¼ã‚¿ã®é–“éš”
+      const GLsizeiptr stride(getStride());
+
+      // ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã§ã¯ãƒ–ãƒ­ãƒƒã‚¯ã”ã¨ã«è»¢é€ã™ã‚‹
+      glBindBuffer(GL_COPY_READ_BUFFER, src_buffer);
+      glBindBuffer(GL_COPY_WRITE_BUFFER, getBuffer());
+      for (GLsizei i = 0; i < count; ++i)
       {
         glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER,
-          this->getSize(src_offset + i), this->getSize(dst_offset + i), this->getSize(1));
+          stride * (src_first + i), stride * (dst_first + i), sizeof (T));
       }
       glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
       glBindBuffer(GL_COPY_READ_BUFFER, 0);
@@ -3886,80 +4471,67 @@ namespace gg
   };
 
   /*!
-  ** \brief Œ`óƒf[ƒ^‚ÌŠî’êƒNƒ‰ƒX.
+  ** \brief å½¢çŠ¶ãƒ‡ãƒ¼ã‚¿ã®åŸºåº•ã‚¯ãƒ©ã‚¹.
   **
-  **   Œ`óƒf[ƒ^‚ÌƒNƒ‰ƒX‚Í‚±‚ÌƒNƒ‰ƒX‚ğ”h¶‚µ‚Äì‚é.
-  **   Šî–{}Œ`‚Ìí—Ş‚Æ’¸“_”z—ñƒIƒuƒWƒFƒNƒg‚ğ•Û‚·‚é.
+  **   å½¢çŠ¶ãƒ‡ãƒ¼ã‚¿ã®ã‚¯ãƒ©ã‚¹ã¯ã“ã®ã‚¯ãƒ©ã‚¹ã‚’æ´¾ç”Ÿã—ã¦ä½œã‚‹.
+  **   åŸºæœ¬å›³å½¢ã®ç¨®é¡ã¨é ‚ç‚¹é…åˆ—ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä¿æŒã™ã‚‹.
   */
   class GgShape
   {
-    // ’¸“_”z—ñƒIƒuƒWƒFƒNƒg
-    GLuint vao;
+    // é ‚ç‚¹é…åˆ—ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+    const GLuint vao;
 
-    // Šî–{}Œ`‚Ìí—Ş
+    // åŸºæœ¬å›³å½¢ã®ç¨®é¡
     GLenum mode;
 
   public:
 
-    //! \brief ƒfƒXƒgƒ‰ƒNƒ^.
+    //! \brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    //!   \param mode åŸºæœ¬å›³å½¢ã®ç¨®é¡.
+    GgShape(GLenum mode = 0)
+      : vao([] { GLuint vao; glGenVertexArrays(1, &vao); return vao; } ())
+      , mode(mode)
+    {
+      glBindVertexArray(vao);
+    }
+
+    //! \brief ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
     virtual ~GgShape()
     {
       glBindVertexArray(0);
       glDeleteVertexArrays(1, &vao);
     }
 
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    //!   \param mode Šî–{}Œ`‚Ìí—Ş.
-    GgShape(GLenum mode = 0)
-    {
-      this->mode = mode;
+    // ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã‚’å°ã˜ã‚‹
+    GgShape(const GgShape &o) = delete;
 
-      glGenVertexArrays(1, &vao);
-      glBindVertexArray(vao);
-    }
+    // ä»£å…¥æ¼”ç®—å­ã‚’å°ã˜ã‚‹
+    GgShape &operator=(const GgShape &o) = delete;
 
-    //! \brief ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    GgShape(const GgShape &o)
-      : vao(o.vao), mode(o.mode)
-    {
-      glBindVertexArray(vao);
-    }
-
-    // ‘ã“ü‰‰Zq
-    GgShape &operator=(const GgShape &o)
-    {
-      if (this != &o)
-      {
-        vao = o.vao;
-        mode = o.mode;
-      }
-      return *this;
-    }
-
-    //! \brief ’¸“_”z—ñƒIƒuƒWƒFƒNƒg–¼‚ğæ‚èo‚·.
-    //!   \return ’¸“_”z—ñƒIƒuƒWƒFƒNƒg–¼.
+    //! \brief é ‚ç‚¹é…åˆ—ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆåã‚’å–ã‚Šå‡ºã™.
+    //!   \return é ‚ç‚¹é…åˆ—ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå.
     GLuint get() const
     {
       return vao;
     }
 
-    //! \brief Šî–{}Œ`‚Ìİ’è.
-    //!   \param mode Šî–{}Œ`‚Ìí—Ş.
+    //! \brief åŸºæœ¬å›³å½¢ã®è¨­å®š.
+    //!   \param mode åŸºæœ¬å›³å½¢ã®ç¨®é¡.
     void setMode(GLenum mode)
     {
       this->mode = mode;
     }
 
-    //! \brief Šî–{}Œ`‚ÌŒŸ¸.
-    //!   \return ‚±‚Ì’¸“_”z—ñƒIƒuƒWƒFƒNƒg‚ÌŠî–{}Œ`‚Ìí—Ş.
+    //! \brief åŸºæœ¬å›³å½¢ã®æ¤œæŸ».
+    //!   \return ã“ã®é ‚ç‚¹é…åˆ—ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®åŸºæœ¬å›³å½¢ã®ç¨®é¡.
     GLenum getMode() const
     {
       return this->mode;
     }
 
-    //! \brief }Œ`‚Ì•`‰æ, ”h¶ƒNƒ‰ƒX‚Å‚±‚Ìè‘±‚«‚ğƒI[ƒo[ƒ‰ƒCƒh‚·‚é.
-    //!   \param first •`‰æ‚·‚éÅ‰‚ÌƒAƒCƒeƒ€.
-    //!   \param count •`‰æ‚·‚éƒAƒCƒeƒ€‚Ì”, 0 ‚È‚ç‘S•”‚ÌƒAƒCƒeƒ€‚ğ•`‰æ‚·‚é.
+    //! \brief å›³å½¢ã®æç”», æ´¾ç”Ÿã‚¯ãƒ©ã‚¹ã§ã“ã®æ‰‹ç¶šãã‚’ã‚ªãƒ¼ãƒãƒ¼ãƒ©ã‚¤ãƒ‰ã™ã‚‹.
+    //!   \param first æç”»ã™ã‚‹æœ€åˆã®ã‚¢ã‚¤ãƒ†ãƒ .
+    //!   \param count æç”»ã™ã‚‹ã‚¢ã‚¤ãƒ†ãƒ ã®æ•°, 0 ãªã‚‰å…¨éƒ¨ã®ã‚¢ã‚¤ãƒ†ãƒ ã‚’æç”»ã™ã‚‹.
     virtual void draw(GLint first = 0, GLsizei count = 0) const
     {
       glBindVertexArray(vao);
@@ -3967,501 +4539,420 @@ namespace gg
   };
 
   /*!
-  ** \brief “_.
+  ** \brief ç‚¹.
   */
   class GgPoints
     : public GgShape
   {
-    // ’¸“_ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg
-    GgBuffer<GgVector> position;
+    // é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+    std::shared_ptr<GgBuffer<GgVector>> position;
 
   public:
 
-    //! \brief ƒfƒXƒgƒ‰ƒNƒ^.
-    virtual ~GgPoints() {}
-
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
+    //! \brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
     GgPoints(GLenum mode = GL_POINTS)
-      : GgShape(mode) {}
+      : GgShape(mode)
+    {}
 
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    //!   \param pos ‚±‚Ì}Œ`‚Ì’¸“_‚ÌˆÊ’u‚Ìƒf[ƒ^‚Ì”z—ñ (nullptr ‚È‚çƒf[ƒ^‚ğ“]‘—‚µ‚È‚¢).
-    //!   \param nv ’¸“_”.
-    //!   \param mode •`‰æ‚·‚éŠî–{}Œ`‚Ìí—Ş.
-    //!   \param usage ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Ìg‚¢•û.
-    GgPoints(const GgVector *pos, GLuint nv, GLenum mode = GL_POINTS, GLenum usage = GL_STATIC_DRAW)
+    //! \brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    //!   \param pos ã“ã®å›³å½¢ã®é ‚ç‚¹ã®ä½ç½®ã®ãƒ‡ãƒ¼ã‚¿ã®é…åˆ— (nullptr ãªã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’è»¢é€ã—ãªã„).
+    //!   \param countv é ‚ç‚¹æ•°.
+    //!   \param mode æç”»ã™ã‚‹åŸºæœ¬å›³å½¢ã®ç¨®é¡.
+    //!   \param usage ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½¿ã„æ–¹.
+    GgPoints(const GgVector *pos, GLsizei countv, GLenum mode = GL_POINTS, GLenum usage = GL_STATIC_DRAW)
       : GgShape(mode)
     {
-      load(pos, nv, usage);
+      load(pos, countv, usage);
     }
 
-    //! \brief ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    GgPoints(const GgPoints &o)
-      : GgShape(o), position(o.position) {}
+    //! \brief ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    virtual ~GgPoints() {}
 
-    // ‘ã“ü
-    GgPoints &operator=(const GgPoints &o)
+    //! \brief ãƒ‡ãƒ¼ã‚¿ã®æ•°ã‚’å–ã‚Šå‡ºã™.
+    //!   \return ã“ã®å›³å½¢ã®é ‚ç‚¹ã®ä½ç½®ãƒ‡ãƒ¼ã‚¿ã®æ•° (é ‚ç‚¹æ•°).
+    GLsizei getCount() const
     {
-      if (&o != this)
-      {
-        GgShape::operator=(o);
-        position = o.position;
-      }
-
-      return *this;
+      return position->getCount();
     }
 
-    //! \brief ’¸“_‚ÌˆÊ’uƒf[ƒ^‚ğŠi”[‚µ‚½’¸“_ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg–¼‚ğæ‚èo‚·.
-    //!   \return ‚±‚Ì}Œ`‚Ì’¸“_‚ÌˆÊ’uƒf[ƒ^‚ğŠi”[‚µ‚½’¸“_ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg–¼.
+    //! \brief é ‚ç‚¹ã®ä½ç½®ãƒ‡ãƒ¼ã‚¿ã‚’æ ¼ç´ã—ãŸé ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆåã‚’å–ã‚Šå‡ºã™.
+    //!   \return ã“ã®å›³å½¢ã®é ‚ç‚¹ã®ä½ç½®ãƒ‡ãƒ¼ã‚¿ã‚’æ ¼ç´ã—ãŸé ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå.
     GLuint getBuffer() const
     {
-      return position.getBuffer();
+      return position->getBuffer();
     }
 
-    //! \brief ƒf[ƒ^‚Ì”‚ğæ‚èo‚·.
-    //!   \return ‚±‚Ì}Œ`‚Ì’¸“_‚ÌˆÊ’uƒf[ƒ^‚Ì” (’¸“_”).
-    GLuint getCount() const
+    //! \brief æ—¢å­˜ã®ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«é ‚ç‚¹ã®ä½ç½®ãƒ‡ãƒ¼ã‚¿ã‚’è»¢é€ã™ã‚‹.
+    //!   \param pos è»¢é€å…ƒã®é ‚ç‚¹ã®ä½ç½®ãƒ‡ãƒ¼ã‚¿ãŒæ ¼ç´ã•ã‚Œã¦ã¦ã„ã‚‹é ˜åŸŸã®å…ˆé ­ã®ãƒã‚¤ãƒ³ã‚¿.
+    //!   \param first è»¢é€å…ˆã®ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®å…ˆé ­ã®è¦ç´ ç•ªå·.
+    //!   \param count è»¢é€ã™ã‚‹é ‚ç‚¹ã®ä½ç½®ãƒ‡ãƒ¼ã‚¿ã®æ•° (0 ãªã‚‰ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå…¨ä½“).
+    void send(const GgVector *pos, GLint first = 0, GLsizei count = 0) const
     {
-      return position.getCount();
+      position->send(pos, first, count);
     }
 
-    //! \brief ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚ğŠm•Û‚µ‚Ä’¸“_‚ÌˆÊ’uƒf[ƒ^‚ğŠi”[‚·‚é.
-    //!   \param pos ’¸“_‚ÌˆÊ’uƒf[ƒ^‚ªŠi”[‚³‚ê‚Ä‚Ä‚¢‚é—Ìˆæ‚Ìæ“ª‚Ìƒ|ƒCƒ“ƒ^.
-    //!   \param nv ’¸“_‚Ìƒf[ƒ^‚Ì” (’¸“_”).
-    //!   \param usage ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Ìg‚¢•û.
-    void load(const GgVector *pos, GLuint nv, GLenum usage = GL_STATIC_DRAW)
+    //! \brief ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç¢ºä¿ã—ã¦é ‚ç‚¹ã®ä½ç½®ãƒ‡ãƒ¼ã‚¿ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param pos é ‚ç‚¹ã®ä½ç½®ãƒ‡ãƒ¼ã‚¿ãŒæ ¼ç´ã•ã‚Œã¦ã¦ã„ã‚‹é ˜åŸŸã®å…ˆé ­ã®ãƒã‚¤ãƒ³ã‚¿.
+    //!   \param count é ‚ç‚¹ã®ãƒ‡ãƒ¼ã‚¿ã®æ•° (é ‚ç‚¹æ•°).
+    //!   \param usage ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½¿ã„æ–¹.
+    void load(const GgVector *pos, GLsizei count, GLenum usage = GL_STATIC_DRAW)
     {
-      // ’¸“_ˆÊ’u
-      position.load(GL_ARRAY_BUFFER, pos, nv, usage);
+      // é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä½œæˆã™ã‚‹
+      position.reset(new GgBuffer<GgVector>(GL_ARRAY_BUFFER, pos, sizeof (GgVector), count, usage));
 
-      // ‚±‚Ìƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Í index == 0 ‚Ì in •Ï”‚©‚ç“ü—Í‚·‚é
+      // ã“ã®ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¯ index == 0 ã® in å¤‰æ•°ã‹ã‚‰å…¥åŠ›ã™ã‚‹
       glVertexAttribPointer(0, static_cast<GLint>(pos->size()), GL_FLOAT, GL_FALSE, 0, 0);
       glEnableVertexAttribArray(0);
     }
 
-
-    //! \brief Šù‘¶‚Ìƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚É’¸“_‚ÌˆÊ’uƒf[ƒ^‚ğ“]‘—‚·‚é.
-    //!   \param pos “]‘—Œ³‚Ì’¸“_‚ÌˆÊ’uƒf[ƒ^‚ªŠi”[‚³‚ê‚Ä‚Ä‚¢‚é—Ìˆæ‚Ìæ“ª‚Ìƒ|ƒCƒ“ƒ^.
-    //!   \param nv “]‘—‚·‚é’¸“_‚ÌˆÊ’uƒf[ƒ^‚Ì” (0 ‚È‚çƒoƒbƒtƒ@‘S‘Ì).
-    //!   \param offset “]‘—æ‚Ìƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Ìæ“ª‚Ì—v‘f”Ô†.
-    void send(const GgVector *pos, GLuint nv, GLuint offset = 0) const
-    {
-      position.send(pos, nv, offset);
-    }
-
-    //! \brief “_‚Ì•`‰æ.
-    //!   \param first •`‰æ‚ğŠJn‚·‚éÅ‰‚Ì“_‚Ì”Ô†.
-    //!   \param count •`‰æ‚·‚é“_‚Ì”, 0 ‚È‚ç‘S•”‚Ì“_‚ğ•`‚­.
+    //! \brief ç‚¹ã®æç”».
+    //!   \param first æç”»ã‚’é–‹å§‹ã™ã‚‹æœ€åˆã®ç‚¹ã®ç•ªå·.
+    //!   \param count æç”»ã™ã‚‹ç‚¹ã®æ•°, 0 ãªã‚‰å…¨éƒ¨ã®ç‚¹ã‚’æã.
     virtual void draw(GLint first = 0, GLsizei count = 0) const;
   };
 
   /*!
-  ** \brief OŠpŒ`‚Ì’¸“_ƒf[ƒ^.
+  ** \brief ä¸‰è§’å½¢ã®é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿.
   */
   struct GgVertex
   {
-    GgVector position;  //! ˆÊ’u.
-    GgVector normal;    //! –@ü.
+    GgVector position;  //! ä½ç½®.
+    GgVector normal;    //! æ³•ç·š.
 
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
+    //! \brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
     GgVertex() {}
 
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    //!   \param pos GgVector Œ^‚ÌˆÊ’uƒf[ƒ^.
-    //!   \param norm GgVector Œ^‚Ì–@üƒf[ƒ^.
+    //! \brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    //!   \param pos GgVector å‹ã®ä½ç½®ãƒ‡ãƒ¼ã‚¿.
+    //!   \param norm GgVector å‹ã®æ³•ç·šãƒ‡ãƒ¼ã‚¿.
     GgVertex(const GgVector &pos, const GgVector &norm)
-      : position(pos), normal(norm) {}
+      : position(pos), normal(norm)
+    {}
 
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    //!   \param px GgVector Œ^‚ÌˆÊ’uƒf[ƒ^‚Ì x ¬•ª.
-    //!   \param py GgVector Œ^‚ÌˆÊ’uƒf[ƒ^‚Ì y ¬•ª.
-    //!   \param pz GgVector Œ^‚ÌˆÊ’uƒf[ƒ^‚Ì z ¬•ª.
-    //!   \param nx GgVector Œ^‚Ì–@üƒf[ƒ^‚Ì x ¬•ª.
-    //!   \param ny GgVector Œ^‚Ì–@üƒf[ƒ^‚Ì y ¬•ª.
-    //!   \param nz GgVector Œ^‚Ì–@üƒf[ƒ^‚Ì z ¬•ª.
+    //! \brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    //!   \param px GgVector å‹ã®ä½ç½®ãƒ‡ãƒ¼ã‚¿ã® x æˆåˆ†.
+    //!   \param py GgVector å‹ã®ä½ç½®ãƒ‡ãƒ¼ã‚¿ã® y æˆåˆ†.
+    //!   \param pz GgVector å‹ã®ä½ç½®ãƒ‡ãƒ¼ã‚¿ã® z æˆåˆ†.
+    //!   \param nx GgVector å‹ã®æ³•ç·šãƒ‡ãƒ¼ã‚¿ã® x æˆåˆ†.
+    //!   \param ny GgVector å‹ã®æ³•ç·šãƒ‡ãƒ¼ã‚¿ã® y æˆåˆ†.
+    //!   \param nz GgVector å‹ã®æ³•ç·šãƒ‡ãƒ¼ã‚¿ã® z æˆåˆ†.
     GgVertex(GLfloat px, GLfloat py, GLfloat pz, GLfloat nx, GLfloat ny, GLfloat nz)
-      : position{ px, py, pz, 1.0f }, normal{ nx, ny, nz, 0.0f } {}
+      : position{ px, py, pz, 1.0f }
+      , normal{ nx, ny, nz, 0.0f }
+    {}
 
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    //!   \param pos 3 —v‘f‚Ì GLfloat Œ^‚ÌˆÊ’uƒf[ƒ^‚Ìƒ|ƒCƒ“ƒ^.
-    //!   \param norm 3 —v‘f‚Ì GLfloat Œ^‚Ì–@üƒf[ƒ^‚Ìƒ|ƒCƒ“ƒ^.
+    //! \brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    //!   \param pos 3 è¦ç´ ã® GLfloat å‹ã®ä½ç½®ãƒ‡ãƒ¼ã‚¿ã®ãƒã‚¤ãƒ³ã‚¿.
+    //!   \param norm 3 è¦ç´ ã® GLfloat å‹ã®æ³•ç·šãƒ‡ãƒ¼ã‚¿ã®ãƒã‚¤ãƒ³ã‚¿.
     GgVertex(const GLfloat *pos, const GLfloat *norm)
-      : GgVertex(pos[0], pos[1], pos[2], norm[0], norm[1], norm[2]) {}
+      : GgVertex(pos[0], pos[1], pos[2], norm[0], norm[1], norm[2])
+    {}
   };
 
   /*!
-  ** \brief OŠpŒ`‚Å•\‚µ‚½Œ`óƒf[ƒ^ (Arrays Œ`®).
+  ** \brief ä¸‰è§’å½¢ã§è¡¨ã—ãŸå½¢çŠ¶ãƒ‡ãƒ¼ã‚¿ (Arrays å½¢å¼).
   */
   class GgTriangles
     : public GgShape
   {
-    // ’¸“_‘®«
-    GgBuffer<GgVertex> vertex;
+    // é ‚ç‚¹å±æ€§
+    std::unique_ptr<GgBuffer<GgVertex>> vertex;
 
   public:
 
-    //! \brief ƒfƒXƒgƒ‰ƒNƒ^.
-    virtual ~GgTriangles() {}
-
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-    //!   \param mode •`‰æ‚·‚éŠî–{}Œ`‚Ìí—Ş.
+    //! \brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+    //!   \param mode æç”»ã™ã‚‹åŸºæœ¬å›³å½¢ã®ç¨®é¡.
     GgTriangles(GLenum mode = GL_TRIANGLES)
-      : GgShape(mode) {}
+      : GgShape(mode)
+    {}
 
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    //!   \param vert ‚±‚Ì}Œ`‚Ì’¸“_‘®«‚Ì”z—ñ (nullptr ‚È‚çƒf[ƒ^‚ğ“]‘—‚µ‚È‚¢).
-    //!   \param nv ’¸“_”.
-    //!   \param mode •`‰æ‚·‚éŠî–{}Œ`‚Ìí—Ş.
-    //!   \param usage ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Ìg‚¢•û.
-    GgTriangles(const GgVertex *vert, GLuint nv,
+    //! \brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    //!   \param vert ã“ã®å›³å½¢ã®é ‚ç‚¹å±æ€§ã®é…åˆ— (nullptr ãªã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’è»¢é€ã—ãªã„).
+    //!   \param count é ‚ç‚¹æ•°.
+    //!   \param mode æç”»ã™ã‚‹åŸºæœ¬å›³å½¢ã®ç¨®é¡.
+    //!   \param usage ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½¿ã„æ–¹.
+    GgTriangles(const GgVertex *vert, GLsizei count,
       GLenum mode = GL_TRIANGLES, GLenum usage = GL_STATIC_DRAW)
       : GgShape(mode)
     {
-      load(vert, nv, usage);
+      load(vert, count, usage);
     }
 
-    //! \brief ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    GgTriangles(const GgTriangles &o)
-      : GgShape(o), vertex(o.vertex) {}
+    //! \brief ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    virtual ~GgTriangles() {}
 
-    // ‘ã“ü
-    GgTriangles &operator=(const GgTriangles &o)
+    //! \brief ãƒ‡ãƒ¼ã‚¿ã®æ•°ã‚’å–ã‚Šå‡ºã™.
+    //!   \return ã“ã®å›³å½¢ã®é ‚ç‚¹å±æ€§ã®æ•° (é ‚ç‚¹æ•°).
+    GLsizei getCount() const
     {
-      if (&o != this)
-      {
-        GgShape::operator=(o);
-        vertex = o.vertex;
-      }
-
-      return *this;
+      return vertex->getCount();
     }
 
-    //! \brief ’¸“_‘®«‚ğŠi”[‚µ‚½’¸“_ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg–¼‚ğæ‚èo‚·.
-    //!   \return ‚±‚Ì}Œ`‚Ì’¸“_‘®«‚ğŠi”[‚µ‚½’¸“_ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg–¼.
+    //! \brief é ‚ç‚¹å±æ€§ã‚’æ ¼ç´ã—ãŸé ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆåã‚’å–ã‚Šå‡ºã™.
+    //!   \return ã“ã®å›³å½¢ã®é ‚ç‚¹å±æ€§ã‚’æ ¼ç´ã—ãŸé ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå.
     GLuint getBuffer() const
     {
-      return vertex.getBuffer();
+      return vertex->getBuffer();
     }
 
-    //! \brief ƒf[ƒ^‚Ì”‚ğæ‚èo‚·.
-    //!   \return ‚±‚Ì}Œ`‚Ì’¸“_‘®«‚Ì” (’¸“_”).
-    GLuint getCount() const
+    //! \brief æ—¢å­˜ã®ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«é ‚ç‚¹å±æ€§ã‚’è»¢é€ã™ã‚‹.
+    //!   \param vert è»¢é€å…ƒã®é ‚ç‚¹å±æ€§ãŒæ ¼ç´ã•ã‚Œã¦ã¦ã„ã‚‹é ˜åŸŸã®å…ˆé ­ã®ãƒã‚¤ãƒ³ã‚¿.
+    //!   \param first è»¢é€å…ˆã®ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®å…ˆé ­ã®è¦ç´ ç•ªå·.
+    //!   \param count è»¢é€ã™ã‚‹é ‚ç‚¹ã®ä½ç½®ãƒ‡ãƒ¼ã‚¿ã®æ•° (0 ãªã‚‰ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå…¨ä½“).
+    void send(const GgVertex *vert, GLint first = 0, GLsizei count = 0) const
     {
-      return vertex.getCount();
+      vertex->send(vert, first, count);
     }
 
-    //! \brief ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚ğŠm•Û‚µ‚Ä’¸“_‘®«‚ğŠi”[‚·‚é.
-    //!   \param vert ’¸“_‘®«‚ªŠi”[‚³‚ê‚Ä‚Ä‚¢‚é—Ìˆæ‚Ìæ“ª‚Ìƒ|ƒCƒ“ƒ^.
-    //!   \param nv ’¸“_‚Ìƒf[ƒ^‚Ì” (’¸“_”).
-    //!   \param usage ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Ìg‚¢•û.
-    void load(const GgVertex *vert, GLuint nv, GLenum usage = GL_STATIC_DRAW)
+    //! \brief ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç¢ºä¿ã—ã¦é ‚ç‚¹å±æ€§ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param vert é ‚ç‚¹å±æ€§ãŒæ ¼ç´ã•ã‚Œã¦ã¦ã„ã‚‹é ˜åŸŸã®å…ˆé ­ã®ãƒã‚¤ãƒ³ã‚¿.
+    //!   \param count é ‚ç‚¹ã®ãƒ‡ãƒ¼ã‚¿ã®æ•° (é ‚ç‚¹æ•°).
+    //!   \param usage ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½¿ã„æ–¹.
+    void load(const GgVertex *vert, GLsizei count, GLenum usage = GL_STATIC_DRAW)
     {
-      // ’¸“_‘®«
-      vertex.load(GL_ARRAY_BUFFER, vert, nv, usage);
+      // é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä½œæˆã™ã‚‹
+      vertex.reset(new GgBuffer<GgVertex>(GL_ARRAY_BUFFER, vert, sizeof (GgVertex), count, usage));
 
-      // ’¸“_‚ÌˆÊ’u‚Í index == 0 ‚Ì in •Ï”‚©‚ç“ü—Í‚·‚é
+      // é ‚ç‚¹ã®ä½ç½®ã¯ index == 0 ã® in å¤‰æ•°ã‹ã‚‰å…¥åŠ›ã™ã‚‹
       glVertexAttribPointer(0, static_cast<GLint>(vert->position.size()), GL_FLOAT, GL_FALSE,
-        sizeof *vert, 0);
+        sizeof (GgVertex), static_cast<const char *>(0) + offsetof(GgVertex, position));
       glEnableVertexAttribArray(0);
 
-      // ’¸“_‚Ì–@ü‚Í index == 1 ‚Ì in •Ï”‚©‚ç“ü—Í‚·‚é
+      // é ‚ç‚¹ã®æ³•ç·šã¯ index == 1 ã® in å¤‰æ•°ã‹ã‚‰å…¥åŠ›ã™ã‚‹
       glVertexAttribPointer(1, static_cast<GLint>(vert->normal.size()), GL_FLOAT, GL_FALSE,
-        sizeof *vert, static_cast<const char *>(0) + sizeof vert->position);
+        sizeof (GgVertex), static_cast<const char *>(0) + offsetof(GgVertex, normal));
       glEnableVertexAttribArray(1);
     }
 
-    //! \brief Šù‘¶‚Ìƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚É’¸“_‘®«‚ğ“]‘—‚·‚é.
-    //!   \param vert “]‘—Œ³‚Ì’¸“_‘®«‚ªŠi”[‚³‚ê‚Ä‚Ä‚¢‚é—Ìˆæ‚Ìæ“ª‚Ìƒ|ƒCƒ“ƒ^.
-    //!   \param nv “]‘—‚·‚é’¸“_‚ÌˆÊ’uƒf[ƒ^‚Ì” (0 ‚È‚çƒoƒbƒtƒ@‘S‘Ì).
-    //!   \param offset “]‘—æ‚Ìƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Ìæ“ª‚Ì—v‘f”Ô†.
-    void send(const GgVertex *vert, GLuint nv, GLuint offset = 0) const
-    {
-      vertex.send(vert, nv, offset);
-    }
-
-    //! \brief OŠpŒ`‚Ì•`‰æ.
-    //!   \param first •`‰æ‚ğŠJn‚·‚éÅ‰‚ÌOŠpŒ`”Ô†.
-    //!   \param count •`‰æ‚·‚éOŠpŒ`”, 0 ‚È‚ç‘S•”‚ÌOŠpŒ`‚ğ•`‚­.
+    //! \brief ä¸‰è§’å½¢ã®æç”».
+    //!   \param first æç”»ã‚’é–‹å§‹ã™ã‚‹æœ€åˆã®ä¸‰è§’å½¢ç•ªå·.
+    //!   \param count æç”»ã™ã‚‹ä¸‰è§’å½¢æ•°, 0 ãªã‚‰å…¨éƒ¨ã®ä¸‰è§’å½¢ã‚’æã.
     virtual void draw(GLint first = 0, GLsizei count = 0) const;
   };
 
   /*!
-  ** \brief OŠpŒ`‚Å•\‚µ‚½Œ`óƒf[ƒ^ (Elements Œ`®).
+  ** \brief ä¸‰è§’å½¢ã§è¡¨ã—ãŸå½¢çŠ¶ãƒ‡ãƒ¼ã‚¿ (Elements å½¢å¼).
   */
   class GgElements
     : public GgTriangles
   {
-    // ƒCƒ“ƒfƒbƒNƒX‚ğŠi”[‚·‚é’¸“_ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg
-    GgBuffer<GLuint> index;
+    // ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’æ ¼ç´ã™ã‚‹é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+    std::unique_ptr<GgBuffer<GLuint>> index;
 
   public:
 
-    //! \brief ƒfƒXƒgƒ‰ƒNƒ^.
+    //! \brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    //!   \param mode æç”»ã™ã‚‹åŸºæœ¬å›³å½¢ã®ç¨®é¡.
+    GgElements(GLenum mode = GL_TRIANGLES)
+      : GgTriangles(mode)
+    {}
+
+    //! \brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    //!   \param vert ã“ã®å›³å½¢ã®é ‚ç‚¹å±æ€§ã®é…åˆ— (nullptr ãªã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’è»¢é€ã—ãªã„).
+    //!   \param countv é ‚ç‚¹æ•°.
+    //!   \param face ä¸‰è§’å½¢ã®é ‚ç‚¹ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹.
+    //!   \param countf ä¸‰è§’å½¢ã®é ‚ç‚¹æ•°.
+    //!   \param mode æç”»ã™ã‚‹åŸºæœ¬å›³å½¢ã®ç¨®é¡.
+    //!   \param usage ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½¿ã„æ–¹.
+    GgElements(const GgVertex *vert, GLsizei countv, const GLuint *face, GLsizei countf,
+      GLenum mode = GL_TRIANGLES, GLenum usage = GL_STATIC_DRAW)
+      : GgTriangles(mode)
+    {
+      load(vert, countv, face, countf, usage);
+    }
+
+    //! \brief ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
     virtual ~GgElements() {}
 
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    //!   \param mode •`‰æ‚·‚éŠî–{}Œ`‚Ìí—Ş.
-    GgElements(GLenum mode = GL_TRIANGLES)
-      : GgTriangles(mode) {}
-
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    //!   \param vert ‚±‚Ì}Œ`‚Ì’¸“_‘®«‚Ì”z—ñ (nullptr ‚È‚çƒf[ƒ^‚ğ“]‘—‚µ‚È‚¢).
-    //!   \param nv ’¸“_”.
-    //!   \param face OŠpŒ`‚Ì’¸“_ƒCƒ“ƒfƒbƒNƒX.
-    //!   \param nf OŠpŒ`‚Ì’¸“_”.
-    //!   \param mode •`‰æ‚·‚éŠî–{}Œ`‚Ìí—Ş.
-    //!   \param usage ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Ìg‚¢•û.
-    GgElements(const GgVertex *vert, GLuint nv, const GLuint *face, GLuint nf,
-      GLenum mode = GL_TRIANGLES, GLenum usage = GL_STATIC_DRAW)
-      : GgTriangles(vert, nv, mode, usage)
+    //! \brief ãƒ‡ãƒ¼ã‚¿ã®æ•°ã‚’å–ã‚Šå‡ºã™.
+    //!   \return ã“ã®å›³å½¢ã®ä¸‰è§’å½¢æ•°.
+    GLsizei getIndexCount() const
     {
-      index.load(GL_ELEMENT_ARRAY_BUFFER, face, nf);
+      return index->getCount();
     }
 
-    //! \brief ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    GgElements(const GgElements &o)
-      : GgTriangles(o), index(o.index) {}
-
-    // ‘ã“ü
-    GgElements &operator=(const GgElements &o)
-    {
-      if (&o != this)
-      {
-        GgTriangles::operator=(o);
-        index = o.index;
-      }
-
-      return *this;
-    }
-
-    //! \brief ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚ğŠm•Û‚µ‚Ä’¸“_‘®«‚ÆOŠpŒ`‚Ì’¸“_ƒCƒ“ƒfƒbƒNƒXƒf[ƒ^‚ğŠi”[‚·‚é.
-    //!   \param vertex ’¸“_‘®«‚ªŠi”[‚³‚ê‚Ä‚Ä‚¢‚é—Ìˆæ‚Ìæ“ª‚Ìƒ|ƒCƒ“ƒ^.
-    //!   \param nv ’¸“_‚Ìƒf[ƒ^‚Ì” (’¸“_”).
-    //!   \param face OŠpŒ`‚Ì’¸“_ƒCƒ“ƒfƒbƒNƒXƒf[ƒ^.
-    //!   \param nf OŠpŒ`‚Ì’¸“_”.
-    //!   \param usage ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Ìg‚¢•û.
-    void load(const GgVertex *vert, GLuint nv, const GLuint *face, GLuint nf,
-      GLenum usage = GL_STATIC_DRAW)
-    {
-      GgTriangles::load(vert, nv, usage);
-      index.load(GL_ELEMENT_ARRAY_BUFFER, face, nf);
-    }
-
-    //! \brief Šù‘¶‚Ìƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚É’¸“_‘®«‚ÆOŠpŒ`‚Ì’¸“_ƒCƒ“ƒfƒbƒNƒXƒf[ƒ^‚ğ“]‘—‚·‚é.
-    //!   \param vertex ’¸“_‘®«‚ªŠi”[‚³‚ê‚Ä‚Ä‚¢‚é—Ìˆæ‚Ìæ“ª‚Ìƒ|ƒCƒ“ƒ^.
-    //!   \param nv ’¸“_‚Ìƒf[ƒ^‚Ì” (’¸“_”).
-    //!   \param voffset ’¸“_‘®«‚Ì“]‘—æ‚Ìƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Ìæ“ª‚Ì—v‘f”Ô†.
-    //!   \param face OŠpŒ`‚Ì’¸“_ƒCƒ“ƒfƒbƒNƒXƒf[ƒ^.
-    //!   \param nf OŠpŒ`‚Ì’¸“_”.
-    //!   \param foffset ƒCƒ“ƒfƒbƒNƒX‚Ì“]‘—æ‚Ìƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Ìæ“ª‚Ì—v‘f”Ô†.
-    void send(const GgVertex *vert, GLuint nv, GLuint voffset = 0,
-      const GLuint *face = nullptr, GLuint nf = 0, GLuint foffset = 0) const
-    {
-      GgTriangles::send(vert, nv, voffset);
-      if (face != nullptr && nf > 0) index.send(face, nf, foffset);
-    }
-
-    //! \brief OŠpŒ`‚Ì’¸“_ƒCƒ“ƒfƒbƒNƒXƒf[ƒ^‚ğŠi”[‚µ‚½’¸“_ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg–¼‚ğæ‚èo‚·.
-    //!   \return ‚±‚Ì}Œ`‚ÌOŠpŒ`‚Ì’¸“_ƒCƒ“ƒfƒbƒNƒXƒf[ƒ^‚ğŠi”[‚µ‚½’¸“_ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg–¼.
+    //! \brief ä¸‰è§’å½¢ã®é ‚ç‚¹ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒ‡ãƒ¼ã‚¿ã‚’æ ¼ç´ã—ãŸé ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆåã‚’å–ã‚Šå‡ºã™.
+    //!   \return ã“ã®å›³å½¢ã®ä¸‰è§’å½¢ã®é ‚ç‚¹ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒ‡ãƒ¼ã‚¿ã‚’æ ¼ç´ã—ãŸé ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå.
     GLuint getIndexBuffer() const
     {
-      return index.getBuffer();
+      return index->getBuffer();
     }
 
-    //! \brief ƒf[ƒ^‚Ì”‚ğæ‚èo‚·.
-    //!   \return ‚±‚Ì}Œ`‚ÌOŠpŒ`”.
-    GLuint getIndexCount() const
+    //! \brief æ—¢å­˜ã®ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«é ‚ç‚¹å±æ€§ã¨ä¸‰è§’å½¢ã®é ‚ç‚¹ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒ‡ãƒ¼ã‚¿ã‚’è»¢é€ã™ã‚‹.
+    //!   \param vertex é ‚ç‚¹å±æ€§ãŒæ ¼ç´ã•ã‚Œã¦ã¦ã„ã‚‹é ˜åŸŸã®å…ˆé ­ã®ãƒã‚¤ãƒ³ã‚¿.
+    //!   \param firstv é ‚ç‚¹å±æ€§ã®è»¢é€å…ˆã®ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®å…ˆé ­ã®è¦ç´ ç•ªå·.
+    //!   \param countv é ‚ç‚¹ã®ãƒ‡ãƒ¼ã‚¿ã®æ•° (é ‚ç‚¹æ•°).
+    //!   \param face ä¸‰è§’å½¢ã®é ‚ç‚¹ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒ‡ãƒ¼ã‚¿.
+    //!   \param firstf ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã®è»¢é€å…ˆã®ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®å…ˆé ­ã®è¦ç´ ç•ªå·.
+    //!   \param countf ä¸‰è§’å½¢ã®é ‚ç‚¹æ•°.
+    void send(const GgVertex *vert, GLuint firstv, GLsizei countv,
+      const GLuint *face = nullptr, GLuint firstf = 0, GLsizei countf = 0) const
     {
-      return index.getCount();
+      GgTriangles::send(vert, firstv, countv);
+      if (face != nullptr && countf > 0) index->send(face, firstf, countf);
     }
 
-    //! \brief ƒCƒ“ƒfƒbƒNƒX‚ğg‚Á‚½OŠpŒ`‚Ì•`‰æ.
-    //!   \param first •`‰æ‚ğŠJn‚·‚éÅ‰‚ÌOŠpŒ`”Ô†.
-    //!   \param count •`‰æ‚·‚éOŠpŒ`”, 0 ‚È‚ç‘S•”‚ÌOŠpŒ`‚ğ•`‚­.
+    //! \brief ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç¢ºä¿ã—ã¦é ‚ç‚¹å±æ€§ã¨ä¸‰è§’å½¢ã®é ‚ç‚¹ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒ‡ãƒ¼ã‚¿ã‚’æ ¼ç´ã™ã‚‹.
+    //!   \param vertex é ‚ç‚¹å±æ€§ãŒæ ¼ç´ã•ã‚Œã¦ã¦ã„ã‚‹é ˜åŸŸã®å…ˆé ­ã®ãƒã‚¤ãƒ³ã‚¿.
+    //!   \param countv é ‚ç‚¹ã®ãƒ‡ãƒ¼ã‚¿ã®æ•° (é ‚ç‚¹æ•°).
+    //!   \param face ä¸‰è§’å½¢ã®é ‚ç‚¹ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒ‡ãƒ¼ã‚¿.
+    //!   \param countf ä¸‰è§’å½¢ã®é ‚ç‚¹æ•°.
+    //!   \param usage ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½¿ã„æ–¹.
+    void load(const GgVertex *vert, GLsizei countv, const GLuint *face, GLsizei countf,
+      GLenum usage = GL_STATIC_DRAW)
+    {
+      // é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä½œæˆã™ã‚‹
+      GgTriangles::load(vert, countv, usage);
+
+      // ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã®é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä½œæˆã™ã‚‹
+      index.reset(new GgBuffer<GLuint>(GL_ELEMENT_ARRAY_BUFFER, face, sizeof (GLuint), countf, usage));
+    }
+
+    //! \brief ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’ä½¿ã£ãŸä¸‰è§’å½¢ã®æç”».
+    //!   \param first æç”»ã‚’é–‹å§‹ã™ã‚‹æœ€åˆã®ä¸‰è§’å½¢ç•ªå·.
+    //!   \param count æç”»ã™ã‚‹ä¸‰è§’å½¢æ•°, 0 ãªã‚‰å…¨éƒ¨ã®ä¸‰è§’å½¢ã‚’æã.
     virtual void draw(GLint first = 0, GLsizei count = 0) const;
   };
 
   /*!
-  ** \brief “_ŒQ‚ğ—§•û‘Ìó‚É¶¬‚·‚é.
+  ** \brief ç‚¹ç¾¤ã‚’ç«‹æ–¹ä½“çŠ¶ã«ç”Ÿæˆã™ã‚‹.
   **
-  **    \param nv ¶¬‚·‚é“_‚Ì”.
-  **    \param length “_ŒQ‚ğ¶¬‚·‚é—§•û‘Ì‚Ìˆê•Ó‚Ì’·‚³.
-  **    \param cx “_ŒQ‚Ì’†S‚Ì x À•W.
-  **    \param cy “_ŒQ‚Ì’†S‚Ì y À•W.
-  **    \param cz “_ŒQ‚Ì’†S‚Ì z À•W.
+  **    \param countv ç”Ÿæˆã™ã‚‹ç‚¹ã®æ•°.
+  **    \param length ç‚¹ç¾¤ã‚’ç”Ÿæˆã™ã‚‹ç«‹æ–¹ä½“ã®ä¸€è¾ºã®é•·ã•.
+  **    \param cx ç‚¹ç¾¤ã®ä¸­å¿ƒã® x åº§æ¨™.
+  **    \param cy ç‚¹ç¾¤ã®ä¸­å¿ƒã® y åº§æ¨™.
+  **    \param cz ç‚¹ç¾¤ã®ä¸­å¿ƒã® z åº§æ¨™.
   */
-  extern GgPoints *ggPointsCube(GLuint nv, GLfloat length = 1.0f,
+  extern GgPoints *ggPointsCube(GLsizei countv, GLfloat length = 1.0f,
     GLfloat cx = 0.0f, GLfloat cy = 0.0f, GLfloat cz = 0.0f);
 
   /*!
-  ** \brief “_ŒQ‚ğ‹…ó‚É¶¬‚·‚é.
+  ** \brief ç‚¹ç¾¤ã‚’çƒçŠ¶ã«ç”Ÿæˆã™ã‚‹.
   **
-  **   \param nv ¶¬‚·‚é“_‚Ì”.
-  **   \param radius “_ŒQ‚ğ¶¬‚·‚é”¼Œa.
-  **   \param cx “_ŒQ‚Ì’†S‚Ì x À•W.
-  **   \param cy “_ŒQ‚Ì’†S‚Ì y À•W.
-  **   \param cz “_ŒQ‚Ì’†S‚Ì z À•W.
+  **   \param countv ç”Ÿæˆã™ã‚‹ç‚¹ã®æ•°.
+  **   \param radius ç‚¹ç¾¤ã‚’ç”Ÿæˆã™ã‚‹åŠå¾„.
+  **   \param cx ç‚¹ç¾¤ã®ä¸­å¿ƒã® x åº§æ¨™.
+  **   \param cy ç‚¹ç¾¤ã®ä¸­å¿ƒã® y åº§æ¨™.
+  **   \param cz ç‚¹ç¾¤ã®ä¸­å¿ƒã® z åº§æ¨™.
   */
-  extern GgPoints *ggPointsSphere(GLuint nv, GLfloat radius = 0.5f,
+  extern GgPoints *ggPointsSphere(GLsizei countv, GLfloat radius = 0.5f,
     GLfloat cx = 0.0f, GLfloat cy = 0.0f, GLfloat cz = 0.0f);
 
   /*!
-  ** \brief ‹éŒ`ó‚É 2 –‡‚ÌOŠpŒ`‚ğ¶¬‚·‚é.
+  ** \brief çŸ©å½¢çŠ¶ã« 2 æšã®ä¸‰è§’å½¢ã‚’ç”Ÿæˆã™ã‚‹.
   **
-  **   \param width ‹éŒ`‚Ì•.
-  **   \param height ‹éŒ`‚Ì‚‚³.
+  **   \param width çŸ©å½¢ã®æ¨ªå¹….
+  **   \param height çŸ©å½¢ã®é«˜ã•.
   */
   extern GgTriangles *ggRectangle(GLfloat width = 1.0f, GLfloat height = 1.0f);
 
   /*!
-  ** \brief ‘È‰~ó‚ÉOŠpŒ`‚ğ¶¬‚·‚é.
+  ** \brief æ¥•å††çŠ¶ã«ä¸‰è§’å½¢ã‚’ç”Ÿæˆã™ã‚‹.
   **
-  **   \param width ‘È‰~‚Ì•.
-  **   \param height ‘È‰~‚Ì‚‚³.
-  **   \param slices ‘È‰~‚Ì•ªŠ„”.
+  **   \param width æ¥•å††ã®æ¨ªå¹….
+  **   \param height æ¥•å††ã®é«˜ã•.
+  **   \param slices æ¥•å††ã®åˆ†å‰²æ•°.
   */
   extern GgTriangles *ggEllipse(GLfloat width = 1.0f, GLfloat height = 1.0f,
     GLuint slices = 16);
 
   /*!
-  ** \brief Wavefront OBJ ƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚Ş (Arrays Œ`®)
+  ** \brief Wavefront OBJ ãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚€ (Arrays å½¢å¼)
   **
-  **   OŠpŒ`•ªŠ„‚³‚ê‚½ Wavefront OBJ ƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚ñ‚Å
-  **   GgArrays Œ`®‚ÌOŠpŒ`ƒf[ƒ^‚ğ¶¬‚·‚é.
+  **   ä¸‰è§’å½¢åˆ†å‰²ã•ã‚ŒãŸ Wavefront OBJ ãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚“ã§
+  **   GgArrays å½¢å¼ã®ä¸‰è§’å½¢ãƒ‡ãƒ¼ã‚¿ã‚’ç”Ÿæˆã™ã‚‹.
   **
-  **   \param name ƒtƒ@ƒCƒ‹–¼.
-  **   \param normalize true ‚È‚ç‘å‚«‚³‚ğ³‹K‰».
+  **   \param name ãƒ•ã‚¡ã‚¤ãƒ«å.
+  **   \param normalize true ãªã‚‰å¤§ãã•ã‚’æ­£è¦åŒ–.
   */
   extern GgTriangles *ggArraysObj(const char *name, bool normalize = false);
 
   /*!
-  ** \brief Wavefront OBJ ƒtƒ@ƒCƒ‹ ‚ğ“Ç‚İ‚Ş (Elements Œ`®).
+  ** \brief Wavefront OBJ ãƒ•ã‚¡ã‚¤ãƒ« ã‚’èª­ã¿è¾¼ã‚€ (Elements å½¢å¼).
   **
-  **   OŠpŒ`•ªŠ„‚³‚ê‚½ Wavefront OBJ ƒtƒ@ƒCƒ‹ ‚ğ“Ç‚İ‚ñ‚Å
-  **   GgElements Œ`®‚ÌOŠpŒ`ƒf[ƒ^‚ğ¶¬‚·‚é.
+  **   ä¸‰è§’å½¢åˆ†å‰²ã•ã‚ŒãŸ Wavefront OBJ ãƒ•ã‚¡ã‚¤ãƒ« ã‚’èª­ã¿è¾¼ã‚“ã§
+  **   GgElements å½¢å¼ã®ä¸‰è§’å½¢ãƒ‡ãƒ¼ã‚¿ã‚’ç”Ÿæˆã™ã‚‹.
   **
-  **   \param name ƒtƒ@ƒCƒ‹–¼.
-  **   \param normalize true ‚È‚ç‘å‚«‚³‚ğ³‹K‰».
+  **   \param name ãƒ•ã‚¡ã‚¤ãƒ«å.
+  **   \param normalize true ãªã‚‰å¤§ãã•ã‚’æ­£è¦åŒ–.
   */
   extern GgElements *ggElementsObj(const char *name, bool normalize = false);
 
   /*!
-  ** \brief ƒƒbƒVƒ…Œ`ó‚ğì¬‚·‚é (Elements Œ`®).
+  ** \brief ãƒ¡ãƒƒã‚·ãƒ¥å½¢çŠ¶ã‚’ä½œæˆã™ã‚‹ (Elements å½¢å¼).
   **
-  **   ƒƒbƒVƒ…ó‚É GgElements Œ`®‚ÌOŠpŒ`ƒf[ƒ^‚ğ¶¬‚·‚é.
+  **   ãƒ¡ãƒƒã‚·ãƒ¥çŠ¶ã« GgElements å½¢å¼ã®ä¸‰è§’å½¢ãƒ‡ãƒ¼ã‚¿ã‚’ç”Ÿæˆã™ã‚‹.
   **
-  **   \param slices ƒƒbƒVƒ…‚Ì‰¡•ûŒü‚Ì•ªŠ„”.
-  **   \param stacks ƒƒbƒVƒ…‚Ìc•ûŒü‚Ì•ªŠ„”.
-  **   \param pos ƒƒbƒVƒ…‚Ì’¸“_‚ÌˆÊ’u.
-  **   \param norm ƒƒbƒVƒ…‚Ì’¸“_‚Ì–@ü.
+  **   \param slices ãƒ¡ãƒƒã‚·ãƒ¥ã®æ¨ªæ–¹å‘ã®åˆ†å‰²æ•°.
+  **   \param stacks ãƒ¡ãƒƒã‚·ãƒ¥ã®ç¸¦æ–¹å‘ã®åˆ†å‰²æ•°.
+  **   \param pos ãƒ¡ãƒƒã‚·ãƒ¥ã®é ‚ç‚¹ã®ä½ç½®.
+  **   \param norm ãƒ¡ãƒƒã‚·ãƒ¥ã®é ‚ç‚¹ã®æ³•ç·š.
   */
   extern GgElements *ggElementsMesh(GLuint slices, GLuint stacks,
     const GLfloat (*pos)[3], const GLfloat (*norm)[3] = nullptr);
 
   /*!
-  ** ‹…ó‚ÉOŠpŒ`ƒf[ƒ^‚ğ¶¬‚·‚é (Elements Œ`®).
+  ** çƒçŠ¶ã«ä¸‰è§’å½¢ãƒ‡ãƒ¼ã‚¿ã‚’ç”Ÿæˆã™ã‚‹ (Elements å½¢å¼).
   **
-  **   ‹…ó‚É GgElements Œ`®‚ÌOŠpŒ`ƒf[ƒ^‚ğ¶¬‚·‚é.
+  **   çƒçŠ¶ã« GgElements å½¢å¼ã®ä¸‰è§’å½¢ãƒ‡ãƒ¼ã‚¿ã‚’ç”Ÿæˆã™ã‚‹.
   **
-  **   \param radius ‹…‚Ì”¼Œa.
-  **   \param slices ‹…‚ÌŒo“x•ûŒü‚Ì•ªŠ„”.
-  **   \param stacks ‹…‚ÌˆÜ“x•ûŒü‚Ì•ªŠ„”.
+  **   \param radius çƒã®åŠå¾„.
+  **   \param slices çƒã®çµŒåº¦æ–¹å‘ã®åˆ†å‰²æ•°.
+  **   \param stacks çƒã®ç·¯åº¦æ–¹å‘ã®åˆ†å‰²æ•°.
   */
   extern GgElements *ggElementsSphere(GLfloat radius = 1.0f, int slices = 16, int stacks = 8);
 
   /*!
-  ** \brief ƒVƒF[ƒ_‚ÌŠî’êƒNƒ‰ƒX.
+  ** \brief ã‚·ã‚§ãƒ¼ãƒ€ã®åŸºåº•ã‚¯ãƒ©ã‚¹.
   **
-  **   ƒVƒF[ƒ_‚ÌƒNƒ‰ƒX‚Í‚±‚ÌƒNƒ‰ƒX‚ğ”h¶‚µ‚Äì‚é.
+  **   ã‚·ã‚§ãƒ¼ãƒ€ã®ã‚¯ãƒ©ã‚¹ã¯ã“ã®ã‚¯ãƒ©ã‚¹ã‚’æ´¾ç”Ÿã—ã¦ä½œã‚‹.
   */
   class GgShader
-    : public GgAttribute
   {
-    // ƒvƒƒOƒ‰ƒ€–¼
-    GLuint program;
+    // ãƒ—ãƒ­ã‚°ãƒ©ãƒ å
+    const GLuint program;
 
   public:
 
-    //! \brief ƒfƒXƒgƒ‰ƒNƒ^.
-    virtual ~GgShader()
-    {
-      // QÆ‚µ‚Ä‚¢‚éƒIƒuƒWƒFƒNƒg‚ªˆê‚Â‚¾‚¯‚È‚çƒVƒF[ƒ_‚ğíœ‚·‚é
-      if (program != 0 && unique())
-      {
-        glUseProgram(0);
-        glDeleteProgram(program);
-      }
-    }
-
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    GgShader()
-      : program(0) {}
-
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    //!   \param vert ƒo[ƒeƒbƒNƒXƒVƒF[ƒ_‚Ìƒ\[ƒXƒtƒ@ƒCƒ‹–¼.
-    //!   \param frag ƒtƒ‰ƒOƒƒ“ƒgƒVƒF[ƒ_‚Ìƒ\[ƒXƒtƒ@ƒCƒ‹–¼ (0 ‚È‚ç•sg—p).
-    //!   \param geom ƒWƒIƒƒgƒŠƒVƒF[ƒ_‚Ìƒ\[ƒXƒtƒ@ƒCƒ‹–¼ (0 ‚È‚ç•sg—p).
-    //!   \param nvarying ƒtƒB[ƒhƒoƒbƒN‚·‚é varying •Ï”‚Ì” (0 ‚È‚ç•sg—p).
-    //!   \param varyings ƒtƒB[ƒhƒoƒbƒN‚·‚é varying •Ï”‚ÌƒŠƒXƒg.
+    //! \brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    //!   \param vert ãƒãƒ¼ãƒ†ãƒƒã‚¯ã‚¹ã‚·ã‚§ãƒ¼ãƒ€ã®ã‚½ãƒ¼ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«å.
+    //!   \param frag ãƒ•ãƒ©ã‚°ãƒ¡ãƒ³ãƒˆã‚·ã‚§ãƒ¼ãƒ€ã®ã‚½ãƒ¼ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«å (0 ãªã‚‰ä¸ä½¿ç”¨).
+    //!   \param geom ã‚¸ã‚ªãƒ¡ãƒˆãƒªã‚·ã‚§ãƒ¼ãƒ€ã®ã‚½ãƒ¼ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«å (0 ãªã‚‰ä¸ä½¿ç”¨).
+    //!   \param nvarying ãƒ•ã‚£ãƒ¼ãƒ‰ãƒãƒƒã‚¯ã™ã‚‹ varying å¤‰æ•°ã®æ•° (0 ãªã‚‰ä¸ä½¿ç”¨).
+    //!   \param varyings ãƒ•ã‚£ãƒ¼ãƒ‰ãƒãƒƒã‚¯ã™ã‚‹ varying å¤‰æ•°ã®ãƒªã‚¹ãƒˆ.
     GgShader(const char *vert, const char *frag = 0, const char *geom = 0,
       int nvarying = 0, const char **varyings = 0)
-      : program(ggLoadShader(vert, frag, geom, nvarying, varyings)) {}
+      : program(ggLoadShader(vert, frag, geom, nvarying, varyings))
+    {}
 
-    //! \brief ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    GgShader(const GgShader &o)
-      : GgAttribute(o), program(o.program) {}
-
-    // ‘ã“ü
-    GgShader &operator=(const GgShader &o)
+    //! \brief ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    virtual ~GgShader()
     {
-      if (&o != this)
-      {
-        GgAttribute::operator=(o);
-        program = o.program;
-      }
-
-      return *this;
+      // å‚ç…§ã—ã¦ã„ã‚‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒä¸€ã¤ã ã‘ãªã‚‰ã‚·ã‚§ãƒ¼ãƒ€ã‚’å‰Šé™¤ã™ã‚‹
+      glUseProgram(0);
+      glDeleteProgram(program);
     }
 
-    //! \brief •Ê‚ÌƒVƒF[ƒ_‚ÌƒvƒƒOƒ‰ƒ€ƒIƒuƒWƒFƒNƒg‚ğ“o˜^‚·‚é.
-    //!   \param newProgram •Ê‚Éì¬‚µ‚½ƒVƒF[ƒ_‚ÌƒvƒƒOƒ‰ƒ€–¼.
-    void setProgram(GLuint newProgram)
-    {
-      if (program != 0 && reset())
-      {
-        glUseProgram(0);
-        glDeleteProgram(program);
-      }
+    // ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã‚’å°ã˜ã‚‹
+    GgShader(const GgShader &o) = delete;
 
-      program = newProgram;
-    }
+    // ä»£å…¥æ¼”ç®—å­ã‚’ï½å°ã˜ã‚‹
+    GgShader &operator=(const GgShader &o) = delete;
 
-    //! \brief ƒVƒF[ƒ_‚Ìƒ\[ƒXƒvƒƒOƒ‰ƒ€‚ğ“Ç‚İ‚ñ‚ÅƒvƒƒOƒ‰ƒ€ƒIƒuƒWƒFƒNƒg‚ğ‚·‚é.
-    //!   \param vert ƒo[ƒeƒbƒNƒXƒVƒF[ƒ_‚Ìƒ\[ƒXƒtƒ@ƒCƒ‹–¼.
-    //!   \param frag ƒtƒ‰ƒOƒƒ“ƒgƒVƒF[ƒ_‚Ìƒ\[ƒXƒtƒ@ƒCƒ‹–¼ (0 ‚È‚ç•sg—p).
-    //!   \param geom ƒWƒIƒƒgƒŠƒVƒF[ƒ_‚Ìƒ\[ƒXƒtƒ@ƒCƒ‹–¼ (0 ‚È‚ç•sg—p).
-    //!   \param nvarying ƒtƒB[ƒhƒoƒbƒN‚·‚é varying •Ï”‚Ì” (0 ‚È‚ç•sg—p).
-    //!   \param varyings ƒtƒB[ƒhƒoƒbƒN‚·‚é varying •Ï”‚ÌƒŠƒXƒg.
-    void load(const char *vert, const char *frag = 0, const char *geom = 0,
-      GLint nvarying = 0, const char **varyings = 0)
-    {
-      setProgram(ggLoadShader(vert, frag, geom, nvarying, varyings));
-    }
-
-    //! \brief ƒVƒF[ƒ_ƒvƒƒOƒ‰ƒ€‚Ìg—p‚ğŠJn‚·‚é.
+    //! \brief ã‚·ã‚§ãƒ¼ãƒ€ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ä½¿ç”¨ã‚’é–‹å§‹ã™ã‚‹.
     void use() const
     {
       glUseProgram(program);
     }
 
-    //! \brief ƒVƒF[ƒ_ƒvƒƒOƒ‰ƒ€‚Ìg—p‚ğI—¹‚·‚é.
+    //! \brief ã‚·ã‚§ãƒ¼ãƒ€ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ä½¿ç”¨ã‚’çµ‚äº†ã™ã‚‹.
     void unuse() const
     {
       glUseProgram(0);
     }
 
-    //! \brief ƒVƒF[ƒ_‚ÌƒvƒƒOƒ‰ƒ€–¼‚ğ“¾‚é.
-    //!   \return ƒVƒF[ƒ_‚ÌƒvƒƒOƒ‰ƒ€–¼.
+    //! \brief ã‚·ã‚§ãƒ¼ãƒ€ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ åã‚’å¾—ã‚‹.
+    //!   \return ã‚·ã‚§ãƒ¼ãƒ€ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ å.
     GLuint get() const
     {
       return program;
@@ -4469,339 +4960,184 @@ namespace gg
   };
 
   /*!
-  ** \brief “_‚ÌƒVƒF[ƒ_.
+  ** \brief ç‚¹ã®ã‚·ã‚§ãƒ¼ãƒ€.
   */
   class GgPointShader
-    : public GgShader
   {
-    // “Š‰e•ÏŠ·s—ñ‚Ì uniform •Ï”‚ÌêŠ
+    // ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
+    std::shared_ptr<GgShader> shader;
+
+    // æŠ•å½±å¤‰æ›è¡Œåˆ—ã® uniform å¤‰æ•°ã®å ´æ‰€
     GLint mpLoc;
 
-    // ƒ‚ƒfƒ‹ƒrƒ…[•ÏŠ·s—ñ‚Ì uniform •Ï”‚ÌêŠ
+    // ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã® uniform å¤‰æ•°ã®å ´æ‰€
     GLint mvLoc;
 
   public:
 
-    //! \brief ƒfƒXƒgƒ‰ƒNƒ^.
-    virtual ~GgPointShader() {}
-
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
+    //! \brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
     GgPointShader() {}
 
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-    //!   \param vert ƒo[ƒeƒbƒNƒXƒVƒF[ƒ_‚Ìƒ\[ƒXƒtƒ@ƒCƒ‹–¼.
-    //!   \param frag ƒtƒ‰ƒOƒƒ“ƒgƒVƒF[ƒ_‚Ìƒ\[ƒXƒtƒ@ƒCƒ‹–¼ (0 ‚È‚ç•sg—p).
-    //!   \param geom ƒWƒIƒƒgƒŠƒVƒF[ƒ_‚Ìƒ\[ƒXƒtƒ@ƒCƒ‹–¼ (0 ‚È‚ç•sg—p).
-    //!   \param nvarying ƒtƒB[ƒhƒoƒbƒN‚·‚é varying •Ï”‚Ì” (0 ‚È‚ç•sg—p).
-    //!   \param varyings ƒtƒB[ƒhƒoƒbƒN‚·‚é varying •Ï”‚ÌƒŠƒXƒg.
+    //! \brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+    //!   \param vert ãƒãƒ¼ãƒ†ãƒƒã‚¯ã‚¹ã‚·ã‚§ãƒ¼ãƒ€ã®ã‚½ãƒ¼ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«å.
+    //!   \param frag ãƒ•ãƒ©ã‚°ãƒ¡ãƒ³ãƒˆã‚·ã‚§ãƒ¼ãƒ€ã®ã‚½ãƒ¼ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«å (0 ãªã‚‰ä¸ä½¿ç”¨).
+    //!   \param geom ã‚¸ã‚ªãƒ¡ãƒˆãƒªã‚·ã‚§ãƒ¼ãƒ€ã®ã‚½ãƒ¼ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«å (0 ãªã‚‰ä¸ä½¿ç”¨).
+    //!   \param nvarying ãƒ•ã‚£ãƒ¼ãƒ‰ãƒãƒƒã‚¯ã™ã‚‹ varying å¤‰æ•°ã®æ•° (0 ãªã‚‰ä¸ä½¿ç”¨).
+    //!   \param varyings ãƒ•ã‚£ãƒ¼ãƒ‰ãƒãƒƒã‚¯ã™ã‚‹ varying å¤‰æ•°ã®ãƒªã‚¹ãƒˆ.
     GgPointShader(const char *vert, const char *frag = 0,
       const char *geom = 0, GLint nvarying = 0, const char **varyings = 0)
-      : GgShader(vert, frag, geom, nvarying, varyings)
     {
-      // ƒvƒƒOƒ‰ƒ€–¼
-      GLuint program = get();
+      // ã‚·ã‚§ãƒ¼ãƒ€ã‚’ä½œæˆã™ã‚‹
+      shader.reset(new GgShader(vert, frag, geom, nvarying, varyings));
 
-      // •ÏŠ·s—ñ‚Ì uniform •Ï”‚ÌêŠ
+      // ãƒ—ãƒ­ã‚°ãƒ©ãƒ åã‚’å–ã‚Šå‡ºã™
+      const GLuint program(shader->get());
+
+      // å¤‰æ›è¡Œåˆ—ã® uniform å¤‰æ•°ã®å ´æ‰€
       mpLoc = glGetUniformLocation(program, "mp");
       mvLoc = glGetUniformLocation(program, "mv");
     }
 
-    //! \brief ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    GgPointShader(const GgPointShader &o)
-      : GgShader(o)
-      , mpLoc(o.mpLoc)
-      , mvLoc(o.mvLoc) {}
+    //! \brief ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    virtual ~GgPointShader() {}
 
-    // ‘ã“ü
-    GgPointShader &operator=(const GgPointShader &o)
+    //! \brief æŠ•å½±å¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã™ã‚‹.
+    //!   \param mp GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°ã«æ ¼ç´ã•ã‚ŒãŸæŠ•å½±å¤‰æ›è¡Œåˆ—.
+    virtual void loadProjectionMatrix(const GLfloat *mp) const
     {
-      if (&o != this)
-      {
-        GgShader::operator=(o);
-        mpLoc = o.mpLoc;
-        mvLoc = o.mvLoc;
-      }
-
-      return *this;
+      glUniformMatrix4fv(mpLoc, 1, GL_FALSE, mp);
     }
 
-    //! \brief •ÏŠ·s—ñ‚ğİ’è‚·‚é.
-    //!   \param mp GLfloat Œ^‚Ì 16 —v‘f‚Ì”z—ñ‚ÉŠi”[‚³‚ê‚½“Š‰e•ÏŠ·s—ñ.
-    //!   \param mv GLfloat Œ^‚Ì 16 —v‘f‚Ì”z—ñ‚ÉŠi”[‚³‚ê‚½ƒ‚ƒfƒ‹ƒrƒ…[•ÏŠ·s—ñ.
-    virtual void loadMatrix(const GLfloat *mp, const GLfloat *mv) const
+    //! \brief æŠ•å½±å¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã™ã‚‹.
+    //!   \param mp GgMatrix å‹ã®æŠ•å½±å¤‰æ›è¡Œåˆ—.
+    virtual void loadProjectionMatrix(const GgMatrix &mp) const
     {
-      // •ÏŠ·
-      glUniformMatrix4fv(mpLoc, 1, GL_FALSE, mp);
+      loadProjectionMatrix(mp.get());
+    }
+
+    //! \brief ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã™ã‚‹.
+    //!   \param mv GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°ã«æ ¼ç´ã•ã‚ŒãŸãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—.
+    virtual void loadModelviewMatrix(const GLfloat *mv) const
+    {
       glUniformMatrix4fv(mvLoc, 1, GL_FALSE, mv);
     }
 
-    //! \brief •ÏŠ·s—ñ‚ğİ’è‚·‚é.
-    //!   \param mp GgMatrix Œ^‚Ì“Š‰e•ÏŠ·s—ñ.
-    //!   \param mv GgMatrix Œ^‚Ìƒ‚ƒfƒ‹ƒrƒ…[•ÏŠ·s—ñ.
+    //! \brief ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã™ã‚‹.
+    //!   \param mv GgMatrix å‹ã®ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—.
+    virtual void loadModelviewMatrix(const GgMatrix &mv) const
+    {
+      loadModelviewMatrix(mv.get());
+    }
+
+    //! \brief æŠ•å½±å¤‰æ›è¡Œåˆ—ã¨ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã™ã‚‹.
+    //!   \param mp GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°ã«æ ¼ç´ã•ã‚ŒãŸæŠ•å½±å¤‰æ›è¡Œåˆ—.
+    //!   \param mv GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°ã«æ ¼ç´ã•ã‚ŒãŸãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—.
+    virtual void loadMatrix(const GLfloat *mp, const GLfloat *mv) const
+    {
+      loadProjectionMatrix(mp);
+      loadModelviewMatrix(mv);
+    }
+
+    //! \brief æŠ•å½±å¤‰æ›è¡Œåˆ—ã¨ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã™ã‚‹.
+    //!   \param mp GgMatrix å‹ã®æŠ•å½±å¤‰æ›è¡Œåˆ—.
+    //!   \param mv GgMatrix å‹ã®ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—.
     virtual void loadMatrix(const GgMatrix &mp, const GgMatrix &mv) const
     {
       loadMatrix(mp.get(), mv.get());
     }
-  };
 
-  /*!
-  ** \brief OŠpŒ`‚É’Pƒ‚È‰A‰e•t‚¯‚ğs‚¤ƒVƒF[ƒ_‚ªQÆ‚·‚éŒõŒ¹ƒf[ƒ^.
-  */
-  struct GgSimpleLight
-  {
-    GgVector ambient;   //! ŒõŒ¹‹­“x‚ÌŠÂ‹«Œõ¬•ª.
-    GgVector diffuse;   //! ŒõŒ¹‹­“x‚ÌŠgU”½ËŒõ¬•ª.
-    GgVector specular;  //! ŒõŒ¹‹­“x‚Ì‹¾–Ê”½ËŒõ¬•ª.
-    GgVector position;  //! ŒõŒ¹‚ÌˆÊ’u.
-  };
-
-  /*!
-  ** \brief OŠpŒ`‚É’Pƒ‚È‰A‰e•t‚¯‚ğs‚¤ƒVƒF[ƒ_‚ªQÆ‚·‚éŒõŒ¹ƒf[ƒ^‚Ìƒ†ƒjƒtƒH[ƒ€ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg.
-  */
-  class GgSimpleLightBuffer
-    : public GgUniformBuffer<GgSimpleLight>
-  {
-  public:
-
-    //! \brief ƒfƒXƒgƒ‰ƒNƒ^.
-    virtual ~GgSimpleLightBuffer() {}
-
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    //!   \param light GgSimpleLight Œ^‚ÌŒõŒ¹ƒf[ƒ^‚Ìƒ|ƒCƒ“ƒ^.
-    //!   \param count ƒoƒbƒtƒ@’†‚Ì GgSimpleLight Œ^‚ÌŒõŒ¹ƒf[ƒ^‚Ì”.
-    GgSimpleLightBuffer(const GgSimpleLight *light = nullptr, GLuint count = 1)
-      : GgUniformBuffer<GgSimpleLight>(light, count) {}
-
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    //!   \param light GgSimpleLight Œ^‚ÌŒõŒ¹ƒf[ƒ^.
-    GgSimpleLightBuffer(const GgSimpleLight &light)
-      : GgSimpleLightBuffer(&light) {}
-
-    //! \brief ŒõŒ¹‚Ì‹­“x‚ÌŠÂ‹«Œõ¬•ª‚ğİ’è‚·‚é.
-    //!   \param r ŒõŒ¹‚Ì‹­“x‚ÌŠÂ‹«Œõ¬•ª‚ÌÔ¬•ª.
-    //!   \param g ŒõŒ¹‚Ì‹­“x‚ÌŠÂ‹«Œõ¬•ª‚Ì—Î¬•ª.
-    //!   \param b ŒõŒ¹‚Ì‹­“x‚ÌŠÂ‹«Œõ¬•ª‚ÌÂ¬•ª.
-    //!   \param first ’l‚ğİ’è‚·‚éŒõŒ¹ƒf[ƒ^‚ÌÅ‰‚Ì”Ô†, ƒfƒtƒHƒ‹ƒg‚Í 0.
-    //!   \param count ’l‚ğİ’è‚·‚éŒõŒ¹ƒf[ƒ^‚Ì”, ƒfƒtƒHƒ‹ƒg‚Í 1.
-    void loadLightAmbient(GLfloat r, GLfloat g, GLfloat b, GLfloat a = 1.0f, GLuint first = 0, GLuint count = 1) const;
-
-    //! \brief ŒõŒ¹‚Ì‹­“x‚ÌŠÂ‹«Œõ¬•ª‚ğİ’è‚·‚é.
-    //!   \param ambient ŒõŒ¹‚Ì‹­“x‚ÌŠÂ‹«Œõ¬•ª‚ğŠi”[‚µ‚½ GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
-    //!   \param first ’l‚ğİ’è‚·‚éŒõŒ¹ƒf[ƒ^‚ÌÅ‰‚Ì”Ô†, ƒfƒtƒHƒ‹ƒg‚Í 0.
-    //!   \param count ’l‚ğİ’è‚·‚éŒõŒ¹ƒf[ƒ^‚Ì”, ƒfƒtƒHƒ‹ƒg‚Í 1.
-    void loadLightAmbient(const GLfloat *ambient, GLuint first = 0, GLuint count = 1) const;
-
-    //! \brief ŒõŒ¹‚Ì‹­“x‚ÌŠgU”½ËŒõ¬•ª‚ğİ’è‚·‚é.
-    //!   \param r ŒõŒ¹‚Ì‹­“x‚ÌŠgU”½ËŒõ¬•ª‚ÌÔ¬•ª.
-    //!   \param g ŒõŒ¹‚Ì‹­“x‚ÌŠgU”½ËŒõ¬•ª‚Ì—Î¬•ª.
-    //!   \param b ŒõŒ¹‚Ì‹­“x‚ÌŠgU”½ËŒõ¬•ª‚ÌÂ¬•ª.
-    //!   \param a ŒõŒ¹‚Ì‹­“x‚ÌŠgU”½ËŒõ¬•ª‚Ì•s“§–¾“x, ƒfƒtƒHƒ‹ƒg‚Í 1.
-    //!   \param first ’l‚ğİ’è‚·‚éŒõŒ¹ƒf[ƒ^‚ÌÅ‰‚Ì”Ô†, ƒfƒtƒHƒ‹ƒg‚Í 0.
-    //!   \param count ’l‚ğİ’è‚·‚éŒõŒ¹ƒf[ƒ^‚Ì”, ƒfƒtƒHƒ‹ƒg‚Í 1.
-    void loadLightDiffuse(GLfloat r, GLfloat g, GLfloat b, GLfloat a = 1.0f, GLuint first = 0, GLuint count = 1) const;
-
-    //! \brief ŒõŒ¹‚Ì‹­“x‚ÌŠgU”½ËŒõ¬•ª‚ğİ’è‚·‚é.
-    //!   \param diffuse ŒõŒ¹‚Ì‹­“x‚ÌŠgU”½ËŒõ¬•ª‚ğŠi”[‚µ‚½ GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
-    //!   \param first ’l‚ğİ’è‚·‚éŒõŒ¹ƒf[ƒ^‚ÌÅ‰‚Ì”Ô†, ƒfƒtƒHƒ‹ƒg‚Í 0.
-    //!   \param count ’l‚ğİ’è‚·‚éŒõŒ¹ƒf[ƒ^‚Ì”, ƒfƒtƒHƒ‹ƒg‚Í 1.
-    void loadLightDiffuse(const GLfloat *diffuse, GLuint first = 0, GLuint count = 1) const;
-
-    //! \brief ŒõŒ¹‚Ì‹­“x‚Ì‹¾–Ê”½ËŒõ¬•ª‚ğİ’è‚·‚é.
-    //!   \param r ŒõŒ¹‚Ì‹­“x‚Ì‹¾–Ê”½ËŒõ¬•ª‚ÌÔ¬•ª.
-    //!   \param g ŒõŒ¹‚Ì‹­“x‚Ì‹¾–Ê”½ËŒõ¬•ª‚Ì—Î¬•ª.
-    //!   \param b ŒõŒ¹‚Ì‹­“x‚Ì‹¾–Ê”½ËŒõ¬•ª‚ÌÂ¬•ª.
-    //!   \param a ŒõŒ¹‚Ì‹­“x‚Ì‹¾–Ê”½ËŒõ¬•ª‚Ì•s“§–¾“x, ƒfƒtƒHƒ‹ƒg‚Í 1.
-    //!   \param first ’l‚ğİ’è‚·‚éŒõŒ¹ƒf[ƒ^‚ÌÅ‰‚Ì”Ô†, ƒfƒtƒHƒ‹ƒg‚Í 0.
-    //!   \param count ’l‚ğİ’è‚·‚éŒõŒ¹ƒf[ƒ^‚Ì”, ƒfƒtƒHƒ‹ƒg‚Í 1.
-    void loadLightSpecular(GLfloat r, GLfloat g, GLfloat b, GLfloat a = 1.0f, GLuint first = 0, GLuint count = 1) const;
-
-    //! \brief ŒõŒ¹‚Ì‹­“x‚Ì‹¾–Ê”½ËŒõ¬•ª‚ğİ’è‚·‚é.
-    //!   \param specular ŒõŒ¹‚Ì‹­“x‚Ì‹¾–Ê”½ËŒõ¬•ª‚ğŠi”[‚µ‚½ GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
-    //!   \param first ’l‚ğİ’è‚·‚éŒõŒ¹ƒf[ƒ^‚ÌÅ‰‚Ì”Ô†, ƒfƒtƒHƒ‹ƒg‚Í 0.
-    //!   \param count ’l‚ğİ’è‚·‚éŒõŒ¹ƒf[ƒ^‚Ì”, ƒfƒtƒHƒ‹ƒg‚Í 1.
-    void loadLightSpecular(const GLfloat *specular, GLuint first = 0, GLuint count = 1) const;
-
-    //! \brief ŒõŒ¹‚ÌF‚ğİ’è‚·‚é‚ªˆÊ’u‚Í•ÏX‚µ‚È‚¢.
-    //!   \param material ŒõŒ¹‚Ì“Á«‚Ì gg::GgSimpleLight \‘¢‘Ì.
-    //!   \param first ’l‚ğİ’è‚·‚éŒõŒ¹ƒf[ƒ^‚ÌÅ‰‚Ì”Ô†, ƒfƒtƒHƒ‹ƒg‚Í 0.
-    //!   \param count ’l‚ğİ’è‚·‚éŒõŒ¹ƒf[ƒ^‚Ì”, ƒfƒtƒHƒ‹ƒg‚Í 1.
-    void loadLightMaterial(const GgSimpleLight &material, GLuint first = 0, GLuint count = 1) const;
-
-    //! \brief ŒõŒ¹‚ÌˆÊ’u‚ğİ’è‚·‚é.
-    //!   \param x ŒõŒ¹‚ÌˆÊ’u‚Ì x À•W.
-    //!   \param y ŒõŒ¹‚ÌˆÊ’u‚Ì y À•W.
-    //!   \param z ŒõŒ¹‚ÌˆÊ’u‚Ì z À•W.
-    //!   \param w ŒõŒ¹‚ÌˆÊ’u‚Ì w À•W, ƒfƒtƒHƒ‹ƒg‚Í 1.
-    //!   \param first ’l‚ğİ’è‚·‚éŒõŒ¹ƒf[ƒ^‚ÌÅ‰‚Ì”Ô†, ƒfƒtƒHƒ‹ƒg‚Í 0.
-    //!   \param count ’l‚ğİ’è‚·‚éŒõŒ¹ƒf[ƒ^‚Ì”, ƒfƒtƒHƒ‹ƒg‚Í 1.
-    void loadLightPosition(GLfloat x, GLfloat y, GLfloat z, GLfloat w = 1.0f, GLuint first = 0, GLuint count = 1) const;
-
-    //! \brief ŒõŒ¹‚ÌˆÊ’u‚ğİ’è‚·‚é.
-    //!   \param position ŒõŒ¹‚ÌˆÊ’u‚Ì“¯ŸÀ•W‚ğŠi”[‚µ‚½ GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
-    //!   \param first ’l‚ğİ’è‚·‚éŒõŒ¹ƒf[ƒ^‚ÌÅ‰‚Ì”Ô†, ƒfƒtƒHƒ‹ƒg‚Í 0.
-    //!   \param count ’l‚ğİ’è‚·‚éŒõŒ¹ƒf[ƒ^‚Ì”, ƒfƒtƒHƒ‹ƒg‚Í 1.
-    void loadLightPosition(const GLfloat *position, GLuint first = 0, GLuint count = 1) const;
-
-    //! \brief ŒõŒ¹‚ÌF‚ÆˆÊ’u‚ğİ’è‚·‚é.
-    //!   \param light ŒõŒ¹‚Ì“Á«‚Ì gg::GgSimpleLight \‘¢‘Ì‚Ìƒ|ƒCƒ“ƒ^
-    //!   \param first ’l‚ğİ’è‚·‚éŒõŒ¹ƒf[ƒ^‚ÌÅ‰‚Ì”Ô†, ƒfƒtƒHƒ‹ƒg‚Í 0.
-    //!   \param count ’l‚ğİ’è‚·‚éŒõŒ¹ƒf[ƒ^‚Ì”, ƒfƒtƒHƒ‹ƒg‚Í 1.
-    void loadLight(const GgSimpleLight *light, GLuint first = 0, GLuint count = 1) const;
-
-    //! \brief ŒõŒ¹‚ÌF‚ÆˆÊ’u‚ğİ’è‚·‚é.
-    //!   \param light ŒõŒ¹‚Ì“Á«‚Ì gg::GgSimpleLight \‘¢‘Ì
-    //!   \param first ’l‚ğİ’è‚·‚éŒõŒ¹ƒf[ƒ^‚ÌÅ‰‚Ì”Ô†, ƒfƒtƒHƒ‹ƒg‚Í 0.
-    //!   \param count ’l‚ğİ’è‚·‚éŒõŒ¹ƒf[ƒ^‚Ì”, ƒfƒtƒHƒ‹ƒg‚Í 1.
-    void loadLight(const GgSimpleLight &light, GLuint first = 0, GLuint count = 1) const
+    //! \brief ã‚·ã‚§ãƒ¼ãƒ€ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ä½¿ç”¨ã‚’é–‹å§‹ã™ã‚‹.
+    virtual void use() const
     {
-      loadLight(&light, first, count);
+      shader->use();
+    }
+
+    //! \brief æŠ•å½±å¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã—ã¦ã‚·ã‚§ãƒ¼ãƒ€ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ä½¿ç”¨ã‚’é–‹å§‹ã™ã‚‹.
+    //!   \param mp GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°ã«æ ¼ç´ã•ã‚ŒãŸæŠ•å½±å¤‰æ›è¡Œåˆ—.
+    void use(const GLfloat *mp) const
+    {
+      use();
+      loadProjectionMatrix(mp);
+    }
+
+    //! \brief æŠ•å½±å¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã—ã¦ã‚·ã‚§ãƒ¼ãƒ€ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ä½¿ç”¨ã‚’é–‹å§‹ã™ã‚‹.
+    //!   \param mp GgMatrix å‹ã®æŠ•å½±å¤‰æ›è¡Œåˆ—.
+    void use(const GgMatrix &mp) const
+    {
+      use(mp.get());
+    }
+
+    //! \brief æŠ•å½±å¤‰æ›è¡Œåˆ—ã¨ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼ã‚’è¨­å®šã—ã¦ã‚·ã‚§ãƒ¼ãƒ€ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ä½¿ç”¨ã‚’é–‹å§‹ã™ã‚‹.
+    //!   \param mp GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°ã«æ ¼ç´ã•ã‚ŒãŸæŠ•å½±å¤‰æ›è¡Œåˆ—.
+    //!   \param mv GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°ã«æ ¼ç´ã•ã‚ŒãŸãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—.
+    void use(const GLfloat *mp, const GLfloat *mv) const
+    {
+      use(mp);
+      loadModelviewMatrix(mv);
+    }
+
+    //! \brief æŠ•å½±å¤‰æ›è¡Œåˆ—ã¨ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼ã‚’è¨­å®šã—ã¦ã‚·ã‚§ãƒ¼ãƒ€ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ä½¿ç”¨ã‚’é–‹å§‹ã™ã‚‹.
+    //!   \param mp GgMatrix å‹ã®æŠ•å½±å¤‰æ›è¡Œåˆ—.
+    //!   \param mv GgMatrix å‹ã®ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—.
+    void use(const GgMatrix &mp, const GgMatrix &mv) const
+    {
+      use(mp.get(), mv.get());
+    }
+
+    //! \brief ã‚·ã‚§ãƒ¼ãƒ€ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ä½¿ç”¨ã‚’çµ‚äº†ã™ã‚‹.
+    void unuse() const
+    {
+      shader->unuse();
+    }
+
+    //! \brief ã‚·ã‚§ãƒ¼ãƒ€ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ åã‚’å¾—ã‚‹.
+    //!   \return ã‚·ã‚§ãƒ¼ãƒ€ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ å.
+    GLuint get() const
+    {
+      return shader->get();
     }
   };
 
   /*!
-  ** \brief OŠpŒ`‚É’Pƒ‚È‰A‰e•t‚¯‚ğs‚¤ƒVƒF[ƒ_‚ªQÆ‚·‚éŞ¿ƒf[ƒ^.
-  */
-  struct GgSimpleMaterial
-  {
-    GgVector ambient;   //! ŠÂ‹«Œõ‚É‘Î‚·‚é”½ËŒW”.
-    GgVector diffuse;   //! ŠgU”½ËŒW”.
-    GgVector specular;  //! ‹¾–Ê”½ËŒW”.
-    GLfloat shininess;  //! ‹P‚«ŒW”.
-  };
-
-  /*!
-  ** \brief OŠpŒ`‚É’Pƒ‚È‰A‰e•t‚¯‚ğs‚¤ƒVƒF[ƒ_‚ªQÆ‚·‚éŞ¿ƒf[ƒ^‚Ìƒ†ƒjƒtƒH[ƒ€ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg.
-  */
-  class GgSimpleMaterialBuffer
-    : public GgUniformBuffer<GgSimpleMaterial>
-  {
-  public:
-
-    //! \brief ƒfƒXƒgƒ‰ƒNƒ^
-    virtual ~GgSimpleMaterialBuffer() {}
-
-    //! \brief  ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-    //!   \param material GgSimpleMaterial Œ^‚ÌŞ¿ƒf[ƒ^‚Ìƒ|ƒCƒ“ƒ^.
-    //!   \param count ƒoƒbƒtƒ@’†‚Ì GgSimpleMaterial Œ^‚ÌŞ¿ƒf[ƒ^‚Ì”.
-    GgSimpleMaterialBuffer(const GgSimpleMaterial *material = nullptr, GLuint count = 1)
-      : GgUniformBuffer<GgSimpleMaterial>(material, count) {}
-
-    //! \brief  ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-    //!   \param material GgSimpleMaterial Œ^‚ÌŞ¿ƒf[ƒ^
-    GgSimpleMaterialBuffer(const GgSimpleMaterial &material)
-      : GgSimpleMaterialBuffer(&material) {}
-
-    //! \brief ŠÂ‹«Œõ‚É‘Î‚·‚é”½ËŒW”‚ğİ’è‚·‚é.
-    //!   \param r ŠÂ‹«Œõ‚É‘Î‚·‚é”½ËŒW”‚ÌÔ¬•ª.
-    //!   \param g ŠÂ‹«Œõ‚É‘Î‚·‚é”½ËŒW”‚Ì—Î¬•ª.
-    //!   \param b ŠÂ‹«Œõ‚É‘Î‚·‚é”½ËŒW”‚ÌÂ¬•ª.
-    //!   \param a ŠÂ‹«Œõ‚É‘Î‚·‚é”½ËŒW”‚Ì•s“§–¾“x, ƒfƒtƒHƒ‹ƒg‚Í 1.
-    //!   \param first ’l‚ğİ’è‚·‚éŞ¿ƒf[ƒ^‚ÌÅ‰‚Ì”Ô†, ƒfƒtƒHƒ‹ƒg‚Í 0.
-    //!   \param count ’l‚ğİ’è‚·‚éŞ¿ƒf[ƒ^‚Ì”, ƒfƒtƒHƒ‹ƒg‚Í 1.
-    void loadMaterialAmbient(GLfloat r, GLfloat g, GLfloat b, GLfloat a = 1.0f, GLuint first = 0, GLuint count = 1) const;
-
-    //! \brief ŠÂ‹«Œõ‚É‘Î‚·‚é”½ËŒW”‚ğİ’è‚·‚é.
-    //!   \param ambient ŠÂ‹«Œõ‚É‘Î‚·‚é”½ËŒW”‚ğŠi”[‚µ‚½ GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
-    void loadMaterialAmbient(const GLfloat *ambient, GLuint first = 0, GLuint count = 1) const;
-
-    //! \brief ŠgU”½ËŒW”‚ğİ’è‚·‚é.
-    //!   \param r ŠgU”½ËŒW”‚ÌÔ¬•ª.
-    //!   \param g ŠgU”½ËŒW”‚Ì—Î¬•ª.
-    //!   \param b ŠgU”½ËŒW”‚ÌÂ¬•ª.
-    //!   \param a ŠgU”½ËŒW”‚Ì•s“§–¾“x, ƒfƒtƒHƒ‹ƒg‚Í 1.
-    //!   \param first ’l‚ğİ’è‚·‚éŞ¿ƒf[ƒ^‚ÌÅ‰‚Ì”Ô†, ƒfƒtƒHƒ‹ƒg‚Í 0.
-    //!   \param count ’l‚ğİ’è‚·‚éŞ¿ƒf[ƒ^‚Ì”, ƒfƒtƒHƒ‹ƒg‚Í 1.
-    void loadMaterialDiffuse(GLfloat r, GLfloat g, GLfloat b, GLfloat a = 1.0f, GLuint first = 0, GLuint count = 1) const;
-
-    //! \brief ŠgU”½ËŒW”‚ğİ’è‚·‚é.
-    //!   \param diffuse ŠgU”½ËŒW”‚ğŠi”[‚µ‚½ GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
-    //!   \param first ’l‚ğİ’è‚·‚éŞ¿ƒf[ƒ^‚ÌÅ‰‚Ì”Ô†, ƒfƒtƒHƒ‹ƒg‚Í 0.
-    //!   \param count ’l‚ğİ’è‚·‚éŞ¿ƒf[ƒ^‚Ì”, ƒfƒtƒHƒ‹ƒg‚Í 1.
-    void loadMaterialDiffuse(const GLfloat *diffuse, GLuint first = 0, GLuint count = 1) const;
-
-    //! \brief ‹¾–Ê”½ËŒW”‚ğİ’è‚·‚é.
-    //!   \param r ‹¾–Ê”½ËŒW”‚ÌÔ¬•ª.
-    //!   \param g ‹¾–Ê”½ËŒW”‚Ì—Î¬•ª.
-    //!   \param b ‹¾–Ê”½ËŒW”‚ÌÂ¬•ª.
-    //!   \param a ‹¾–Ê”½ËŒW”‚Ì•s“§–¾“x, ƒfƒtƒHƒ‹ƒg‚Í 1.
-    //!   \param first ’l‚ğİ’è‚·‚éŞ¿ƒf[ƒ^‚ÌÅ‰‚Ì”Ô†, ƒfƒtƒHƒ‹ƒg‚Í 0.
-    //!   \param count ’l‚ğİ’è‚·‚éŞ¿ƒf[ƒ^‚Ì”, ƒfƒtƒHƒ‹ƒg‚Í 1.
-    void loadMaterialSpecular(GLfloat r, GLfloat g, GLfloat b, GLfloat a = 1.0f, GLuint first = 0, GLuint count = 1) const;
-
-    //! \brief ‹¾–Ê”½ËŒW”‚ğİ’è‚·‚é.
-    //!   \param specular ‹¾–Ê”½ËŒW”‚ğŠi”[‚µ‚½ GLfloat Œ^‚Ì 4 —v‘f‚Ì”z—ñ.
-    //!   \param first ’l‚ğİ’è‚·‚éŞ¿ƒf[ƒ^‚ÌÅ‰‚Ì”Ô†, ƒfƒtƒHƒ‹ƒg‚Í 0.
-    //!   \param count ’l‚ğİ’è‚·‚éŞ¿ƒf[ƒ^‚Ì”, ƒfƒtƒHƒ‹ƒg‚Í 1.
-    void loadMaterialSpecular(const GLfloat *specular, GLuint first = 0, GLuint count = 1) const;
-
-    //! \brief ‹P‚«ŒW”‚ğİ’è‚·‚é.
-    //!   \param shininess ‹P‚«ŒW”.
-    //!   \param first ’l‚ğİ’è‚·‚éŞ¿ƒf[ƒ^‚ÌÅ‰‚Ì”Ô†, ƒfƒtƒHƒ‹ƒg‚Í 0.
-    //!   \param count ’l‚ğİ’è‚·‚éŞ¿ƒf[ƒ^‚Ì”, ƒfƒtƒHƒ‹ƒg‚Í 1.
-    void loadMaterialShininess(GLfloat shininess, GLuint first = 0, GLuint count = 1) const;
-
-    //! \brief ‹P‚«ŒW”‚ğİ’è‚·‚é.
-    //!   \param shininess ‹P‚«ŒW”.
-    //!   \param first ’l‚ğİ’è‚·‚éŞ¿ƒf[ƒ^‚ÌÅ‰‚Ì”Ô†, ƒfƒtƒHƒ‹ƒg‚Í 0.
-    //!   \param count ’l‚ğİ’è‚·‚éŞ¿ƒf[ƒ^‚Ì”, ƒfƒtƒHƒ‹ƒg‚Í 1.
-    void loadMaterialShininess(const GLfloat *shininess, GLuint first = 0, GLuint count = 1) const;
-
-    //! \brief Ş¿‚ğİ’è‚·‚é.
-    //!   \param material ŒõŒ¹‚Ì“Á«‚Ì gg::GgSimpleMaterial \‘¢‘Ì‚Ìƒ|ƒCƒ“ƒ^.
-    //!   \param first ’l‚ğİ’è‚·‚éŞ¿ƒf[ƒ^‚ÌÅ‰‚Ì”Ô†, ƒfƒtƒHƒ‹ƒg‚Í 0.
-    //!   \param count ’l‚ğİ’è‚·‚éŞ¿ƒf[ƒ^‚Ì”, ƒfƒtƒHƒ‹ƒg‚Í 1.
-    void loadMaterial(const GgSimpleMaterial *material, GLuint first = 0, GLuint count = 1) const;
-
-    //! \brief Ş¿‚ğİ’è‚·‚é.
-    //!   \param material ŒõŒ¹‚Ì“Á«‚Ì gg::GgSimpleMaterial \‘¢‘Ì.
-    //!   \param first ’l‚ğİ’è‚·‚éŞ¿ƒf[ƒ^‚ÌÅ‰‚Ì”Ô†, ƒfƒtƒHƒ‹ƒg‚Í 0.
-    //!   \param count ’l‚ğİ’è‚·‚éŞ¿ƒf[ƒ^‚Ì”, ƒfƒtƒHƒ‹ƒg‚Í 1.
-    void loadMaterial(const GgSimpleMaterial &material, GLuint first = 0, GLuint count = 1) const
-    {
-      loadMaterial(&material, first, count);
-    }
-  };
-
-  /*!
-  ** \brief OŠpŒ`‚É’Pƒ‚È‰A‰e•t‚¯‚ğs‚¤ƒVƒF[ƒ_.
+  ** \brief ä¸‰è§’å½¢ã«å˜ç´”ãªé™°å½±ä»˜ã‘ã‚’è¡Œã†ã‚·ã‚§ãƒ¼ãƒ€.
   */
   class GgSimpleShader
     : public GgPointShader
   {
-    // Ş¿ƒf[ƒ^‚Ì uniform block ‚ÌƒCƒ“ƒfƒbƒNƒX
+    // æè³ªãƒ‡ãƒ¼ã‚¿ã® uniform block ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
     GLint materialIndex;
 
-    // ŒõŒ¹ƒf[ƒ^‚Ì uniform block ‚ÌƒCƒ“ƒfƒbƒNƒX
+    // å…‰æºãƒ‡ãƒ¼ã‚¿ã® uniform block ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
     GLint lightIndex;
 
-    // ƒ‚ƒfƒ‹ƒrƒ…[•ÏŠ·‚Ì–@ü•ÏŠ·s—ñ‚Ì uniform •Ï”‚ÌêŠ
+    // ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›ã®æ³•ç·šå¤‰æ›è¡Œåˆ—ã® uniform å¤‰æ•°ã®å ´æ‰€
     GLint mnLoc;
 
   public:
 
-    //! \brief ƒfƒXƒgƒ‰ƒNƒ^.
-    virtual ~GgSimpleShader() {}
-
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
+    //! \brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
     GgSimpleShader() {}
 
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-    //!   \param vert ƒo[ƒeƒbƒNƒXƒVƒF[ƒ_‚Ìƒ\[ƒXƒtƒ@ƒCƒ‹–¼.
-    //!   \param frag ƒtƒ‰ƒOƒƒ“ƒgƒVƒF[ƒ_‚Ìƒ\[ƒXƒtƒ@ƒCƒ‹–¼ (0 ‚È‚ç•sg—p).
-    //!   \param geom ƒWƒIƒƒgƒŠƒVƒF[ƒ_‚Ìƒ\[ƒXƒtƒ@ƒCƒ‹–¼ (0 ‚È‚ç•sg—p).
-    //!   \param nvarying ƒtƒB[ƒhƒoƒbƒN‚·‚é varying •Ï”‚Ì” (0 ‚È‚ç•sg—p).
-    //!   \param varyings ƒtƒB[ƒhƒoƒbƒN‚·‚é varying •Ï”‚ÌƒŠƒXƒg.
+    //! \brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+    //!   \param vert ãƒãƒ¼ãƒ†ãƒƒã‚¯ã‚¹ã‚·ã‚§ãƒ¼ãƒ€ã®ã‚½ãƒ¼ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«å.
+    //!   \param frag ãƒ•ãƒ©ã‚°ãƒ¡ãƒ³ãƒˆã‚·ã‚§ãƒ¼ãƒ€ã®ã‚½ãƒ¼ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«å (0 ãªã‚‰ä¸ä½¿ç”¨).
+    //!   \param geom ã‚¸ã‚ªãƒ¡ãƒˆãƒªã‚·ã‚§ãƒ¼ãƒ€ã®ã‚½ãƒ¼ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«å (0 ãªã‚‰ä¸ä½¿ç”¨).
+    //!   \param nvarying ãƒ•ã‚£ãƒ¼ãƒ‰ãƒãƒƒã‚¯ã™ã‚‹ varying å¤‰æ•°ã®æ•° (0 ãªã‚‰ä¸ä½¿ç”¨).
+    //!   \param varyings ãƒ•ã‚£ãƒ¼ãƒ‰ãƒãƒƒã‚¯ã™ã‚‹ varying å¤‰æ•°ã®ãƒªã‚¹ãƒˆ.
     GgSimpleShader(const char *vert, const char *frag = 0,
       const char *geom = 0, GLint nvarying = 0, const char **varyings = 0);
 
-    //! \brief ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
+    //! \brief ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
     GgSimpleShader(const GgSimpleShader &o)
       : GgPointShader(o)
       , materialIndex(o.materialIndex)
       , lightIndex(o.lightIndex)
       , mnLoc(o.mnLoc) {}
 
-    // ‘ã“ü
+    //! \brief ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    virtual ~GgSimpleShader() {}
+
+    // ä»£å…¥
     GgSimpleShader &operator=(const GgSimpleShader &o)
     {
       if (&o != this)
@@ -4815,241 +5151,577 @@ namespace gg
       return *this;
     }
 
-    //! \brief •ÏŠ·s—ñ‚ğİ’è‚·‚é.
-    //!   \param mp GLfloat Œ^‚Ì 16 —v‘f‚Ì”z—ñ‚ÉŠi”[‚³‚ê‚½“Š‰e•ÏŠ·s—ñ.
-    //!   \param mv GLfloat Œ^‚Ì 16 —v‘f‚Ì”z—ñ‚ÉŠi”[‚³‚ê‚½ƒ‚ƒfƒ‹ƒrƒ…[•ÏŠ·s—ñ.
-    //!   \param mv GLfloat Œ^‚Ì 16 —v‘f‚Ì”z—ñ‚ÉŠi”[‚³‚ê‚½ƒ‚ƒfƒ‹ƒrƒ…[•ÏŠ·s—ñ‚Ì–@ü•ÏŠ·s—ñ.
+    //! \brief ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã¨æ³•ç·šå¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã™ã‚‹.
+    //!   \param mv GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°ã«æ ¼ç´ã•ã‚ŒãŸãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—.
+    //!   \param mv GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°ã«æ ¼ç´ã•ã‚ŒãŸãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã®æ³•ç·šå¤‰æ›è¡Œåˆ—.
+    virtual void loadModelviewMatrix(const GLfloat *mv, const GLfloat *mn) const
+    {
+      GgPointShader::loadModelviewMatrix(mv);
+      glUniformMatrix4fv(mnLoc, 1, GL_FALSE, mn);
+    }
+
+    //! \brief ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã¨æ³•ç·šå¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã™ã‚‹.
+    //!   \param mv GgMatrix å‹ã®ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—.
+    //!   \param mn GgMatrix å‹ã®ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã®æ³•ç·šå¤‰æ›è¡Œåˆ—.
+    virtual void loadModelviewMatrix(const GgMatrix &mv, const GgMatrix &mn) const
+    {
+      loadModelviewMatrix(mv.get(), mn.get());
+    }
+
+    //! \brief ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã¨ãã‚Œã‹ã‚‰æ±‚ã‚ãŸæ³•ç·šå¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã™ã‚‹.
+    //!   \param mv GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°ã«æ ¼ç´ã•ã‚ŒãŸãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—.
+    virtual void loadModelviewMatrix(const GLfloat *mv) const
+    {
+      loadModelviewMatrix(mv, GgMatrix(mv).normal().get());
+    }
+
+    //! \brief ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã¨ãã‚Œã‹ã‚‰æ±‚ã‚ãŸæ³•ç·šå¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã™ã‚‹.
+    //!   \param mv GgMatrix å‹ã®ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—.
+    virtual void loadModelviewMatrix(const GgMatrix &mv) const
+    {
+      loadModelviewMatrix(mv.get());
+    }
+
+    //! \brief æŠ•å½±å¤‰æ›è¡Œåˆ—ã¨ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã¨æ³•ç·šå¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã™ã‚‹.
+    //!   \param mp GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°ã«æ ¼ç´ã•ã‚ŒãŸæŠ•å½±å¤‰æ›è¡Œåˆ—.
+    //!   \param mv GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°ã«æ ¼ç´ã•ã‚ŒãŸãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—.
+    //!   \param mv GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°ã«æ ¼ç´ã•ã‚ŒãŸãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã®æ³•ç·šå¤‰æ›è¡Œåˆ—.
     virtual void loadMatrix(const GLfloat *mp, const GLfloat *mv, const GLfloat *mn) const
     {
       GgPointShader::loadMatrix(mp, mv);
       glUniformMatrix4fv(mnLoc, 1, GL_FALSE, mn);
     }
 
-    //! \brief •ÏŠ·s—ñ‚ğİ’è‚·‚é.
-    //!   \param mp GgMatrix Œ^‚Ì“Š‰e•ÏŠ·s—ñ.
-    //!   \param mv GgMatrix Œ^‚Ìƒ‚ƒfƒ‹ƒrƒ…[•ÏŠ·s—ñ.
-    //!   \param mn GgMatrix Œ^‚Ìƒ‚ƒfƒ‹ƒrƒ…[•ÏŠ·s—ñ‚Ì–@ü•ÏŠ·s—ñ.
+    //! \brief æŠ•å½±å¤‰æ›è¡Œåˆ—ã¨ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã¨æ³•ç·šå¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã™ã‚‹.
+    //!   \param mp GgMatrix å‹ã®æŠ•å½±å¤‰æ›è¡Œåˆ—.
+    //!   \param mv GgMatrix å‹ã®ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—.
+    //!   \param mn GgMatrix å‹ã®ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã®æ³•ç·šå¤‰æ›è¡Œåˆ—.
     virtual void loadMatrix(const GgMatrix &mp, const GgMatrix &mv, const GgMatrix &mn) const
     {
       loadMatrix(mp.get(), mv.get(), mn.get());
     }
 
-    //! \brief •ÏŠ·s—ñ‚ğİ’è‚·‚é.
-    //!   \param mp GLfloat Œ^‚Ì 16 —v‘f‚Ì”z—ñ‚ÉŠi”[‚³‚ê‚½“Š‰e•ÏŠ·s—ñ.
-    //!   \param mv GLfloat Œ^‚Ì 16 —v‘f‚Ì”z—ñ‚ÉŠi”[‚³‚ê‚½ƒ‚ƒfƒ‹ƒrƒ…[•ÏŠ·s—ñ.
+    //! \brief æŠ•å½±å¤‰æ›è¡Œåˆ—ã¨ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã—ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã‹ã‚‰æ±‚ã‚ãŸæ³•ç·šå¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã™ã‚‹.
+    //!   \param mp GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°ã«æ ¼ç´ã•ã‚ŒãŸæŠ•å½±å¤‰æ›è¡Œåˆ—.
+    //!   \param mv GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°ã«æ ¼ç´ã•ã‚ŒãŸãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—.
     virtual void loadMatrix(const GLfloat *mp, const GLfloat *mv) const
     {
       loadMatrix(mp, mv, GgMatrix(mv).normal());
     }
 
-    //! \brief •ÏŠ·s—ñ‚ğİ’è‚·‚é.
-    //!   \param mp GgMatrix Œ^‚Ì“Š‰e•ÏŠ·s—ñ.
-    //!   \param mv GgMatrix Œ^‚Ìƒ‚ƒfƒ‹ƒrƒ…[•ÏŠ·s—ñ.
+    //! \brief æŠ•å½±å¤‰æ›è¡Œåˆ—ã¨ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã—ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã‹ã‚‰æ±‚ã‚ãŸæ³•ç·šå¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã™ã‚‹.
+    //!   \param mp GgMatrix å‹ã®æŠ•å½±å¤‰æ›è¡Œåˆ—.
+    //!   \param mv GgMatrix å‹ã®ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—.
     virtual void loadMatrix(const GgMatrix &mp, const GgMatrix &mv) const
     {
       loadMatrix(mp, mv, mv.normal());
     }
 
-    //! Ş¿‚ğ‘I‘ğ‚·‚é
-    void selectMaterial(const GgSimpleMaterialBuffer *material, GLint i = 0) const
+    /*!
+    ** \brief ä¸‰è§’å½¢ã«å˜ç´”ãªé™°å½±ä»˜ã‘ã‚’è¡Œã†ã‚·ã‚§ãƒ¼ãƒ€ãŒå‚ç…§ã™ã‚‹å…‰æºãƒ‡ãƒ¼ã‚¿.
+    */
+    struct Light
     {
-      // ƒoƒbƒtƒ@ƒIƒuƒWƒFƒNƒg‚Ì i ”Ô–Ú‚ÌƒuƒƒbƒN‚ÌˆÊ’u
-      const GLintptr offset(material->getSize(i));
-      glBindBufferRange(material->getTarget(), 1, material->getBuffer(), offset, sizeof *material);
-    }
+      GgVector ambient;   //! å…‰æºå¼·åº¦ã®ç’°å¢ƒå…‰æˆåˆ†.
+      GgVector diffuse;   //! å…‰æºå¼·åº¦ã®æ‹¡æ•£åå°„å…‰æˆåˆ†.
+      GgVector specular;  //! å…‰æºå¼·åº¦ã®é¡é¢åå°„å…‰æˆåˆ†.
+      GgVector position;  //! å…‰æºã®ä½ç½®.
+    };
 
-    //! Ş¿‚ğ‘I‘ğ‚·‚é
-    void selectMaterial(const GgSimpleMaterialBuffer &material, GLint i = 0) const
+    /*!
+    ** \brief ä¸‰è§’å½¢ã«å˜ç´”ãªé™°å½±ä»˜ã‘ã‚’è¡Œã†ã‚·ã‚§ãƒ¼ãƒ€ãŒå‚ç…§ã™ã‚‹å…‰æºãƒ‡ãƒ¼ã‚¿ã®ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ.
+    */
+    class LightBuffer
+      : public GgUniformBuffer<Light>
     {
-      selectMaterial(&material, i);
-    }
+    public:
 
-    //! ŒõŒ¹‚ğ‘I‘ğ‚·‚é
-    void selectLight(const GgSimpleLightBuffer *light, GLint i = 0) const
+      //! \brief ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+      //!   \param light GgSimpleShader::Light å‹ã®å…‰æºãƒ‡ãƒ¼ã‚¿ã®ãƒã‚¤ãƒ³ã‚¿.
+      //!   \param count ãƒãƒƒãƒ•ã‚¡ä¸­ã® GgSimpleShader::Light å‹ã®å…‰æºãƒ‡ãƒ¼ã‚¿ã®æ•°.
+      LightBuffer(const Light *light = nullptr, GLsizei count = 1, GLenum usage = GL_STATIC_DRAW)
+        : GgUniformBuffer<Light>(light, count, usage) {}
+
+      //! \brief åŒã˜ãƒ‡ãƒ¼ã‚¿ã§åŸ‹ã‚ã‚‹ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+      //!   \param light GgSimpleShader::Light å‹ã®å…‰æºãƒ‡ãƒ¼ã‚¿.
+      //!   \param count ãƒãƒƒãƒ•ã‚¡ä¸­ã® GgSimpleShader::Light å‹ã®å…‰æºãƒ‡ãƒ¼ã‚¿ã®æ•°.
+      LightBuffer(const Light &light, GLsizei count = 1, GLenum usage = GL_STATIC_DRAW)
+        : GgUniformBuffer<Light>(light, count, usage) {}
+
+      //! \brief ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+      virtual ~LightBuffer() {}
+
+      //! \brief å…‰æºã®å¼·åº¦ã®ç’°å¢ƒå…‰æˆåˆ†ã‚’è¨­å®šã™ã‚‹.
+      //!   \param r å…‰æºã®å¼·åº¦ã®ç’°å¢ƒå…‰æˆåˆ†ã®èµ¤æˆåˆ†.
+      //!   \param g å…‰æºã®å¼·åº¦ã®ç’°å¢ƒå…‰æˆåˆ†ã®ç·‘æˆåˆ†.
+      //!   \param b å…‰æºã®å¼·åº¦ã®ç’°å¢ƒå…‰æˆåˆ†ã®é’æˆåˆ†.
+      //!   \param first å€¤ã‚’è¨­å®šã™ã‚‹å…‰æºãƒ‡ãƒ¼ã‚¿ã®æœ€åˆã®ç•ªå·, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 0.
+      //!   \param count å€¤ã‚’è¨­å®šã™ã‚‹å…‰æºãƒ‡ãƒ¼ã‚¿ã®æ•°, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      void loadAmbient(GLfloat r, GLfloat g, GLfloat b, GLfloat a = 1.0f, GLint first = 0, GLsizei count = 1) const;
+
+      //! \brief å…‰æºã®å¼·åº¦ã®ç’°å¢ƒå…‰æˆåˆ†ã‚’è¨­å®šã™ã‚‹.
+      //!   \param ambient å…‰æºã®å¼·åº¦ã®ç’°å¢ƒå…‰æˆåˆ†ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+      //!   \param first å€¤ã‚’è¨­å®šã™ã‚‹å…‰æºãƒ‡ãƒ¼ã‚¿ã®æœ€åˆã®ç•ªå·, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 0.
+      //!   \param count å€¤ã‚’è¨­å®šã™ã‚‹å…‰æºãƒ‡ãƒ¼ã‚¿ã®æ•°, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      void loadAmbient(const GLfloat *ambient, GLint first = 0, GLsizei count = 1) const
+      {
+        // first ç•ªç›®ã®ãƒ–ãƒ­ãƒƒã‚¯ã‹ã‚‰ count å€‹ã® ambient è¦ç´ ã«å€¤ã‚’è¨­å®šã™ã‚‹
+        send(ambient, offsetof(Light, ambient), sizeof (Light::ambient), first, count);
+      }
+
+      //! \brief å…‰æºã®å¼·åº¦ã®æ‹¡æ•£åå°„å…‰æˆåˆ†ã‚’è¨­å®šã™ã‚‹.
+      //!   \param r å…‰æºã®å¼·åº¦ã®æ‹¡æ•£åå°„å…‰æˆåˆ†ã®èµ¤æˆåˆ†.
+      //!   \param g å…‰æºã®å¼·åº¦ã®æ‹¡æ•£åå°„å…‰æˆåˆ†ã®ç·‘æˆåˆ†.
+      //!   \param b å…‰æºã®å¼·åº¦ã®æ‹¡æ•£åå°„å…‰æˆåˆ†ã®é’æˆåˆ†.
+      //!   \param a å…‰æºã®å¼·åº¦ã®æ‹¡æ•£åå°„å…‰æˆåˆ†ã®ä¸é€æ˜åº¦, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      //!   \param first å€¤ã‚’è¨­å®šã™ã‚‹å…‰æºãƒ‡ãƒ¼ã‚¿ã®æœ€åˆã®ç•ªå·, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 0.
+      //!   \param count å€¤ã‚’è¨­å®šã™ã‚‹å…‰æºãƒ‡ãƒ¼ã‚¿ã®æ•°, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      void loadDiffuse(GLfloat r, GLfloat g, GLfloat b, GLfloat a = 1.0f, GLint first = 0, GLsizei count = 1) const;
+
+      //! \brief å…‰æºã®å¼·åº¦ã®æ‹¡æ•£åå°„å…‰æˆåˆ†ã‚’è¨­å®šã™ã‚‹.
+      //!   \param diffuse å…‰æºã®å¼·åº¦ã®æ‹¡æ•£åå°„å…‰æˆåˆ†ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+      //!   \param first å€¤ã‚’è¨­å®šã™ã‚‹å…‰æºãƒ‡ãƒ¼ã‚¿ã®æœ€åˆã®ç•ªå·, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 0.
+      //!   \param count å€¤ã‚’è¨­å®šã™ã‚‹å…‰æºãƒ‡ãƒ¼ã‚¿ã®æ•°, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      void loadDiffuse(const GLfloat *diffuse, GLint first = 0, GLsizei count = 1) const
+      {
+        // first ç•ªç›®ã®ãƒ–ãƒ­ãƒƒã‚¯ã‹ã‚‰ count å€‹ã® diffuse è¦ç´ ã«å€¤ã‚’è¨­å®šã™ã‚‹
+        send(diffuse, offsetof(Light, diffuse), sizeof (Light::diffuse), first, count);
+      }
+
+      //! \brief å…‰æºã®å¼·åº¦ã®é¡é¢åå°„å…‰æˆåˆ†ã‚’è¨­å®šã™ã‚‹.
+      //!   \param r å…‰æºã®å¼·åº¦ã®é¡é¢åå°„å…‰æˆåˆ†ã®èµ¤æˆåˆ†.
+      //!   \param g å…‰æºã®å¼·åº¦ã®é¡é¢åå°„å…‰æˆåˆ†ã®ç·‘æˆåˆ†.
+      //!   \param b å…‰æºã®å¼·åº¦ã®é¡é¢åå°„å…‰æˆåˆ†ã®é’æˆåˆ†.
+      //!   \param a å…‰æºã®å¼·åº¦ã®é¡é¢åå°„å…‰æˆåˆ†ã®ä¸é€æ˜åº¦, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      //!   \param first å€¤ã‚’è¨­å®šã™ã‚‹å…‰æºãƒ‡ãƒ¼ã‚¿ã®æœ€åˆã®ç•ªå·, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 0.
+      //!   \param count å€¤ã‚’è¨­å®šã™ã‚‹å…‰æºãƒ‡ãƒ¼ã‚¿ã®æ•°, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      void loadSpecular(GLfloat r, GLfloat g, GLfloat b, GLfloat a = 1.0f, GLint first = 0, GLsizei count = 1) const;
+
+      //! \brief å…‰æºã®å¼·åº¦ã®é¡é¢åå°„å…‰æˆåˆ†ã‚’è¨­å®šã™ã‚‹.
+      //!   \param specular å…‰æºã®å¼·åº¦ã®é¡é¢åå°„å…‰æˆåˆ†ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+      //!   \param first å€¤ã‚’è¨­å®šã™ã‚‹å…‰æºãƒ‡ãƒ¼ã‚¿ã®æœ€åˆã®ç•ªå·, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 0.
+      //!   \param count å€¤ã‚’è¨­å®šã™ã‚‹å…‰æºãƒ‡ãƒ¼ã‚¿ã®æ•°, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      void loadSpecular(const GLfloat *specular, GLint first = 0, GLsizei count = 1) const
+      {
+        // first ç•ªç›®ã®ãƒ–ãƒ­ãƒƒã‚¯ã‹ã‚‰ count å€‹ã® specular è¦ç´ ã«å€¤ã‚’è¨­å®šã™ã‚‹
+        send(specular, offsetof(Light, specular), sizeof (Light::specular), first, count);
+      }
+
+      //! \brief å…‰æºã®è‰²ã‚’è¨­å®šã™ã‚‹ãŒä½ç½®ã¯å¤‰æ›´ã—ãªã„.
+      //!   \param color å…‰æºã®ç‰¹æ€§ã® GgSimpleShader::Light æ§‹é€ ä½“.
+      //!   \param first å€¤ã‚’è¨­å®šã™ã‚‹å…‰æºãƒ‡ãƒ¼ã‚¿ã®æœ€åˆã®ç•ªå·, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 0.
+      //!   \param count å€¤ã‚’è¨­å®šã™ã‚‹å…‰æºãƒ‡ãƒ¼ã‚¿ã®æ•°, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      void loadColor(const Light &color, GLint first = 0, GLsizei count = 1) const;
+
+      //! \brief å…‰æºã®ä½ç½®ã‚’è¨­å®šã™ã‚‹.
+      //!   \param x å…‰æºã®ä½ç½®ã® x åº§æ¨™.
+      //!   \param y å…‰æºã®ä½ç½®ã® y åº§æ¨™.
+      //!   \param z å…‰æºã®ä½ç½®ã® z åº§æ¨™.
+      //!   \param w å…‰æºã®ä½ç½®ã® w åº§æ¨™, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      //!   \param first å€¤ã‚’è¨­å®šã™ã‚‹å…‰æºãƒ‡ãƒ¼ã‚¿ã®æœ€åˆã®ç•ªå·, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 0.
+      //!   \param count å€¤ã‚’è¨­å®šã™ã‚‹å…‰æºãƒ‡ãƒ¼ã‚¿ã®æ•°, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      void loadPosition(GLfloat x, GLfloat y, GLfloat z, GLfloat w = 1.0f, GLint first = 0, GLsizei count = 1) const;
+
+      //! \brief å…‰æºã®ä½ç½®ã‚’è¨­å®šã™ã‚‹.
+      //!   \param position å…‰æºã®ä½ç½®ã®åŒæ¬¡åº§æ¨™ã‚’æ ¼ç´ã—ãŸ GgVector å‹ã®å¤‰æ•°.
+      //!   \param first å€¤ã‚’è¨­å®šã™ã‚‹å…‰æºãƒ‡ãƒ¼ã‚¿ã®æœ€åˆã®ç•ªå·, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 0.
+      //!   \param count å€¤ã‚’è¨­å®šã™ã‚‹å…‰æºãƒ‡ãƒ¼ã‚¿ã®æ•°, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      void loadPosition(const GgVector &position, GLint first = 0, GLsizei count = 1) const;
+
+      //! \brief å…‰æºã®ä½ç½®ã‚’è¨­å®šã™ã‚‹.
+      //!   \param position å…‰æºã®ä½ç½®ã®åŒæ¬¡åº§æ¨™ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+      //!   \param first å€¤ã‚’è¨­å®šã™ã‚‹å…‰æºãƒ‡ãƒ¼ã‚¿ã®æœ€åˆã®ç•ªå·, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 0.
+      //!   \param count å€¤ã‚’è¨­å®šã™ã‚‹å…‰æºãƒ‡ãƒ¼ã‚¿ã®æ•°, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      void loadPosition(const GLfloat *position, GLint first = 0, GLsizei count = 1) const
+      {
+        // first ç•ªç›®ã®ãƒ–ãƒ­ãƒƒã‚¯ã‹ã‚‰ count å€‹ã® position è¦ç´ ã«å€¤ã‚’è¨­å®šã™ã‚‹
+        send(position, offsetof(Light, position), sizeof (Light::position), first, count);
+      }
+
+      //! \brief å…‰æºã®ä½ç½®ã‚’è¨­å®šã™ã‚‹.
+      //!   \param position å…‰æºã®ä½ç½®ã®åŒæ¬¡åº§æ¨™ã‚’æ ¼ç´ã—ãŸ GgVector å‹ã®é…åˆ—.
+      //!   \param first å€¤ã‚’è¨­å®šã™ã‚‹å…‰æºãƒ‡ãƒ¼ã‚¿ã®æœ€åˆã®ç•ªå·, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 0.
+      //!   \param count å€¤ã‚’è¨­å®šã™ã‚‹å…‰æºãƒ‡ãƒ¼ã‚¿ã®æ•°, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      void loadPosition(const GgVector *position, GLint first = 0, GLsizei count = 1) const
+      {
+        loadPosition(position->data(), first, count);
+      }
+
+      //! \brief å…‰æºã®è‰²ã¨ä½ç½®ã‚’è¨­å®šã™ã‚‹.
+      //!   \param light å…‰æºã®ç‰¹æ€§ã® GgSimpleShader::Light æ§‹é€ ä½“ã®ãƒã‚¤ãƒ³ã‚¿
+      //!   \param first å€¤ã‚’è¨­å®šã™ã‚‹å…‰æºãƒ‡ãƒ¼ã‚¿ã®æœ€åˆã®ç•ªå·, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 0.
+      //!   \param count å€¤ã‚’è¨­å®šã™ã‚‹å…‰æºãƒ‡ãƒ¼ã‚¿ã®æ•°, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      void load(const Light *light, GLint first = 0, GLsizei count = 1) const
+      {
+        send(light, 0, sizeof (Light), first, count);
+      }
+
+      //! \brief å…‰æºã®è‰²ã¨ä½ç½®ã‚’è¨­å®šã™ã‚‹.
+      //!   \param light å…‰æºã®ç‰¹æ€§ã® GgSimpleShader::Light æ§‹é€ ä½“
+      //!   \param first å€¤ã‚’è¨­å®šã™ã‚‹å…‰æºãƒ‡ãƒ¼ã‚¿ã®æœ€åˆã®ç•ªå·, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 0.
+      //!   \param count å€¤ã‚’è¨­å®šã™ã‚‹å…‰æºãƒ‡ãƒ¼ã‚¿ã®æ•°, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      void load(const Light &light, GLint first = 0, GLsizei count = 1) const
+      {
+        load(&light, first, count);
+      }
+
+      //! \brief å…‰æºã‚’é¸æŠã™ã‚‹.
+      //!   \param i å…‰æºãƒ‡ãƒ¼ã‚¿ã® uniform block ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹.
+      void select(GLint i = 0) const
+      {
+        // ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã® i ç•ªç›®ã®ãƒ–ãƒ­ãƒƒã‚¯ã®ä½ç½®
+        const GLintptr offset(static_cast<GLintptr>(getStride()) * i);
+        glBindBufferRange(getTarget(), LightBindingPoint, getBuffer(), offset, sizeof (Light));
+      }
+    };
+
+    /*!
+    ** \brief ä¸‰è§’å½¢ã«å˜ç´”ãªé™°å½±ä»˜ã‘ã‚’è¡Œã†ã‚·ã‚§ãƒ¼ãƒ€ãŒå‚ç…§ã™ã‚‹æè³ªãƒ‡ãƒ¼ã‚¿.
+    */
+    struct Material
     {
-      // 0 ‚ğ (GgSimpleMaterial *) ‚ÉƒLƒƒƒXƒg‚µ‚Ä i ‚ğ‘«‚µ‚Ä“¾‚½ i ”Ô–Ú‚Ìƒ|ƒCƒ“ƒ^‚ğ“¾‚é
-      const GLintptr offset(reinterpret_cast<GLintptr>(static_cast<GgSimpleLight *>(0) + i));
-      glBindBufferRange(GL_UNIFORM_BUFFER, 0, light->getBuffer(), offset, sizeof (GgSimpleLight));
-    }
+      GgVector ambient;   //! ç’°å¢ƒå…‰ã«å¯¾ã™ã‚‹åå°„ä¿‚æ•°.
+      GgVector diffuse;   //! æ‹¡æ•£åå°„ä¿‚æ•°.
+      GgVector specular;  //! é¡é¢åå°„ä¿‚æ•°.
+      GLfloat shininess;  //! è¼ãä¿‚æ•°.
+    };
 
-    //! ŒõŒ¹‚ğ‘I‘ğ‚·‚é
-    void selectLight(const GgSimpleLightBuffer &light, GLint i = 0) const
+    /*!
+    ** \brief ä¸‰è§’å½¢ã«å˜ç´”ãªé™°å½±ä»˜ã‘ã‚’è¡Œã†ã‚·ã‚§ãƒ¼ãƒ€ãŒå‚ç…§ã™ã‚‹æè³ªãƒ‡ãƒ¼ã‚¿ã®ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ.
+    */
+    class MaterialBuffer
+      : public GgUniformBuffer<Material>
     {
-      selectLight(&light, i);
-    }
+    public:
 
-    //! \brief ƒVƒF[ƒ_ƒvƒƒOƒ‰ƒ€‚Ìg—p‚ğŠJn‚·‚é.
+      //! \brief ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+      //!   \param material GgSimpleShader::Material å‹ã®æè³ªãƒ‡ãƒ¼ã‚¿ã®ãƒã‚¤ãƒ³ã‚¿.
+      //!   \param count ãƒãƒƒãƒ•ã‚¡ä¸­ã® GgSimpleShader::Material å‹ã®æè³ªãƒ‡ãƒ¼ã‚¿ã®æ•°.
+      MaterialBuffer(const Material *material = nullptr, GLsizei count = 1, GLenum usage = GL_STATIC_DRAW)
+        : GgUniformBuffer<Material>(material, count, usage) {}
+
+      //! \brief åŒã˜ãƒ‡ãƒ¼ã‚¿ã§åŸ‹ã‚ã‚‹ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+      //!   \param material GgSimpleShader::Material å‹ã®æè³ªãƒ‡ãƒ¼ã‚¿.
+      //!   \param count ãƒãƒƒãƒ•ã‚¡ä¸­ã® GgSimpleShader::Material å‹ã®æè³ªãƒ‡ãƒ¼ã‚¿ã®æ•°.
+      MaterialBuffer(const Material &material, GLsizei count = 1, GLenum usage = GL_STATIC_DRAW)
+        : GgUniformBuffer<Material>(material, count, usage) {}
+
+      //! \brief ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+      virtual ~MaterialBuffer() {}
+
+      //! \brief ç’°å¢ƒå…‰ã«å¯¾ã™ã‚‹åå°„ä¿‚æ•°ã‚’è¨­å®šã™ã‚‹.
+      //!   \param r ç’°å¢ƒå…‰ã«å¯¾ã™ã‚‹åå°„ä¿‚æ•°ã®èµ¤æˆåˆ†.
+      //!   \param g ç’°å¢ƒå…‰ã«å¯¾ã™ã‚‹åå°„ä¿‚æ•°ã®ç·‘æˆåˆ†.
+      //!   \param b ç’°å¢ƒå…‰ã«å¯¾ã™ã‚‹åå°„ä¿‚æ•°ã®é’æˆåˆ†.
+      //!   \param a ç’°å¢ƒå…‰ã«å¯¾ã™ã‚‹åå°„ä¿‚æ•°ã®ä¸é€æ˜åº¦, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      //!   \param first å€¤ã‚’è¨­å®šã™ã‚‹æè³ªãƒ‡ãƒ¼ã‚¿ã®æœ€åˆã®ç•ªå·, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 0.
+      //!   \param count å€¤ã‚’è¨­å®šã™ã‚‹æè³ªãƒ‡ãƒ¼ã‚¿ã®æ•°, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      void loadAmbient(GLfloat r, GLfloat g, GLfloat b, GLfloat a = 1.0f, GLint first = 0, GLsizei count = 1) const;
+
+      //! \brief ç’°å¢ƒå…‰ã«å¯¾ã™ã‚‹åå°„ä¿‚æ•°ã‚’è¨­å®šã™ã‚‹.
+      //!   \param ambient ç’°å¢ƒå…‰ã«å¯¾ã™ã‚‹åå°„ä¿‚æ•°ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+      void loadAmbient(const GLfloat *ambient, GLint first = 0, GLsizei count = 1) const
+      {
+        // first ç•ªç›®ã®ãƒ–ãƒ­ãƒƒã‚¯ã‹ã‚‰ count å€‹ã®ãƒ–ãƒ­ãƒƒã‚¯ã® ambient è¦ç´ ã«å€¤ã‚’è¨­å®šã™ã‚‹
+        send(ambient, offsetof(Material, ambient), sizeof (Material::ambient), first, count);
+      }
+
+      //! \brief æ‹¡æ•£åå°„ä¿‚æ•°ã‚’è¨­å®šã™ã‚‹.
+      //!   \param r æ‹¡æ•£åå°„ä¿‚æ•°ã®èµ¤æˆåˆ†.
+      //!   \param g æ‹¡æ•£åå°„ä¿‚æ•°ã®ç·‘æˆåˆ†.
+      //!   \param b æ‹¡æ•£åå°„ä¿‚æ•°ã®é’æˆåˆ†.
+      //!   \param a æ‹¡æ•£åå°„ä¿‚æ•°ã®ä¸é€æ˜åº¦, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      //!   \param first å€¤ã‚’è¨­å®šã™ã‚‹æè³ªãƒ‡ãƒ¼ã‚¿ã®æœ€åˆã®ç•ªå·, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 0.
+      //!   \param count å€¤ã‚’è¨­å®šã™ã‚‹æè³ªãƒ‡ãƒ¼ã‚¿ã®æ•°, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      void loadDiffuse(GLfloat r, GLfloat g, GLfloat b, GLfloat a = 1.0f, GLint first = 0, GLsizei count = 1) const;
+
+      //! \brief æ‹¡æ•£åå°„ä¿‚æ•°ã‚’è¨­å®šã™ã‚‹.
+      //!   \param diffuse æ‹¡æ•£åå°„ä¿‚æ•°ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+      //!   \param first å€¤ã‚’è¨­å®šã™ã‚‹æè³ªãƒ‡ãƒ¼ã‚¿ã®æœ€åˆã®ç•ªå·, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 0.
+      //!   \param count å€¤ã‚’è¨­å®šã™ã‚‹æè³ªãƒ‡ãƒ¼ã‚¿ã®æ•°, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      void loadDiffuse(const GLfloat *diffuse, GLint first = 0, GLsizei count = 1) const
+      {
+        // first ç•ªç›®ã®ãƒ–ãƒ­ãƒƒã‚¯ã‹ã‚‰ count å€‹ã® diffuse è¦ç´ ã«å€¤ã‚’è¨­å®šã™ã‚‹
+        send(diffuse, offsetof(Material, diffuse), sizeof (Material::diffuse), first, count);
+      }
+
+      //! \brief ç’°å¢ƒå…‰ã«å¯¾ã™ã‚‹åå°„ä¿‚æ•°ã¨æ‹¡æ•£åå°„ä¿‚æ•°ã‚’è¨­å®šã™ã‚‹.
+      //!   \param r ç’°å¢ƒå…‰ã«å¯¾ã™ã‚‹åå°„ä¿‚æ•°ã¨æ‹¡æ•£åå°„ä¿‚æ•°ã®èµ¤æˆåˆ†.
+      //!   \param g ç’°å¢ƒå…‰ã«å¯¾ã™ã‚‹åå°„ä¿‚æ•°ã¨æ‹¡æ•£åå°„ä¿‚æ•°ã®ç·‘æˆåˆ†.
+      //!   \param b ç’°å¢ƒå…‰ã«å¯¾ã™ã‚‹åå°„ä¿‚æ•°ã¨æ‹¡æ•£åå°„ä¿‚æ•°ã®é’æˆåˆ†.
+      //!   \param a ç’°å¢ƒå…‰ã«å¯¾ã™ã‚‹åå°„ä¿‚æ•°ã¨æ‹¡æ•£åå°„ä¿‚æ•°ã®ä¸é€æ˜åº¦, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      //!   \param first å€¤ã‚’è¨­å®šã™ã‚‹æè³ªãƒ‡ãƒ¼ã‚¿ã®æœ€åˆã®ç•ªå·, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 0.
+      //!   \param count å€¤ã‚’è¨­å®šã™ã‚‹æè³ªãƒ‡ãƒ¼ã‚¿ã®æ•°, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      void loadAmbientAndDiffuse(GLfloat r, GLfloat g, GLfloat b, GLfloat a = 1.0f, GLint first = 0, GLsizei count = 1) const;
+
+      //! \brief ç’°å¢ƒå…‰ã«å¯¾ã™ã‚‹åå°„ä¿‚æ•°ã¨æ‹¡æ•£åå°„ä¿‚æ•°ã‚’è¨­å®šã™ã‚‹.
+      //!   \param color ç’°å¢ƒå…‰ã«å¯¾ã™ã‚‹åå°„ä¿‚æ•°ã¨æ‹¡æ•£åå°„ä¿‚æ•°ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+      //!   \param first å€¤ã‚’è¨­å®šã™ã‚‹æè³ªãƒ‡ãƒ¼ã‚¿ã®æœ€åˆã®ç•ªå·, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 0.
+      //!   \param count å€¤ã‚’è¨­å®šã™ã‚‹æè³ªãƒ‡ãƒ¼ã‚¿ã®æ•°, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      void loadAmbientAndDiffuse(const GLfloat *color, GLint first = 0, GLsizei count = 1) const;
+
+      //! \brief é¡é¢åå°„ä¿‚æ•°ã‚’è¨­å®šã™ã‚‹.
+      //!   \param r é¡é¢åå°„ä¿‚æ•°ã®èµ¤æˆåˆ†.
+      //!   \param g é¡é¢åå°„ä¿‚æ•°ã®ç·‘æˆåˆ†.
+      //!   \param b é¡é¢åå°„ä¿‚æ•°ã®é’æˆåˆ†.
+      //!   \param a é¡é¢åå°„ä¿‚æ•°ã®ä¸é€æ˜åº¦, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      //!   \param first å€¤ã‚’è¨­å®šã™ã‚‹æè³ªãƒ‡ãƒ¼ã‚¿ã®æœ€åˆã®ç•ªå·, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 0.
+      //!   \param count å€¤ã‚’è¨­å®šã™ã‚‹æè³ªãƒ‡ãƒ¼ã‚¿ã®æ•°, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      void loadSpecular(GLfloat r, GLfloat g, GLfloat b, GLfloat a = 1.0f, GLint first = 0, GLsizei count = 1) const;
+
+      //! \brief é¡é¢åå°„ä¿‚æ•°ã‚’è¨­å®šã™ã‚‹.
+      //!   \param specular é¡é¢åå°„ä¿‚æ•°ã‚’æ ¼ç´ã—ãŸ GLfloat å‹ã® 4 è¦ç´ ã®é…åˆ—å¤‰æ•°.
+      //!   \param first å€¤ã‚’è¨­å®šã™ã‚‹æè³ªãƒ‡ãƒ¼ã‚¿ã®æœ€åˆã®ç•ªå·, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 0.
+      //!   \param count å€¤ã‚’è¨­å®šã™ã‚‹æè³ªãƒ‡ãƒ¼ã‚¿ã®æ•°, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      void loadSpecular(const GLfloat *specular, GLint first = 0, GLsizei count = 1) const
+      {
+        // first ç•ªç›®ã®ãƒ–ãƒ­ãƒƒã‚¯ã‹ã‚‰ count å€‹ã® specular è¦ç´ ã«å€¤ã‚’è¨­å®šã™ã‚‹
+        send(specular, offsetof(Material, specular), sizeof (Material::specular), first, count);
+      }
+
+      //! \brief è¼ãä¿‚æ•°ã‚’è¨­å®šã™ã‚‹.
+      //!   \param shininess è¼ãä¿‚æ•°.
+      //!   \param first å€¤ã‚’è¨­å®šã™ã‚‹æè³ªãƒ‡ãƒ¼ã‚¿ã®æœ€åˆã®ç•ªå·, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 0.
+      //!   \param count å€¤ã‚’è¨­å®šã™ã‚‹æè³ªãƒ‡ãƒ¼ã‚¿ã®æ•°, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      void loadShininess(GLfloat shininess, GLint first = 0, GLsizei count = 1) const;
+
+      //! \brief è¼ãä¿‚æ•°ã‚’è¨­å®šã™ã‚‹.
+      //!   \param shininess è¼ãä¿‚æ•°.
+      //!   \param first å€¤ã‚’è¨­å®šã™ã‚‹æè³ªãƒ‡ãƒ¼ã‚¿ã®æœ€åˆã®ç•ªå·, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 0.
+      //!   \param count å€¤ã‚’è¨­å®šã™ã‚‹æè³ªãƒ‡ãƒ¼ã‚¿ã®æ•°, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      void loadShininess(const GLfloat *shininess, GLint first = 0, GLsizei count = 1) const;
+
+      //! \brief æè³ªã‚’è¨­å®šã™ã‚‹.
+      //!   \param material å…‰æºã®ç‰¹æ€§ã® GgSimpleShader::Material æ§‹é€ ä½“ã®ãƒã‚¤ãƒ³ã‚¿.
+      //!   \param first å€¤ã‚’è¨­å®šã™ã‚‹æè³ªãƒ‡ãƒ¼ã‚¿ã®æœ€åˆã®ç•ªå·, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 0.
+      //!   \param count å€¤ã‚’è¨­å®šã™ã‚‹æè³ªãƒ‡ãƒ¼ã‚¿ã®æ•°, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      void load(const Material *material, GLint first = 0, GLsizei count = 1) const
+      {
+        send(material, 0, sizeof (Material), first, count);
+      }
+
+      //! \brief æè³ªã‚’è¨­å®šã™ã‚‹.
+      //!   \param material å…‰æºã®ç‰¹æ€§ã® GgSimpleShader::Material æ§‹é€ ä½“.
+      //!   \param first å€¤ã‚’è¨­å®šã™ã‚‹æè³ªãƒ‡ãƒ¼ã‚¿ã®æœ€åˆã®ç•ªå·, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 0.
+      //!   \param count å€¤ã‚’è¨­å®šã™ã‚‹æè³ªãƒ‡ãƒ¼ã‚¿ã®æ•°, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ 1.
+      void load(const Material &material, GLint first = 0, GLsizei count = 1) const
+      {
+        load(&material, first, count);
+      }
+
+      //! \brief æè³ªã‚’é¸æŠã™ã‚‹.
+      //!   \param i æè³ªãƒ‡ãƒ¼ã‚¿ã® uniform block ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹.
+      void select(GLint i = 0) const
+      {
+        // ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã® i ç•ªç›®ã®ãƒ–ãƒ­ãƒƒã‚¯ã®ä½ç½®
+        const GLintptr offset(static_cast<GLintptr>(getStride()) * i);
+        glBindBufferRange(getTarget(), MaterialBindingPoint, getBuffer(), offset, sizeof (Material));
+      }
+    };
+
+    //! \brief ã‚·ã‚§ãƒ¼ãƒ€ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ä½¿ç”¨ã‚’é–‹å§‹ã™ã‚‹.
     void use() const
     {
-      // ƒvƒƒOƒ‰ƒ€ƒIƒuƒWƒFƒNƒg‚ÍŠî’êƒNƒ‰ƒX‚Åw’è‚·‚é
+      // ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¯åŸºåº•ã‚¯ãƒ©ã‚¹ã§æŒ‡å®šã™ã‚‹
       GgPointShader::use();
     }
 
-    //! \brief ŒõŒ¹‚ğw’è‚µ‚ÄƒVƒF[ƒ_ƒvƒƒOƒ‰ƒ€‚Ìg—p‚ğŠJn‚·‚é.
-    //!   \param light ŒõŒ¹‚Ì“Á«‚Ì gg::GgSimpleLightBuffer \‘¢‘Ì‚Ìƒ|ƒCƒ“ƒ^.
-    void use(const GgSimpleLightBuffer *light) const
+    //! \brief æŠ•å½±å¤‰æ›è¡Œåˆ—ã¨ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã¨æ³•ç·šå¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã—ã¦ã‚·ã‚§ãƒ¼ãƒ€ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ä½¿ç”¨ã‚’é–‹å§‹ã™ã‚‹.
+    //!   \param mp GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°ã«æ ¼ç´ã•ã‚ŒãŸæŠ•å½±å¤‰æ›è¡Œåˆ—.
+    //!   \param mv GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°ã«æ ¼ç´ã•ã‚ŒãŸãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—.
+    //!   \param mv GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°ã«æ ¼ç´ã•ã‚ŒãŸãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã®æ³•ç·šå¤‰æ›è¡Œåˆ—.
+    void use(const GLfloat *mp, const GLfloat *mv, const GLfloat *mn) const
     {
-      // ƒvƒƒOƒ‰ƒ€ƒIƒuƒWƒFƒNƒg‚ğw’è‚·‚é
+      // ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’æŒ‡å®šã™ã‚‹
       use();
 
-      // ŒõŒ¹‚ğİ’è‚·‚é
-      selectLight(light);
-    }
-
-    //! \brief ŒõŒ¹‚ğw’è‚µ‚ÄƒVƒF[ƒ_ƒvƒƒOƒ‰ƒ€‚Ìg—p‚ğŠJn‚·‚é.
-    //!   \param light ŒõŒ¹‚Ì“Á«‚Ì gg::GgSimpleLightBuffer \‘¢‘Ì.
-    void use(const GgSimpleLightBuffer &light) const
-    {
-      use(&light);
-    }
-
-    //! \brief ŒõŒ¹‚Æ•ÏŠ·s—ñ‚ğw’è‚µ‚ÄƒVƒF[ƒ_ƒvƒƒOƒ‰ƒ€‚Ìg—p‚ğŠJn‚·‚é.
-    //!   \param light ŒõŒ¹‚Ì“Á«‚Ì gg::GgSimpleLightBuffer \‘¢‘Ì
-    //!   \param mp GLfloat Œ^‚Ì 16 —v‘f‚Ì”z—ñ‚ÉŠi”[‚³‚ê‚½“Š‰e•ÏŠ·s—ñ.
-    //!   \param mv GLfloat Œ^‚Ì 16 —v‘f‚Ì”z—ñ‚ÉŠi”[‚³‚ê‚½ƒ‚ƒfƒ‹ƒrƒ…[•ÏŠ·s—ñ.
-    //!   \param mv GLfloat Œ^‚Ì 16 —v‘f‚Ì”z—ñ‚ÉŠi”[‚³‚ê‚½ƒ‚ƒfƒ‹ƒrƒ…[•ÏŠ·s—ñ‚Ì–@ü•ÏŠ·s—ñ.
-    void use(const GgSimpleLightBuffer &light, const GLfloat *mp, const GLfloat *mv, const GLfloat *mn) const
-    {
-      // ŒõŒ¹‚ğw’è‚µ‚ÄƒVƒF[ƒ_ƒvƒƒOƒ‰ƒ€‚Ìg—p‚ğŠJn‚·‚é
-      use(light);
-
-      // •ÏŠ·s—ñ‚ğİ’è‚·‚é
+      // å¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã™ã‚‹
       loadMatrix(mp, mv, mn);
     }
 
-    //! \brief ŒõŒ¹‚Æ•ÏŠ·s—ñ‚ğw’è‚µ‚ÄƒVƒF[ƒ_ƒvƒƒOƒ‰ƒ€‚Ìg—p‚ğŠJn‚·‚é.
-    //!   \param light ŒõŒ¹‚Ì“Á«‚Ì gg::GgSimpleLightBuffer \‘¢‘Ì
-    //!   \param mp GgMatrix Œ^‚Ì“Š‰e•ÏŠ·s—ñ.
-    //!   \param mv GgMatrix Œ^‚Ìƒ‚ƒfƒ‹ƒrƒ…[•ÏŠ·s—ñ.
-    //!   \param mn GgMatrix Œ^‚Ìƒ‚ƒfƒ‹ƒrƒ…[•ÏŠ·s—ñ‚Ì–@ü•ÏŠ·s—ñ.
-    void use(const GgSimpleLightBuffer &light, const GgMatrix &mp, const GgMatrix &mv, const GgMatrix &mn) const
+    //! \brief æŠ•å½±å¤‰æ›è¡Œåˆ—ã¨ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã¨æ³•ç·šå¤‰æ›è¡Œåˆ—ã‚’æŒ‡å®šã—ã¦ã‚·ã‚§ãƒ¼ãƒ€ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ä½¿ç”¨ã‚’é–‹å§‹ã™ã‚‹.
+    //!   \param mp GgMatrix å‹ã®æŠ•å½±å¤‰æ›è¡Œåˆ—.
+    //!   \param mv GgMatrix å‹ã®ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—.
+    //!   \param mn GgMatrix å‹ã®ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã®æ³•ç·šå¤‰æ›è¡Œåˆ—.
+    void use(const GgMatrix &mp, const GgMatrix &mv, const GgMatrix &mn) const
     {
-      use(light, mp.get(), mv.get(), mn.get());
+      use(mp.get(), mv.get(), mn.get());
     }
 
-    //! \brief ŒõŒ¹‚Æ•ÏŠ·s—ñ‚ğw’è‚µ‚ÄƒVƒF[ƒ_ƒvƒƒOƒ‰ƒ€‚Ìg—p‚ğŠJn‚·‚é.
-    //!   \param light ŒõŒ¹‚Ì“Á«‚Ì gg::GgSimpleLightBuffer \‘¢‘Ì
-    //!   \param mp GgMatrix Œ^‚Ì“Š‰e•ÏŠ·s—ñ.
-    //!   \param mv GgMatrix Œ^‚Ìƒ‚ƒfƒ‹ƒrƒ…[•ÏŠ·s—ñ.
-    void use(const GgSimpleLightBuffer &light, const GgMatrix &mp, const GgMatrix &mv) const
+    //! \brief æŠ•å½±å¤‰æ›è¡Œåˆ—ã¨ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã—ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã‹ã‚‰æ±‚ã‚ãŸæ³•ç·šå¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã—ã¦ã‚·ã‚§ãƒ¼ãƒ€ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ä½¿ç”¨ã‚’é–‹å§‹ã™ã‚‹.
+    //!   \param mp GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°ã«æ ¼ç´ã•ã‚ŒãŸæŠ•å½±å¤‰æ›è¡Œåˆ—.
+    //!   \param mv GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°ã«æ ¼ç´ã•ã‚ŒãŸãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—.
+    void use(const GLfloat *mp, const GLfloat *mv) const
     {
-      use(light, mp, mv, mv.normal());
+      use(mp, mv, GgMatrix(mv).normal().get());
     }
 
-    //! \brief ŒõŒ¹‚Æ•ÏŠ·s—ñ‚ğw’è‚µ‚ÄƒVƒF[ƒ_ƒvƒƒOƒ‰ƒ€‚Ìg—p‚ğŠJn‚·‚é.
-    //!   \param light ŒõŒ¹‚Ì“Á«‚Ì gg::GgSimpleLightBuffer \‘¢‘Ì
-    //!   \param mp GLfloat Œ^‚Ì 16 —v‘f‚Ì”z—ñ‚ÉŠi”[‚³‚ê‚½“Š‰e•ÏŠ·s—ñ.
-    //!   \param mv GLfloat Œ^‚Ì 16 —v‘f‚Ì”z—ñ‚ÉŠi”[‚³‚ê‚½ƒ‚ƒfƒ‹ƒrƒ…[•ÏŠ·s—ñ.
-    void use(const GgSimpleLightBuffer &light, const GLfloat *mp, const GLfloat *mv) const
+    //! \brief æŠ•å½±å¤‰æ›è¡Œåˆ—ã¨ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã—ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã‹ã‚‰æ±‚ã‚ãŸæ³•ç·šå¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã—ã¦ã‚·ã‚§ãƒ¼ãƒ€ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ä½¿ç”¨ã‚’é–‹å§‹ã™ã‚‹.
+    //!   \param mp GgMatrix å‹ã®æŠ•å½±å¤‰æ›è¡Œåˆ—.
+    //!   \param mv GgMatrix å‹ã®ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—.
+    void use(const GgMatrix &mp, const GgMatrix &mv) const
     {
-      use(light, mp, mv, GgMatrix(mv).normal());
+      use(mp, mv, mv.normal());
+    }
+
+    //! \brief å…‰æºã‚’æŒ‡å®šã—ã¦ã‚·ã‚§ãƒ¼ãƒ€ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ä½¿ç”¨ã‚’é–‹å§‹ã™ã‚‹.
+    //!   \param light å…‰æºã®ç‰¹æ€§ã® gg::LightBuffer æ§‹é€ ä½“ã®ãƒã‚¤ãƒ³ã‚¿.
+    //!   \param i å…‰æºãƒ‡ãƒ¼ã‚¿ã® uniform block ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹.
+    void use(const LightBuffer *light, GLint i = 0) const
+    {
+      // ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’æŒ‡å®šã™ã‚‹
+      use();
+
+      // å…‰æºã‚’è¨­å®šã™ã‚‹
+      light->select(i);
+    }
+
+    //! \brief å…‰æºã‚’æŒ‡å®šã—ã¦ã‚·ã‚§ãƒ¼ãƒ€ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ä½¿ç”¨ã‚’é–‹å§‹ã™ã‚‹.
+    //!   \param light å…‰æºã®ç‰¹æ€§ã® gg::LightBuffer æ§‹é€ ä½“.
+    //!   \param i å…‰æºãƒ‡ãƒ¼ã‚¿ã® uniform block ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹.
+    void use(const LightBuffer &light, GLint i = 0) const
+    {
+      use(&light, i);
+    }
+
+    //! \brief å…‰æºã‚’æŒ‡å®šã—æŠ•å½±å¤‰æ›è¡Œåˆ—ã¨ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã¨æ³•ç·šå¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã—ã¦ã‚·ã‚§ãƒ¼ãƒ€ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ä½¿ç”¨ã‚’é–‹å§‹ã™ã‚‹.
+    //!   \param mp GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°ã«æ ¼ç´ã•ã‚ŒãŸæŠ•å½±å¤‰æ›è¡Œåˆ—.
+    //!   \param mv GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°ã«æ ¼ç´ã•ã‚ŒãŸãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—.
+    //!   \param mv GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°ã«æ ¼ç´ã•ã‚ŒãŸãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã®æ³•ç·šå¤‰æ›è¡Œåˆ—.
+    //!   \param light å…‰æºã®ç‰¹æ€§ã® gg::LightBuffer æ§‹é€ ä½“ã®ãƒã‚¤ãƒ³ã‚¿.
+    //!   \param i å…‰æºãƒ‡ãƒ¼ã‚¿ã® uniform block ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹.
+    void use(const GLfloat *mp, const GLfloat *mv, const GLfloat *mn, const LightBuffer *light, GLint i = 0) const
+    {
+      // å…‰æºã‚’æŒ‡å®šã—ã¦ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’æŒ‡å®šã™ã‚‹
+      use(light, i);
+
+      // å¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã™ã‚‹
+      loadMatrix(mp, mv, mn);
+    }
+
+    //! \brief å…‰æºã‚’æŒ‡å®šã—æŠ•å½±å¤‰æ›è¡Œåˆ—ã¨ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã¨æ³•ç·šå¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã—ã¦ã‚·ã‚§ãƒ¼ãƒ€ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ä½¿ç”¨ã‚’é–‹å§‹ã™ã‚‹.
+    //!   \param mp GgMatrix å‹ã®æŠ•å½±å¤‰æ›è¡Œåˆ—.
+    //!   \param mv GgMatrix å‹ã®ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—.
+    //!   \param mn GgMatrix å‹ã®ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã®æ³•ç·šå¤‰æ›è¡Œåˆ—.
+    //!   \param light å…‰æºã®ç‰¹æ€§ã® gg::LightBuffer æ§‹é€ ä½“.
+    //!   \param i å…‰æºãƒ‡ãƒ¼ã‚¿ã® uniform block ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹.
+    void use(const GgMatrix &mp, const GgMatrix &mv, const GgMatrix &mn, const LightBuffer &light, GLint i = 0) const
+    {
+      use(mp.get(), mv.get(), mn.get(), &light, i);
+    }
+
+    //! \brief å…‰æºã‚’æŒ‡å®šã—æŠ•å½±å¤‰æ›è¡Œåˆ—ã¨ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã—ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã‹ã‚‰æ±‚ã‚ãŸæ³•ç·šå¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã—ã¦ã‚·ã‚§ãƒ¼ãƒ€ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ä½¿ç”¨ã‚’é–‹å§‹ã™ã‚‹.
+    //!   \param mp GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°ã«æ ¼ç´ã•ã‚ŒãŸæŠ•å½±å¤‰æ›è¡Œåˆ—.
+    //!   \param mv GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°ã«æ ¼ç´ã•ã‚ŒãŸãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—.
+    //!   \param light å…‰æºã®ç‰¹æ€§ã® gg::LightBuffer æ§‹é€ ä½“ã®ãƒã‚¤ãƒ³ã‚¿.
+    //!   \param i å…‰æºãƒ‡ãƒ¼ã‚¿ã® uniform block ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹.
+    void use(const GLfloat *mp, const GLfloat *mv, const LightBuffer *light, GLint i = 0) const
+    {
+      use(mp, mv, GgMatrix(mv).normal().get(), light, i);
+    }
+
+    //! \brief å…‰æºã‚’æŒ‡å®šã—æŠ•å½±å¤‰æ›è¡Œåˆ—ã¨ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã—ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—ã‹ã‚‰æ±‚ã‚ãŸæ³•ç·šå¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã—ã¦ã‚·ã‚§ãƒ¼ãƒ€ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ä½¿ç”¨ã‚’é–‹å§‹ã™ã‚‹.
+    //!   \param mp GgMatrix å‹ã®æŠ•å½±å¤‰æ›è¡Œåˆ—.
+    //!   \param mv GgMatrix å‹ã®ãƒ¢ãƒ‡ãƒ«ãƒ“ãƒ¥ãƒ¼å¤‰æ›è¡Œåˆ—.
+    //!   \param light å…‰æºã®ç‰¹æ€§ã® gg::LightBuffer æ§‹é€ ä½“.
+    //!   \param i å…‰æºãƒ‡ãƒ¼ã‚¿ã® uniform block ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹.
+    void use(const GgMatrix &mp, const GgMatrix &mv, const LightBuffer &light, GLint i = 0) const
+    {
+      use(mp, mv, mv.normal(), light, i);
+    }
+
+    //! \brief å…‰æºã‚’æŒ‡å®šã—æŠ•å½±å¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã—ã¦ã‚·ã‚§ãƒ¼ãƒ€ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ä½¿ç”¨ã‚’é–‹å§‹ã™ã‚‹.
+    //!   \param mp GLfloat å‹ã® 16 è¦ç´ ã®é…åˆ—å¤‰æ•°ã«æ ¼ç´ã•ã‚ŒãŸæŠ•å½±å¤‰æ›è¡Œåˆ—.
+    //!   \param light å…‰æºã®ç‰¹æ€§ã® gg::LightBuffer æ§‹é€ ä½“ã®ãƒã‚¤ãƒ³ã‚¿.
+    //!   \param i å…‰æºãƒ‡ãƒ¼ã‚¿ã® uniform block ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹.
+    void use(const GLfloat *mp, const LightBuffer *light, GLint i = 0) const
+    {
+      // å…‰æºã‚’æŒ‡å®šã—ã¦ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’æŒ‡å®šã™ã‚‹
+      use(light, i);
+
+      // æŠ•å½±å¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã™ã‚‹
+      loadProjectionMatrix(mp);
+    }
+
+    //! \brief å…‰æºã‚’æŒ‡å®šã—æŠ•å½±å¤‰æ›è¡Œåˆ—ã‚’è¨­å®šã—ã¦ã‚·ã‚§ãƒ¼ãƒ€ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ä½¿ç”¨ã‚’é–‹å§‹ã™ã‚‹.
+    //!   \param mp GgMatrix å‹ã®æŠ•å½±å¤‰æ›è¡Œåˆ—.
+    //!   \param light å…‰æºã®ç‰¹æ€§ã® gg::LightBuffer æ§‹é€ ä½“.
+    //!   \param i å…‰æºãƒ‡ãƒ¼ã‚¿ã® uniform block ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹.
+    void use(const GgMatrix &mp, const LightBuffer &light, GLint i = 0) const
+    {
+      // å…‰æºã‚’æŒ‡å®šã—ã¦ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’æŒ‡å®šã™ã‚‹
+      use(mp.get(), &light, i);
     }
   };
 
   /*!
-  ** \brief OŠpŒ`•ªŠ„‚³‚ê‚½ OBJ ƒtƒ@ƒCƒ‹‚Æ MTL ƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚Ş (Arrays Œ`®)
+  ** \brief ä¸‰è§’å½¢åˆ†å‰²ã•ã‚ŒãŸ OBJ ãƒ•ã‚¡ã‚¤ãƒ«ã¨ MTL ãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚€ (Arrays å½¢å¼)
   **
-  **   \param name “Ç‚İ‚Ş Wavefront OBJ ƒtƒ@ƒCƒ‹–¼.
-  **   \param group “Ç‚İ‚ñ‚¾ƒf[ƒ^‚Ìƒ|ƒŠƒSƒ“ƒOƒ‹[ƒv‚²‚Æ‚ÌÅ‰‚ÌOŠpŒ`‚Ì”Ô†‚ÆOŠpŒ`”EŞ¿”Ô†.
-  **   \param material “Ç‚İ‚ñ‚¾ƒf[ƒ^‚Ìƒ|ƒŠƒSƒ“ƒOƒ‹[ƒv‚²‚Æ‚ÌŞ¿.
-  **   \param vert “Ç‚İ‚ñ‚¾ƒf[ƒ^‚Ì’¸“_‘®«.
-  **   \param normalize true ‚È‚ç“Ç‚İ‚ñ‚¾ƒf[ƒ^‚Ì‘å‚«‚³‚ğ³‹K‰»‚·‚é.
-  **   \return ƒtƒ@ƒCƒ‹‚Ì“Ç‚İ‚İ‚É¬Œ÷‚µ‚½‚ç true.
+  **   \param name èª­ã¿è¾¼ã‚€ Wavefront OBJ ãƒ•ã‚¡ã‚¤ãƒ«å.
+  **   \param group èª­ã¿è¾¼ã‚“ã ãƒ‡ãƒ¼ã‚¿ã®ãƒãƒªã‚´ãƒ³ã‚°ãƒ«ãƒ¼ãƒ—ã”ã¨ã®æœ€åˆã®ä¸‰è§’å½¢ã®ç•ªå·ã¨ä¸‰è§’å½¢æ•°ãƒ»æè³ªç•ªå·.
+  **   \param material èª­ã¿è¾¼ã‚“ã ãƒ‡ãƒ¼ã‚¿ã®ãƒãƒªã‚´ãƒ³ã‚°ãƒ«ãƒ¼ãƒ—ã”ã¨ã® GgSimpleShader::Material å‹ã®æè³ª.
+  **   \param vert èª­ã¿è¾¼ã‚“ã ãƒ‡ãƒ¼ã‚¿ã®é ‚ç‚¹å±æ€§.
+  **   \param normalize true ãªã‚‰èª­ã¿è¾¼ã‚“ã ãƒ‡ãƒ¼ã‚¿ã®å¤§ãã•ã‚’æ­£è¦åŒ–ã™ã‚‹.
+  **   \return ãƒ•ã‚¡ã‚¤ãƒ«ã®èª­ã¿è¾¼ã¿ã«æˆåŠŸã—ãŸã‚‰ true.
   */
-  extern bool ggLoadObj(const char *name,
-    std::vector< std::array<GLuint, 3> > &group,
-    std::vector<GgSimpleMaterial> &material,
+  extern bool ggLoadSimpleObj(const char *name,
+    std::vector<std::array<GLuint, 3>> &group,
+    std::vector<GgSimpleShader::Material> &material,
     std::vector<GgVertex> &vert,
     bool normalize = false);
 
   /*!
-  ** \brief OŠpŒ`•ªŠ„‚³‚ê‚½ OBJ ƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚Ş (Elements Œ`®).
+  ** \brief ä¸‰è§’å½¢åˆ†å‰²ã•ã‚ŒãŸ OBJ ãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚€ (Elements å½¢å¼).
   **
-  **   \param name “Ç‚İ‚Ş Wavefront OBJ ƒtƒ@ƒCƒ‹–¼.
-  **   \param group “Ç‚İ‚ñ‚¾ƒf[ƒ^‚Ìƒ|ƒŠƒSƒ“ƒOƒ‹[ƒv‚²‚Æ‚ÌÅ‰‚ÌOŠpŒ`‚Ì”Ô†‚ÆOŠpŒ`”EŞ¿”Ô†.
-  **   \param material “Ç‚İ‚ñ‚¾ƒf[ƒ^‚Ìƒ|ƒŠƒSƒ“ƒOƒ‹[ƒv‚²‚Æ‚ÌŞ¿.
-  **   \param vert “Ç‚İ‚ñ‚¾ƒf[ƒ^‚Ì’¸“_‘®«.
-  **   \param face “Ç‚İ‚ñ‚¾ƒf[ƒ^‚ÌOŠpŒ`‚Ì’¸“_ƒCƒ“ƒfƒbƒNƒX.
-  **   \param normalize true ‚È‚ç“Ç‚İ‚ñ‚¾ƒf[ƒ^‚Ì‘å‚«‚³‚ğ³‹K‰»‚·‚é.
-  **   \return ƒtƒ@ƒCƒ‹‚Ì“Ç‚İ‚İ‚É¬Œ÷‚µ‚½‚ç true.
+  **   \param name èª­ã¿è¾¼ã‚€ Wavefront OBJ ãƒ•ã‚¡ã‚¤ãƒ«å.
+  **   \param group èª­ã¿è¾¼ã‚“ã ãƒ‡ãƒ¼ã‚¿ã®ãƒãƒªã‚´ãƒ³ã‚°ãƒ«ãƒ¼ãƒ—ã”ã¨ã®æœ€åˆã®ä¸‰è§’å½¢ã®ç•ªå·ã¨ä¸‰è§’å½¢æ•°ãƒ»æè³ªç•ªå·.
+  **   \param material èª­ã¿è¾¼ã‚“ã ãƒ‡ãƒ¼ã‚¿ã®ãƒãƒªã‚´ãƒ³ã‚°ãƒ«ãƒ¼ãƒ—ã”ã¨ã®æè³ª.
+  **   \param vert èª­ã¿è¾¼ã‚“ã ãƒ‡ãƒ¼ã‚¿ã®é ‚ç‚¹å±æ€§.
+  **   \param face èª­ã¿è¾¼ã‚“ã ãƒ‡ãƒ¼ã‚¿ã®ä¸‰è§’å½¢ã®é ‚ç‚¹ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹.
+  **   \param normalize true ãªã‚‰èª­ã¿è¾¼ã‚“ã ãƒ‡ãƒ¼ã‚¿ã®å¤§ãã•ã‚’æ­£è¦åŒ–ã™ã‚‹.
+  **   \return ãƒ•ã‚¡ã‚¤ãƒ«ã®èª­ã¿è¾¼ã¿ã«æˆåŠŸã—ãŸã‚‰ true.
   */
-  extern bool ggLoadObj(const char *name,
-    std::vector< std::array<GLuint, 3> > &group,
-    std::vector<GgSimpleMaterial> &material,
+  extern bool ggLoadSimpleObj(const char *name,
+    std::vector<std::array<GLuint, 3>> &group,
+    std::vector<GgSimpleShader::Material> &material,
     std::vector<GgVertex> &vert,
     std::vector<GLuint> &face,
     bool normalize = false);
 
   /*!
-  ** \brief Wavefront OBJ Œ`®‚Ìƒtƒ@ƒCƒ‹ (Arrays Œ`®).
+  ** \brief Wavefront OBJ å½¢å¼ã®ãƒ•ã‚¡ã‚¤ãƒ« (Arrays å½¢å¼).
   */
-  class GgObj
+  class GgSimpleObj
   {
-    // “¯‚¶Ş¿‚ğŠ„‚è“–‚Ä‚éƒ|ƒŠƒSƒ“ƒOƒ‹[ƒv‚²‚Æ‚ÌOŠpŒ`”
-    std::vector< std::array<GLuint, 3> > group;
+    // åŒã˜æè³ªã‚’å‰²ã‚Šå½“ã¦ã‚‹ãƒãƒªã‚´ãƒ³ã‚°ãƒ«ãƒ¼ãƒ—ã”ã¨ã®ä¸‰è§’å½¢æ•°
+    std::vector<std::array<GLuint, 3>> group;
 
-    // ƒ|ƒŠƒSƒ“ƒOƒ‹[ƒv‚²‚Æ‚ÌŞ¿
-    GgSimpleMaterialBuffer *material;
+    // ãƒãƒªã‚´ãƒ³ã‚°ãƒ«ãƒ¼ãƒ—ã”ã¨ã®æè³ªã®ãƒ¦ãƒ‹ãƒ•ã‚©ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡
+    std::shared_ptr<GgSimpleShader::MaterialBuffer> material;
 
-    // ‚±‚Ì}Œ`‚ÌŒ`óƒf[ƒ^
-    GgElements *data;
-
-    // ‚±‚Ì}Œ`‚ğ•`‰æ‚·‚éƒVƒF[ƒ_
-    const GgSimpleShader *shader;
+    // ã“ã®å›³å½¢ã®å½¢çŠ¶ãƒ‡ãƒ¼ã‚¿
+    std::shared_ptr<GgElements> data;
 
   public:
 
-    //! \brief ƒfƒXƒgƒ‰ƒNƒ^.
-    virtual ~GgObj()
-    {
-      delete data;
-      delete material;
-    }
+    //! \brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    //!   \param name ä¸‰è§’å½¢åˆ†å‰²ã•ã‚ŒãŸ Alias OBJ å½¢å¼ã®ãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ•ã‚¡ã‚¤ãƒ«å.
+    //!   \param normalize true ãªã‚‰å›³å½¢ã®ã‚µã‚¤ã‚ºã‚’ [-1, 1] ã«æ­£è¦åŒ–ã™ã‚‹.
+    GgSimpleObj(const char *name, bool normalize = false);
 
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    //!   \param name OŠpŒ`•ªŠ„‚³‚ê‚½ Alias OBJ Œ`®‚Ìƒtƒ@ƒCƒ‹‚Ìƒtƒ@ƒCƒ‹–¼.
-    //!   \param shader ‚±‚Ì}Œ`‚Ì•`‰æ‚É—p‚¢‚é GgSimpleShader Œ^‚ÌƒVƒF[ƒ_ƒIƒuƒWƒFƒNƒg‚Ìƒ|ƒCƒ“ƒ^.
-    //!   \param normalize true ‚È‚ç}Œ`‚ÌƒTƒCƒY‚ğ [-1, 1] ‚É³‹K‰»‚·‚é.
-    GgObj(const char *name, const GgSimpleShader *shader = nullptr, bool normalize = false);
+    //! \brief ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿.
+    virtual ~GgSimpleObj() {}
 
-    //! \brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^.
-    //!   \param name OŠpŒ`•ªŠ„‚³‚ê‚½ Alias OBJ Œ`®‚Ìƒtƒ@ƒCƒ‹‚Ìƒtƒ@ƒCƒ‹–¼.
-    //!   \param shader ‚±‚Ì}Œ`‚Ì•`‰æ‚É—p‚¢‚é GgSimpleShader Œ^‚ÌƒVƒF[ƒ_ƒIƒuƒWƒFƒNƒg.
-    //!   \param normalize true ‚È‚ç}Œ`‚ÌƒTƒCƒY‚ğ [-1, 1] ‚É³‹K‰»‚·‚é.
-    GgObj(const char *name, const GgSimpleShader &shader, bool normalize = false)
-      : GgObj(name, &shader, normalize) {}
-
-    //! \brief Œ`óƒf[ƒ^‚Ìæ‚èo‚µ.
-    //!   \return GgTriangles Œ^‚ÌŒ`óƒf[ƒ^‚Ìƒ|ƒCƒ“ƒ^.
+    //! \brief å½¢çŠ¶ãƒ‡ãƒ¼ã‚¿ã®å–ã‚Šå‡ºã—.
+    //!   \return GgTriangles å‹ã®å½¢çŠ¶ãƒ‡ãƒ¼ã‚¿ã®ãƒã‚¤ãƒ³ã‚¿.
     const GgTriangles *get() const
     {
-      return data;
+      return data.get();
     }
 
-    //! \brief Wavefront OBJ Œ`®‚Ìƒf[ƒ^‚ğ•`‰æ‚·‚éÛ‚É—p‚¢‚éƒVƒF[ƒ_‚ğw’è‚·‚é.
-    //!   \param shader ‚±‚Ì}Œ`‚Ì•`‰æ‚É—p‚¢‚é GgSimpleShader Œ^‚ÌƒVƒF[ƒ_ƒIƒuƒWƒFƒNƒg‚Ìƒ|ƒCƒ“ƒ^.
-    void selectShader(const GgSimpleShader *shader)
-    {
-      this->shader = shader;
-    }
-
-    //! \brief Wavefront OBJ Œ`®‚Ìƒf[ƒ^‚ğ•`‰æ‚·‚éÛ‚É—p‚¢‚éƒVƒF[ƒ_‚ğw’è‚·‚é.
-    //!   \param shader ‚±‚Ì}Œ`‚Ì•`‰æ‚É—p‚¢‚é GgSimpleShader Œ^‚ÌƒVƒF[ƒ_ƒIƒuƒWƒFƒNƒg.
-    void selectShader(const GgSimpleShader &shader)
-    {
-      selectShader(&shader);
-    }
-
-    //! \brief Wavefront ‚±‚Ì OBJ Œ`®‚Ìƒf[ƒ^‚ğ•`‰æ‚·‚éÛ‚É—p‚¢‚éƒVƒF[ƒ_‚ğæ‚èo‚·.
-    //!   \return ‚±‚Ì}Œ`‚Ì•`‰æ‚É—p‚¢‚é GgSimpleShader Œ^‚ÌƒVƒF[ƒ_ƒIƒuƒWƒFƒNƒg‚Ìƒ|ƒCƒ“ƒ^.
-    const GgSimpleShader *getShader() const
-    {
-      return shader;
-    }
-
-    //! \brief Wavefront OBJ Œ`®‚Ìƒf[ƒ^‚ğ•`‰æ‚·‚éè‘±‚«.
-    //!   \param first •`‰æ‚·‚éÅ‰‚Ìƒp[ƒc”Ô†.
-    //!   \param count •`‰æ‚·‚éƒp[ƒc‚Ì”, 0 ‚È‚ç‘S•”‚Ìƒp[ƒc‚ğ•`‚­.
-    virtual void draw(GLuint first = 0, GLsizei count = 0) const;
+    //! \brief Wavefront OBJ å½¢å¼ã®ãƒ‡ãƒ¼ã‚¿ã‚’æç”»ã™ã‚‹æ‰‹ç¶šã.
+    //!   \param first æç”»ã™ã‚‹æœ€åˆã®ãƒ‘ãƒ¼ãƒ„ç•ªå·.
+    //!   \param count æç”»ã™ã‚‹ãƒ‘ãƒ¼ãƒ„ã®æ•°, 0 ãªã‚‰å…¨éƒ¨ã®ãƒ‘ãƒ¼ãƒ„ã‚’æã.
+    virtual void draw(GLint first = 0, GLsizei count = 0) const;
   };
 }
