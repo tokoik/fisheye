@@ -1,52 +1,52 @@
-#pragma once
+ï»¿#pragma once
 
 //
-// •½–Ê“WŠJ‚ÉŽg‚¤ƒVƒF[ƒ_
+// å¹³é¢å±•é–‹ã«ä½¿ã†ã‚·ã‚§ãƒ¼ãƒ€
 //
 
-// ƒVƒF[ƒ_‚ÌƒZƒbƒg‚Æƒpƒ‰ƒ[ƒ^
+// ã‚·ã‚§ãƒ¼ãƒ€ã®ã‚»ãƒƒãƒˆã¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
 struct ExpansionShader
 {
-  // ƒo[ƒeƒbƒNƒXƒVƒF[ƒ_‚Ìƒ\[ƒXƒvƒƒOƒ‰ƒ€‚Ìƒtƒ@ƒCƒ‹–¼
+  // ãƒãƒ¼ãƒ†ãƒƒã‚¯ã‚¹ã‚·ã‚§ãƒ¼ãƒ€ã®ã‚½ãƒ¼ã‚¹ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ãƒ•ã‚¡ã‚¤ãƒ«å
   const char *vsrc;
 
-  // ƒtƒ‰ƒOƒƒ“ƒgƒVƒF[ƒ_‚Ìƒ\[ƒXƒvƒƒOƒ‰ƒ€‚Ìƒtƒ@ƒCƒ‹–¼
+  // ãƒ•ãƒ©ã‚°ãƒ¡ãƒ³ãƒˆã‚·ã‚§ãƒ¼ãƒ€ã®ã‚½ãƒ¼ã‚¹ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ãƒ•ã‚¡ã‚¤ãƒ«å
   const char *fsrc;
 
-  // ƒJƒƒ‰‚Ì‰ð‘œ“x
+  // ã‚«ãƒ¡ãƒ©ã®è§£åƒåº¦
   const int width, height;
 
-  // ƒCƒ[ƒWƒT[ƒNƒ‹‚Ì”¼Œa‚Æ’†SˆÊ’u
+  // ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚µãƒ¼ã‚¯ãƒ«ã®åŠå¾„ã¨ä¸­å¿ƒä½ç½®
   const float circle[4];
 };
 
-// ƒVƒF[ƒ_‚ÌŽí—Þ
+// ã‚·ã‚§ãƒ¼ãƒ€ã®ç¨®é¡ž
 constexpr ExpansionShader shader_type[] =
 {
-  // 0: ’Êí‚ÌƒJƒƒ‰
+  // 0: é€šå¸¸ã®ã‚«ãƒ¡ãƒ©
   { "fixed.vert",     "normal.frag",    640,  480, 1.0f, 1.0f, 0.0f, 0.0f },
 
-  // 1: ’Êí‚ÌƒJƒƒ‰‚ÅŽ‹“_‚ð‰ñ“]
+  // 1: é€šå¸¸ã®ã‚«ãƒ¡ãƒ©ã§è¦–ç‚¹ã‚’å›žè»¢
   { "rectangle.vert", "normal.frag",    640,  480, 1.0f, 1.0f, 0.0f, 0.0f },
 
-  // 2: ³‹—‰~“›}–@‚Ì‰æ‘œ (cü‚ðÁ‚·‚É‚Í GL_CLAMP_TO_BORDER ‚ð GL_REPEAT ‚É‚µ‚Ä‚­‚¾‚³‚¢)
+  // 2: æ­£è·å††ç­’å›³æ³•ã®ç”»åƒ (ç¸¦ç·šã‚’æ¶ˆã™ã«ã¯ GL_CLAMP_TO_BORDER ã‚’ GL_REPEAT ã«ã—ã¦ãã ã•ã„)
   { "panorama.vert",  "panorama.frag", 1280,  720, 1.0f, 1.0f, 0.0f, 0.0f },
 
-  // 3: 180‹‹›ŠáƒJƒƒ‰ : 3.1415927 / 2 (à 180‹/ 2)
+  // 3: 180Â°é­šçœ¼ã‚«ãƒ¡ãƒ© : 3.1415927 / 2 (â‰’ 180Â°/ 2)
   { "fisheye.vert",   "normal.frag",   1280,  720, 1.570796327f, 1.570796327f, 0.0f, 0.0f },
 
-  // 4: 180‹‹›ŠáƒJƒƒ‰ (FUJINON FE185C046HA-1 + SENTECH STC-MCE132U3V) : 3.5779249 / 2 (à 205‹/ 2)
+  // 4: 180Â°é­šçœ¼ã‚«ãƒ¡ãƒ© (FUJINON FE185C046HA-1 + SENTECH STC-MCE132U3V) : 3.5779249 / 2 (â‰’ 205Â°/ 2)
   { "fisheye.vert",   "normal.frag",   1280, 1024, 1.797689129f, 1.797689129f, 0.0f, 0.0f },
 
-  // 5: 206‹‹›ŠáƒJƒƒ‰ (Kodak PIXPRO SP360 4K, ŽèU‚ê•â³‚ ‚è) : 3.5953783 / 2 (à 206‹/ 2)
+  // 5: 206Â°é­šçœ¼ã‚«ãƒ¡ãƒ© (Kodak PIXPRO SP360 4K, æ‰‹æŒ¯ã‚Œè£œæ­£ã‚ã‚Š) : 3.5953783 / 2 (â‰’ 206Â°/ 2)
   { "fisheye.vert",   "normal.frag",   1440, 1440, 1.797689129f, 1.797689129f, 0.0f, 0.0f },
 
-  // 6: 235‹‹›ŠáƒJƒƒ‰ (Kodak PIXPRO SP360 4K, ŽèU‚ê•â³‚È‚µ) : 4.1015237 / 2 (à 235‹/ 2)
+  // 6: 235Â°é­šçœ¼ã‚«ãƒ¡ãƒ© (Kodak PIXPRO SP360 4K, æ‰‹æŒ¯ã‚Œè£œæ­£ãªã—) : 4.1015237 / 2 (â‰’ 235Â°/ 2)
   { "fisheye.vert",   "normal.frag",   1440, 1440, 2.050761871f, 2.050761871f, 0.0f, 0.0f },
 
-  // 7: RICHO THETA ‚Ì USB ƒ‰ƒCƒuƒXƒgƒŠ[ƒ~ƒ“ƒO‰f‘œ : (Žè“®’²®‚ÅŒˆ‚ß‚½’l)
+  // 7: RICHO THETA ã® USB ãƒ©ã‚¤ãƒ–ã‚¹ãƒˆãƒªãƒ¼ãƒŸãƒ³ã‚°æ˜ åƒ : (æ‰‹å‹•èª¿æ•´ã§æ±ºã‚ãŸå€¤)
   { "theta.vert",     "theta.frag",    1280,  720, 1.003f, 1.003f, 0.0f, -0.002f },
 
-  // 8: RICHO THETA ‚Ì HDMI ƒ‰ƒCƒuƒXƒgƒŠ[ƒ~ƒ“ƒO‰f‘œ : (Žè“®’²®‚ÅŒˆ‚ß‚½’l)
+  // 8: RICHO THETA ã® HDMI ãƒ©ã‚¤ãƒ–ã‚¹ãƒˆãƒªãƒ¼ãƒŸãƒ³ã‚°æ˜ åƒ : (æ‰‹å‹•èª¿æ•´ã§æ±ºã‚ãŸå€¤)
   { "theta.vert",     "theta.frag",    1920,  1080, 1.003f, 1.003f, 0.0f, -0.002f }
 };

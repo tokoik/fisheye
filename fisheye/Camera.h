@@ -1,139 +1,139 @@
-#pragma once
+ï»¿#pragma once
 
 //
-// ƒJƒƒ‰ŠÖ˜A‚Ìˆ—
+// ã‚«ãƒ¡ãƒ©é–¢é€£ã®å‡¦ç†
 //
 
-// •â•ƒvƒƒOƒ‰ƒ€
+// è£œåŠ©ãƒ—ãƒ­ã‚°ãƒ©ãƒ 
 #include "gg.h"
 using namespace gg;
 
-// ƒLƒƒƒvƒ`ƒƒ‚ð”ñ“¯Šú‚Ås‚¤
+// ã‚­ãƒ£ãƒ—ãƒãƒ£ã‚’éžåŒæœŸã§è¡Œã†
 #include <thread>
 #include <mutex>
 
 //
-// ƒJƒƒ‰ŠÖ˜A‚Ìˆ—‚ð’S“–‚·‚éƒNƒ‰ƒX
+// ã‚«ãƒ¡ãƒ©é–¢é€£ã®å‡¦ç†ã‚’æ‹…å½“ã™ã‚‹ã‚¯ãƒ©ã‚¹
 //
 class Camera
 {
-  // ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^‚ð••‚¶‚é
+  // ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã‚’å°ã˜ã‚‹
   Camera(const Camera &c);
 
-  // ‘ã“ü‚ð••‚¶‚é
+  // ä»£å…¥ã‚’å°ã˜ã‚‹
   Camera &operator=(const Camera &w);
 
 protected:
 
-  // ƒLƒƒƒvƒ`ƒƒ‚µ‚½‰æ‘œ
+  // ã‚­ãƒ£ãƒ—ãƒãƒ£ã—ãŸç”»åƒ
   GLubyte *buffer;
 
-  // ƒLƒƒƒvƒ`ƒƒ‚µ‚½‰æ‘œ‚Ì•‚Æ‚‚³
+  // ã‚­ãƒ£ãƒ—ãƒãƒ£ã—ãŸç”»åƒã®å¹…ã¨é«˜ã•
   GLsizei width, height;
 
-  // ƒLƒƒƒvƒ`ƒƒ‚³‚ê‚é‰æ‘œ‚ÌƒtƒH[ƒ}ƒbƒg
+  // ã‚­ãƒ£ãƒ—ãƒãƒ£ã•ã‚Œã‚‹ç”»åƒã®ãƒ•ã‚©ãƒ¼ãƒžãƒƒãƒˆ
   GLenum format;
 
-  // ƒXƒŒƒbƒh
+  // ã‚¹ãƒ¬ãƒƒãƒ‰
   std::thread thr;
 
-  // ƒ~ƒ…[ƒeƒbƒNƒX
+  // ãƒŸãƒ¥ãƒ¼ãƒ†ãƒƒã‚¯ã‚¹
   std::mutex mtx;
 
-  // ŽÀsó‘Ô
+  // å®Ÿè¡ŒçŠ¶æ…‹
   bool run;
 
-  // ƒtƒŒ[ƒ€‚ðƒLƒƒƒvƒ`ƒƒ‚·‚é
+  // ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’ã‚­ãƒ£ãƒ—ãƒãƒ£ã™ã‚‹
   virtual void capture() {};
 
 public:
 
-  // ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+  // ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
   Camera()
   {
-    // ‰æ‘œ‚ª‚Ü‚¾Žæ“¾‚³‚ê‚Ä‚¢‚È‚¢‚±‚Æ‚ð‹L˜^‚µ‚Ä‚¨‚­
+    // ç”»åƒãŒã¾ã å–å¾—ã•ã‚Œã¦ã„ãªã„ã“ã¨ã‚’è¨˜éŒ²ã—ã¦ãŠã
     buffer = nullptr;
 
-    // ƒXƒŒƒbƒh‚ª’âŽ~ó‘Ô‚Å‚ ‚é‚±‚Æ‚ð‹L˜^‚µ‚Ä‚¨‚­
+    // ã‚¹ãƒ¬ãƒƒãƒ‰ãŒåœæ­¢çŠ¶æ…‹ã§ã‚ã‚‹ã“ã¨ã‚’è¨˜éŒ²ã—ã¦ãŠã
     run = false;
   }
 
-  // ƒfƒXƒgƒ‰ƒNƒ^
+  // ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
   virtual ~Camera()
   {
   }
 
-  // ƒXƒŒƒbƒh‚ð‹N“®‚·‚é
+  // ã‚¹ãƒ¬ãƒƒãƒ‰ã‚’èµ·å‹•ã™ã‚‹
   void start()
   {
-    // ƒXƒŒƒbƒh‚ª‹N“®ó‘Ô‚Å‚ ‚é‚±‚Æ‚ð‹L˜^‚µ‚Ä‚¨‚­
+    // ã‚¹ãƒ¬ãƒƒãƒ‰ãŒèµ·å‹•çŠ¶æ…‹ã§ã‚ã‚‹ã“ã¨ã‚’è¨˜éŒ²ã—ã¦ãŠã
     run = true;
 
-    // ƒXƒŒƒbƒh‚ð‹N“®‚·‚é
+    // ã‚¹ãƒ¬ãƒƒãƒ‰ã‚’èµ·å‹•ã™ã‚‹
     thr = std::thread([this](){ this->capture(); });
   }
 
-  // ƒXƒŒƒbƒh‚ð’âŽ~‚·‚é
+  // ã‚¹ãƒ¬ãƒƒãƒ‰ã‚’åœæ­¢ã™ã‚‹
   void stop()
   {
-    // ƒLƒƒƒvƒ`ƒƒƒXƒŒƒbƒh‚ªŽÀs’†‚È‚ç
+    // ã‚­ãƒ£ãƒ—ãƒãƒ£ã‚¹ãƒ¬ãƒƒãƒ‰ãŒå®Ÿè¡Œä¸­ãªã‚‰
     if (run)
     {
-      // ƒLƒƒƒvƒ`ƒƒƒfƒoƒCƒX‚ðƒƒbƒN‚·‚é
+      // ã‚­ãƒ£ãƒ—ãƒãƒ£ãƒ‡ãƒã‚¤ã‚¹ã‚’ãƒ­ãƒƒã‚¯ã™ã‚‹
       mtx.lock();
 
-      // ƒLƒƒƒvƒ`ƒƒƒXƒŒƒbƒh‚Ìƒ‹[ƒv‚ðŽ~‚ß‚Ä
+      // ã‚­ãƒ£ãƒ—ãƒãƒ£ã‚¹ãƒ¬ãƒƒãƒ‰ã®ãƒ«ãƒ¼ãƒ—ã‚’æ­¢ã‚ã¦
       run = false;
 
-      // ƒƒbƒN‚ð‰ðœ‚µ
+      // ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã—
       mtx.unlock();
 
-      // ‡—¬‚·‚é
+      // åˆæµã™ã‚‹
       thr.join();
     }
   }
 
-  // ‰æ‘œ‚Ì•‚ð“¾‚é
+  // ç”»åƒã®å¹…ã‚’å¾—ã‚‹
   int getWidth() const
   {
     return width;
   }
 
-  // ‰æ‘œ‚Ì‚‚³‚ð“¾‚é
+  // ç”»åƒã®é«˜ã•ã‚’å¾—ã‚‹
   int getHeight() const
   {
     return height;
   }
 
-  // Ovrvision Pro ‚Ì˜Io‚ðã‚°‚é
+  // Ovrvision Pro ã®éœ²å‡ºã‚’ä¸Šã’ã‚‹
   virtual void increaseExposure() {};
 
-  // Ovrvision Pro ‚Ì˜Io‚ð‰º‚°‚é
+  // Ovrvision Pro ã®éœ²å‡ºã‚’ä¸‹ã’ã‚‹
   virtual void decreaseExposure() {};
 
-  // Ovrvision Pro ‚Ì—˜“¾‚ðã‚°‚é
+  // Ovrvision Pro ã®åˆ©å¾—ã‚’ä¸Šã’ã‚‹
   virtual void increaseGain() {};
 
-  // Ovrvision Pro ‚Ì—˜“¾‚ð‰º‚°‚é
+  // Ovrvision Pro ã®åˆ©å¾—ã‚’ä¸‹ã’ã‚‹
   virtual void decreaseGain() {};
 
-  // ƒJƒƒ‰‚ðƒƒbƒN‚µ‚Ä‰æ‘œ‚ðƒeƒNƒXƒ`ƒƒ‚É“]‘—‚·‚é
+  // ã‚«ãƒ¡ãƒ©ã‚’ãƒ­ãƒƒã‚¯ã—ã¦ç”»åƒã‚’ãƒ†ã‚¯ã‚¹ãƒãƒ£ã«è»¢é€ã™ã‚‹
   void transmit()
   {
-    // ƒJƒƒ‰‚ÌƒƒbƒN‚ðŽŽ‚Ý‚é
+    // ã‚«ãƒ¡ãƒ©ã®ãƒ­ãƒƒã‚¯ã‚’è©¦ã¿ã‚‹
     if (mtx.try_lock())
     {
-      // V‚µ‚¢ƒf[ƒ^‚ª“ž’…‚µ‚Ä‚¢‚½‚ç
+      // æ–°ã—ã„ãƒ‡ãƒ¼ã‚¿ãŒåˆ°ç€ã—ã¦ã„ãŸã‚‰
       if (buffer)
       {
-        // ƒf[ƒ^‚ðƒeƒNƒXƒ`ƒƒ‚É“]‘—‚·‚é
+        // ãƒ‡ãƒ¼ã‚¿ã‚’ãƒ†ã‚¯ã‚¹ãƒãƒ£ã«è»¢é€ã™ã‚‹
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, format, GL_UNSIGNED_BYTE, buffer);
 
-        // ƒf[ƒ^‚Ì“]‘—Š®—¹‚ð‹L˜^‚·‚é
+        // ãƒ‡ãƒ¼ã‚¿ã®è»¢é€å®Œäº†ã‚’è¨˜éŒ²ã™ã‚‹
         buffer = nullptr;
       }
 
-      // ¶ƒJƒƒ‰‚ÌƒƒbƒN‚ð‰ðœ‚·‚é
+      // å·¦ã‚«ãƒ¡ãƒ©ã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã™ã‚‹
       mtx.unlock();
     }
   }

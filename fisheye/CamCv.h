@@ -1,190 +1,191 @@
 #pragma once
 
 //
-// OpenCV ‚ðŽg‚Á‚½ƒLƒƒƒvƒ`ƒƒ
+// OpenCV ã‚’ä½¿ã£ãŸã‚­ãƒ£ãƒ—ãƒãƒ£
 //
 
-// ƒJƒƒ‰ŠÖ˜A‚Ìˆ—
+// ã‚«ãƒ¡ãƒ©é–¢é€£ã®å‡¦ç†
 #include "Camera.h"
 
 // OpenCV
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/videoio/legacy/constants_c.h>
 
-// OpenCV ‚ðŽg‚Á‚ÄƒLƒƒƒvƒ`ƒƒ‚·‚éƒNƒ‰ƒX
+// OpenCV ã‚’ä½¿ã£ã¦ã‚­ãƒ£ãƒ—ãƒãƒ£ã™ã‚‹ã‚¯ãƒ©ã‚¹
 class CamCv
   : public Camera
 {
-  // OpenCV ‚ÌƒLƒƒƒvƒ`ƒƒƒfƒoƒCƒX
+  // OpenCV ã®ã‚­ãƒ£ãƒ—ãƒãƒ£ãƒ‡ãƒã‚¤ã‚¹
   cv::VideoCapture camera;
 
-  // OpenCV ‚ÌƒLƒƒƒvƒ`ƒƒƒfƒoƒCƒX‚©‚çŽæ“¾‚µ‚½ƒtƒŒ[ƒ€
+  // OpenCV ã®ã‚­ãƒ£ãƒ—ãƒãƒ£ãƒ‡ãƒã‚¤ã‚¹ã‹ã‚‰å–å¾—ã—ãŸãƒ•ãƒ¬ãƒ¼ãƒ 
   cv::Mat frame;
 
-  // Œ»Ý‚ÌƒtƒŒ[ƒ€‚ÌŽž
+  // ç¾åœ¨ã®ãƒ•ãƒ¬ãƒ¼ãƒ ã®æ™‚åˆ»
   double frameTime;
 
-  // ˜Io‚Æ—˜“¾
+  // éœ²å‡ºã¨åˆ©å¾—
   int exposure, gain;
 
-  // ƒLƒƒƒvƒ`ƒƒƒfƒoƒCƒX‚ð‰Šú‰»‚·‚é
+  // ã‚­ãƒ£ãƒ—ãƒãƒ£ãƒ‡ãƒã‚¤ã‚¹ã‚’åˆæœŸåŒ–ã™ã‚‹
   bool init(int initial_width, int initial_height, int initial_fps)
   {
-    // ƒJƒƒ‰‚Ì‰ð‘œ“x‚ðÝ’è‚·‚é
+    // ã‚«ãƒ¡ãƒ©ã®è§£åƒåº¦ã‚’è¨­å®šã™ã‚‹
     if (initial_width > 0) camera.set(CV_CAP_PROP_FRAME_WIDTH, initial_width);
     if (initial_height > 0) camera.set(CV_CAP_PROP_FRAME_HEIGHT, initial_height);
     if (initial_fps > 0) camera.set(CV_CAP_PROP_FPS, initial_fps);
 
-    // ƒJƒƒ‰‚©‚çÅ‰‚ÌƒtƒŒ[ƒ€‚ðƒLƒƒƒvƒ`ƒƒ‚·‚é
+    // ã‚«ãƒ¡ãƒ©ã‹ã‚‰æœ€åˆã®ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’ã‚­ãƒ£ãƒ—ãƒãƒ£ã™ã‚‹
     if (camera.grab())
     {
-      // Å‰‚ÌƒtƒŒ[ƒ€‚ðŽæ“¾‚µ‚½Žž‚ðŠî€‚É‚·‚é
+      // æœ€åˆã®ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’å–å¾—ã—ãŸæ™‚åˆ»ã‚’åŸºæº–ã«ã™ã‚‹
       glfwSetTime(0.0);
 
-      // Å‰‚ÌƒtƒŒ[ƒ€‚ÌŽž‚Í 0 ‚É‚·‚é
+      // æœ€åˆã®ãƒ•ãƒ¬ãƒ¼ãƒ ã®æ™‚åˆ»ã¯ 0 ã«ã™ã‚‹
       frameTime = 0.0;
 
-      // ƒLƒƒƒvƒ`ƒƒ‚µ‚½ƒtƒŒ[ƒ€‚ÌƒTƒCƒY‚ðŽæ“¾‚·‚é
+      // ã‚­ãƒ£ãƒ—ãƒãƒ£ã—ãŸãƒ•ãƒ¬ãƒ¼ãƒ ã®ã‚µã‚¤ã‚ºã‚’å–å¾—ã™ã‚‹
       width = static_cast<GLsizei>(camera.get(CV_CAP_PROP_FRAME_WIDTH));
       height = static_cast<GLsizei>(camera.get(CV_CAP_PROP_FRAME_HEIGHT));
 
-      // macOS ‚¾‚ÆÝ’è‚Å‚«‚Ä‚à 0 ‚ª•Ô‚Á‚Ä‚­‚é
+      // macOS ã ã¨è¨­å®šã§ãã¦ã‚‚ 0 ãŒè¿”ã£ã¦ãã‚‹
       if (width == 0) width = initial_width;
       if (height == 0) height = initial_height;
 
-      // ƒJƒƒ‰‚Ì—˜“¾‚Æ˜Io‚ðŽæ“¾‚·‚é
+      // ã‚«ãƒ¡ãƒ©ã®åˆ©å¾—ã¨éœ²å‡ºã‚’å–å¾—ã™ã‚‹
       gain = static_cast<GLsizei>(camera.get(CV_CAP_PROP_GAIN));
       exposure = static_cast<GLsizei>(camera.get(CV_CAP_PROP_EXPOSURE) * 10.0);
 
-      // ƒLƒƒƒvƒ`ƒƒ‚³‚ê‚éƒtƒŒ[ƒ€‚ÌƒtƒH[ƒ}ƒbƒg‚ðÝ’è‚·‚é
+      // ã‚­ãƒ£ãƒ—ãƒãƒ£ã•ã‚Œã‚‹ãƒ•ãƒ¬ãƒ¼ãƒ ã®ãƒ•ã‚©ãƒ¼ãƒžãƒƒãƒˆã‚’è¨­å®šã™ã‚‹
       format = GL_BGR;
 
-      // ƒtƒŒ[ƒ€‚ðŽæ‚èo‚µ‚ÄƒLƒƒƒvƒ`ƒƒ—p‚Ìƒƒ‚ƒŠ‚ðŠm•Û‚·‚é
+      // ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’å–ã‚Šå‡ºã—ã¦ã‚­ãƒ£ãƒ—ãƒãƒ£ç”¨ã®ãƒ¡ãƒ¢ãƒªã‚’ç¢ºä¿ã™ã‚‹
       camera.retrieve(frame, 3);
 
-      // ƒtƒŒ[ƒ€‚ªƒLƒƒƒvƒ`ƒƒ‚³‚ê‚½‚±‚Æ‚ð‹L˜^‚·‚é
+      // ãƒ•ãƒ¬ãƒ¼ãƒ ãŒã‚­ãƒ£ãƒ—ãƒãƒ£ã•ã‚ŒãŸã“ã¨ã‚’è¨˜éŒ²ã™ã‚‹
       buffer = frame.data;
 
-      // ƒJƒƒ‰‚ªŽg‚¦‚é
+      // ã‚«ãƒ¡ãƒ©ãŒä½¿ãˆã‚‹
       return true;
     }
 
-    // ƒJƒƒ‰‚ªŽg‚¦‚È‚¢
+    // ã‚«ãƒ¡ãƒ©ãŒä½¿ãˆãªã„
     return false;
   }
 
-  // ƒtƒŒ[ƒ€‚ðƒLƒƒƒvƒ`ƒƒ‚·‚é
+  // ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’ã‚­ãƒ£ãƒ—ãƒãƒ£ã™ã‚‹
   virtual void capture()
   {
-    // ‚ ‚ç‚©‚¶‚ßƒLƒƒƒvƒ`ƒƒƒfƒoƒCƒX‚ðƒƒbƒN‚µ‚Ä
+    // ã‚ã‚‰ã‹ã˜ã‚ã‚­ãƒ£ãƒ—ãƒãƒ£ãƒ‡ãƒã‚¤ã‚¹ã‚’ãƒ­ãƒƒã‚¯ã—ã¦
     mtx.lock();
 
-    // ƒXƒŒƒbƒh‚ªŽÀs‰Â‚ÌŠÔ
+    // ã‚¹ãƒ¬ãƒƒãƒ‰ãŒå®Ÿè¡Œå¯ã®é–“
     while (run)
     {
-      // ƒoƒbƒtƒ@‚ª‹ó‚Ì‚Æ‚«Œo‰ßŽžŠÔ‚ªŒ»Ý‚ÌƒtƒŒ[ƒ€‚ÌŽž‚É’B‚µ‚Ä‚¢‚Ä
+      // ãƒãƒƒãƒ•ã‚¡ãŒç©ºã®ã¨ãçµŒéŽæ™‚é–“ãŒç¾åœ¨ã®ãƒ•ãƒ¬ãƒ¼ãƒ ã®æ™‚åˆ»ã«é”ã—ã¦ã„ã¦
       if (!buffer && glfwGetTime() >= frameTime)
       {
-        // ŽŸ‚ÌƒtƒŒ[ƒ€‚ª‘¶Ý‚·‚ê‚Î
+        // æ¬¡ã®ãƒ•ãƒ¬ãƒ¼ãƒ ãŒå­˜åœ¨ã™ã‚Œã°
         if (camera.grab())
         {
-          // ƒLƒƒƒvƒ`ƒƒ‚µ‚½ƒtƒŒ[ƒ€‚ÌŽž‚ð‹L˜^‚µ‚Ä
+          // ã‚­ãƒ£ãƒ—ãƒãƒ£ã—ãŸãƒ•ãƒ¬ãƒ¼ãƒ ã®æ™‚åˆ»ã‚’è¨˜éŒ²ã—ã¦
           frameTime = camera.get(CV_CAP_PROP_POS_MSEC) * 0.001;
 
-          // “ž’…‚µ‚½ƒtƒŒ[ƒ€‚ðØ‚èo‚µ‚Ä
+          // åˆ°ç€ã—ãŸãƒ•ãƒ¬ãƒ¼ãƒ ã‚’åˆ‡ã‚Šå‡ºã—ã¦
           camera.retrieve(frame, 3);
 
-          // ƒtƒŒ[ƒ€‚ðXV‚µ
+          // ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’æ›´æ–°ã—
           buffer = frame.data;
 
-          // ŽŸ‚ÌƒtƒŒ[ƒ€‚Éi‚Þ
+          // æ¬¡ã®ãƒ•ãƒ¬ãƒ¼ãƒ ã«é€²ã‚€
           continue;
         }
 
-        // ƒtƒŒ[ƒ€‚ªŽæ“¾‚Å‚«‚È‚©‚Á‚½‚çƒ€[ƒr[ƒtƒ@ƒCƒ‹‚ðŠª‚«–ß‚µ
+        // ãƒ•ãƒ¬ãƒ¼ãƒ ãŒå–å¾—ã§ããªã‹ã£ãŸã‚‰ãƒ ãƒ¼ãƒ“ãƒ¼ãƒ•ã‚¡ã‚¤ãƒ«ã‚’å·»ãæˆ»ã—
         if (camera.set(CV_CAP_PROP_POS_FRAMES, 0.0))
         {
-          // Œo‰ßŽžŠÔ‚ðƒŠƒZƒbƒg‚µ‚Ä
+          // çµŒéŽæ™‚é–“ã‚’ãƒªã‚»ãƒƒãƒˆã—ã¦
           glfwSetTime(0.0);
 
-          // ƒtƒŒ[ƒ€‚ÌŽž‚ðƒŠƒZƒbƒg‚µ
+          // ãƒ•ãƒ¬ãƒ¼ãƒ ã®æ™‚åˆ»ã‚’ãƒªã‚»ãƒƒãƒˆã—
           frameTime = 0.0;
 
-          // ŽŸ‚ÌƒtƒŒ[ƒ€‚Éi‚Þ
+          // æ¬¡ã®ãƒ•ãƒ¬ãƒ¼ãƒ ã«é€²ã‚€
           continue;
         }
       }
 
-      // ƒtƒŒ[ƒ€‚ªØ‚èo‚¹‚È‚¯‚ê‚ÎƒƒbƒN‚ð‰ðœ‚µ‚Ä
+      // ãƒ•ãƒ¬ãƒ¼ãƒ ãŒåˆ‡ã‚Šå‡ºã›ãªã‘ã‚Œã°ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã—ã¦
       mtx.unlock();
 
-      // ‘¼‚ÌƒXƒŒƒbƒh‚ªƒŠƒ\[ƒX‚ÉƒAƒNƒZƒX‚·‚é‚½‚ß‚É­‚µ‘Ò‚Á‚Ä‚©‚ç
+      // ä»–ã®ã‚¹ãƒ¬ãƒƒãƒ‰ãŒãƒªã‚½ãƒ¼ã‚¹ã«ã‚¢ã‚¯ã‚»ã‚¹ã™ã‚‹ãŸã‚ã«å°‘ã—å¾…ã£ã¦ã‹ã‚‰
       std::this_thread::sleep_for(std::chrono::milliseconds(10L));
 
-      // ‚Ü‚½ƒLƒƒƒvƒ`ƒƒƒfƒoƒCƒX‚ðƒƒbƒN‚·‚é
+      // ã¾ãŸã‚­ãƒ£ãƒ—ãƒãƒ£ãƒ‡ãƒã‚¤ã‚¹ã‚’ãƒ­ãƒƒã‚¯ã™ã‚‹
       mtx.lock();
     }
 
-    // I‚í‚é‚Æ‚«‚ÍƒƒbƒN‚ð‰ðœ‚·‚é
+    // çµ‚ã‚ã‚‹ã¨ãã¯ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã™ã‚‹
     mtx.unlock();
   }
 
 public:
 
-  // ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+  // ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
   CamCv() {}
 
-  // ƒfƒXƒgƒ‰ƒNƒ^
+  // ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
   virtual ~CamCv()
   {
-    // ƒXƒŒƒbƒh‚ð’âŽ~‚·‚é
+    // ã‚¹ãƒ¬ãƒƒãƒ‰ã‚’åœæ­¢ã™ã‚‹
     stop();
   }
 
-  // ƒJƒƒ‰‚©‚ç“ü—Í‚·‚é
+  // ã‚«ãƒ¡ãƒ©ã‹ã‚‰å…¥åŠ›ã™ã‚‹
   bool open(int device, int width = 0, int height = 0, int fps = 0)
   {
-    // ƒJƒƒ‰‚ðŠJ‚­
+    // ã‚«ãƒ¡ãƒ©ã‚’é–‹ã
     camera.open(device);
 
-    // ƒJƒƒ‰‚ªŽg‚¦‚ê‚ÎƒJƒƒ‰‚ð‰Šú‰»‚·‚é
+    // ã‚«ãƒ¡ãƒ©ãŒä½¿ãˆã‚Œã°ã‚«ãƒ¡ãƒ©ã‚’åˆæœŸåŒ–ã™ã‚‹
     if (camera.isOpened() && init(width, height, fps)) return true;
 
-    // ƒJƒƒ‰‚ªŽg‚¦‚È‚¢
+    // ã‚«ãƒ¡ãƒ©ãŒä½¿ãˆãªã„
     return false;
   }
 
-  // ƒtƒ@ƒCƒ‹^ƒlƒbƒgƒ[ƒN‚©‚ç“ü—Í‚·‚é
+  // ãƒ•ã‚¡ã‚¤ãƒ«ï¼ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯ã‹ã‚‰å…¥åŠ›ã™ã‚‹
   bool open(const std::string &file, int width = 0, int height = 0, int fps = 0)
   {
-    // ƒtƒ@ƒCƒ‹^ƒlƒbƒgƒ[ƒN‚ðŠJ‚­
+    // ãƒ•ã‚¡ã‚¤ãƒ«ï¼ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯ã‚’é–‹ã
     camera.open(file);
 
-    // ƒtƒ@ƒCƒ‹^ƒlƒbƒgƒ[ƒN‚ªŽg‚¦‚ê‚Î‰Šú‰»‚·‚é
+    // ãƒ•ã‚¡ã‚¤ãƒ«ï¼ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯ãŒä½¿ãˆã‚Œã°åˆæœŸåŒ–ã™ã‚‹
     if (camera.isOpened() && init(width, height, fps)) return true;
 
-    // ƒtƒ@ƒCƒ‹^ƒlƒbƒgƒ[ƒN‚ªŽg‚¦‚È‚¢
+    // ãƒ•ã‚¡ã‚¤ãƒ«ï¼ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯ãŒä½¿ãˆãªã„
     return false;
   }
 
-  // ˜Io‚ðã‚°‚é
+  // éœ²å‡ºã‚’ä¸Šã’ã‚‹
   virtual void increaseExposure()
   {
     if (camera.isOpened()) camera.set(CV_CAP_PROP_EXPOSURE, ++exposure * 0.1);
   }
 
-  // ˜Io‚ð‰º‚°‚é
+  // éœ²å‡ºã‚’ä¸‹ã’ã‚‹
   virtual void decreaseExposure()
   {
     if (camera.isOpened()) camera.set(CV_CAP_PROP_EXPOSURE, --exposure * 0.1);
   }
 
-  // —˜“¾‚ðã‚°‚é
+  // åˆ©å¾—ã‚’ä¸Šã’ã‚‹
   virtual void increaseGain()
   {
     if (camera.isOpened()) camera.set(CV_CAP_PROP_GAIN, ++gain);
   }
 
-  // —˜“¾‚ð‰º‚°‚é
+  // åˆ©å¾—ã‚’ä¸‹ã’ã‚‹
   virtual void decreaseGain()
   {
     if (camera.isOpened()) camera.set(CV_CAP_PROP_GAIN, --gain);
