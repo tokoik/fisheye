@@ -1,45 +1,45 @@
 #version 150 core
 
 //
-// �����~���}�@�̃p�m���}�摜�̕��ʓW�J
+// 正距円筒図法のパノラマ画像の平面展開
 //
 
-// �X�N���[���̊i�q�Ԋu
+// スクリーンの格子間隔
 uniform vec2 gap;
 
-// �X�N���[���̑傫���ƒ��S�ʒu
+// スクリーンの大きさと中心位置
 uniform vec4 screen;
 
-// �X�N���[���܂ł̏œ_����
+// スクリーンまでの焦点距離
 uniform float focal;
 
-// �X�N���[������]����ϊ��s��
+// スクリーンを回転する変換行列
 uniform mat4 rotation;
 
-// �����x�N�g��
+// 視線ベクトル
 out vec4 vector;
 
 void main(void)
 {
-  // ���_�ʒu
-  //   �e���_�ɂ����� gl_VertexID �� 0, 1, 2, 3, ... �̂悤�Ɋ��蓖�Ă��邩��A
+  // 頂点位置
+  //   各頂点において gl_VertexID が 0, 1, 2, 3, ... のように割り当てられるから、
   //     x = gl_VertexID >> 1      = 0, 0, 1, 1, 2, 2, 3, 3, ...
   //     y = 1 - (gl_VertexID & 1) = 1, 0, 1, 0, 1, 0, 1, 0, ...
-  //   �̂悤�� GL_TRIANGLE_STRIP �����̒��_���W�l��������B
-  //   y �� gl_InstaceID �𑫂��� glDrawArrayInstanced() �̃C���X�^���X���Ƃ� y ���ω�����B
-  //   ����Ɋi�q�̊Ԋu gap �������� 1 �������Ώc�� [-1, 1] �͈̔͂̓_�Q position ��������B
+  //   のように GL_TRIANGLE_STRIP 向けの頂点座標値が得られる。
+  //   y に gl_InstaceID を足せば glDrawArrayInstanced() のインスタンスごとに y が変化する。
+  //   これに格子の間隔 gap をかけて 1 を引けば縦横 [-1, 1] の範囲の点群 position が得られる。
   int x = gl_VertexID >> 1;
   int y = gl_InstanceID + 1 - (gl_VertexID & 1);
   vec2 position = vec2(x, y) * gap - 1.0;
 
-  // ���_�ʒu�����̂܂܃��X�^���C�U�ɑ���΃N���b�s���O��ԑS�ʂɕ`��
+  // 頂点位置をそのままラスタライザに送ればクリッピング空間全面に描く
   gl_Position = vec4(position, 0.0, 1.0);
 
-  // �����x�N�g��
-  //   position �ɃX�N���[���̑傫�� screen.st �������Ē��S�ʒu screen.pq �𑫂��΁A
-  //   �X�N���[����̓_�̈ʒu p �������邩��A���_�ɂ��鎋�_���炱�̓_�Ɍ����������́A
-  //   �œ_���� focal �� Z ���W�ɗp���� (p, -focal) �ƂȂ�B
-  //   �������]���āA���̕����̎����P�ʃx�N�g���𓾂�B
+  // 視線ベクトル
+  //   position にスクリーンの大きさ screen.st をかけて中心位置 screen.pq を足せば、
+  //   スクリーン上の点の位置 p が得られるから、原点にある視点からこの点に向かう視線は、
+  //   焦点距離 focal を Z 座標に用いて (p, -focal) となる。
+  //   これを回転して、その方向の視線単位ベクトルを得る。
   vec2 p = position * screen.st + screen.pq;
   vector = rotation * vec4(p, -focal, 0.0);
 }

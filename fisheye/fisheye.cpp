@@ -1,4 +1,4 @@
-// ウィンドウ関連の処理
+﻿// ウィンドウ関連の処理
 #include "GgApplication.h"
 
 // 平面展開の設定一覧
@@ -111,7 +111,7 @@ void GgApplication::run()
   GgSimpleShader::LightBuffer light(lightData);
 
   // 表示する図形の形状データファイルの読み込み
-  const GgSimpleObj object(file, true);
+  //const GgSimpleObj object(file, true);
 
   // 図形表示用の視野変換行列の
   const GgMatrix mv(ggLookat(0.0f, 0.0f, 2.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f));

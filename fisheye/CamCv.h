@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 //
 // OpenCV を使ったキャプチャ
@@ -10,6 +10,17 @@
 // OpenCV
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/videoio/legacy/constants_c.h>
+#if defined(_WIN32)
+#  define CV_VERSION_STR CVAUX_STR(CV_MAJOR_VERSION) CVAUX_STR(CV_MINOR_VERSION) CVAUX_STR(CV_SUBMINOR_VERSION)
+#  if defined(_DEBUG)
+#    define CV_EXT_STR "d.lib"
+#  else
+#    define CV_EXT_STR ".lib"
+#  endif
+#  pragma comment(lib, "opencv_core" CV_VERSION_STR CV_EXT_STR)
+#  pragma comment(lib, "opencv_highgui" CV_VERSION_STR CV_EXT_STR)
+#  pragma comment(lib, "opencv_videoio" CV_VERSION_STR CV_EXT_STR)
+#endif
 
 // OpenCV を使ってキャプチャするクラス
 class CamCv
