@@ -47,7 +47,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // Windows のとき
 #if defined(_WIN32)
 // リンクするライブラリ
+#  if defined(_DEBUG)
+#  pragma comment(lib, "glfw3d.lib")
+#  else
 #  pragma comment(lib, "glfw3.lib")
+#  endif
 #endif
 
 // OpenGL 3.2 の API のエントリポイント
