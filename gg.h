@@ -33,7 +33,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 // Windows (Visual Studio) 用の設定
 #if defined(_WIN32)
-#  pragma warning(disable:4996)
+#ifndef _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
+#endif
 #  define _USE_MATH_DEFINES
 #  define NOMINMAX
 #  undef APIENTRY
