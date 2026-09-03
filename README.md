@@ -1,65 +1,59 @@
-fisheye
-=======
+# fisheye - 全天球・魚眼カメラ映像の展開と 3D 空間マッピング
 
-魚眼レンズ画像の GLSL を使った平面展開のサンプルプログラム
+## 1. 概要
 
-    Copyright (c) 2017 Kohe Tokoi. All Rights Reserved.
-    
-    Permission is hereby granted, free of charge,  to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction,  including without limitation the rights
-    to use, copy,  modify, merge,  publish, distribute,  sublicense,  and/or sell
-    copies or substantial portions of the Software.
-    
-    The above  copyright notice  and this permission notice  shall be included in
-    all copies or substantial portions of the Software.
-    
-    THE SOFTWARE  IS PROVIDED "AS IS",  WITHOUT WARRANTY OF ANY KIND,  EXPRESS OR
-    IMPLIED,  INCLUDING  BUT  NOT LIMITED  TO THE WARRANTIES  OF MERCHANTABILITY,
-    FITNESS  FOR  A PARTICULAR PURPOSE  AND NONINFRINGEMENT.  IN  NO EVENT  SHALL
-    KOHE TOKOI  BE LIABLE FOR ANY CLAIM,  DAMAGES OR OTHER LIABILITY,  WHETHER IN
-    AN ACTION  OF CONTRACT,  TORT  OR  OTHERWISE,  ARISING  FROM,  OUT OF  OR  IN
-    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+本プログラムは、全天球カメラ（RICOH THETA など）や魚眼カメラ（Kodak SP360 など）で撮影された動画・静止画・ライブ映像をテクスチャとして取り込み、GLSL シェーダで正距円筒図法（パノラマ展開）や透視投影にリアルタイム変換して 3D 空間内にレンダリングするサンプルプログラムです。
 
-* Kodak SP360 4K、RICOH THETA S などの魚眼カメラのライブストリーミング映像を平面展開します。
-* [床井研究室：魚眼レンズ画像の平面展開](http://marina.sys.wakayama-u.ac.jp/~tokoi/?date=20160629)にある手法を使っています。
-* [床井研究室：矩形の描き方](http://marina.sys.wakayama-u.ac.jp/~tokoi/?date=20160831)の手法でバーテックスシェーダに実装しています。
-* GLFW の version 3 と OpenCV 3.1 (Windows 版) 2.4 (Mac 版) を使っています。
-* GLFW と OpenCV を組み込みには、Windows 版は NuGet、Mac 版は HomeBrew を使っています。
-* Xcode で実行するときは Working Directory に "$PROJECT_DIR/fisheye" を設定してください。
-* マウスの左ボタンドラッグで視線を変更できます。
-* マウスのホイールを回すとスクリーンの画角を調整できます。
-* シフトキーを押しながらマウスのホイールを回すとレンズの画角を調整できます。
-* SHIFT キーを押しながら矢印キーで左目と右目の相対的な位置を調整できます。
-* CONTROL キーを押しながら矢印キーで両目のウィンドウ上の位置を調整できます。
-    
-設定
-----
+- 移行元ブログ記事:
+  - [全方位カメラのリアルタイムパノラマ展開 - 床井研究室](https://tokoik.github.io/blog/2016/12/03/)
 
-設定項目は main.cpp の最初の部分にあります。
+## 2. 対応環境
 
-* shader_selection に ExpansionShader.h の中にあるものの番号を設定してください。
-* UVC Blender を使うとき (shader_selection == 2, panorama.vert) は main.cpp で GL_CLAMP_TO_BORDER を GL_REPEAT に変更してください。
+- **Windows**: Visual Studio 2019 / 2022 / 2026 (CMake 経由で GLFW および OpenCV 4.13.0 を自動構成)
+- **macOS**: Xcode (GLFW 自動ダウンロード、OpenCV を使用)
+- **Ubuntu Linux**: GCC / Make (システム標準の libglfw3-dev, libopencv-dev, libgl1-mesa-dev を使用)
 
-```
-    // 使用するシェーダー
-    const int shader_selection(1);
+## 3. ビルド手順
+
+### Windows (Visual Studio)
+
+```pwsh
+cmake -B build -S .
+cmake --build build --config Release
 ```
 
-* capture_device に使用する USB カメラの番号を設定してください。
-* USB カメラが１台しかなければ 0 を設定してください。
+### macOS (Xcode)
 
-```
-    // 使用するデバイス
-    const int capture_device(0);
+```bash
+brew install opencv
+cmake -B build -G Xcode
+cmake --build build --config Release
 ```
 
-* カメラの解像度は、THETA S の USB 接続で 1280x720、HDMI 接続で 1920x1080 でテストしています。
-* Kodak SP360 4K の HDMI 接続では 1440x1440 を設定してください。
-* いまのところ HDMI 接続でカメラがうまく設定されないことがあります (他のプログラムは動くのに)。
+### Ubuntu Linux (Makefile)
 
+```bash
+sudo apt-get update
+sudo apt-get install -y libglfw3-dev libgl1-mesa-dev libopencv-dev
+cmake -B build -S .
+cmake --build build
 ```
-    // カメラの解像度 (0 ならカメラから取得)
-    const int capture_width(1280);
-    const int capture_height(720);
-```
+
+## 4. 起動方法
+
+ビルド完了後、生成された実行ファイルを実行します。
+
+- **Windows**: `build/Release/fisheye.exe`
+- **macOS**: `build/Release/fisheye.app`
+- **Linux**: `build/fisheye`
+
+## 5. 操作方法
+
+- **マウスドラッグ**: 視点の回転
+- **マウスホイール**: ズーム
+- **[SPACE]**: カメラ / 動画ソースの切り替え
+- **[q] / [Q] / [ESC]**: プログラムの終了
+
+## 6. プログラムの解説
+
+OpenCV の `cv::VideoCapture` により動画ファイル（`theta.mp4`, `sp360.mp4`）や USB 接続カメラからフレームを取得し、GLSL バーテックスシェーダ・フラグメントシェーダ内で球座標変換を行って正距円筒画像への変換や透視投影による矩形領域の切り出しを行います。

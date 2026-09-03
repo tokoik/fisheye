@@ -1,58 +1,45 @@
-#
-# for Linux
-#
-/fisheye/fisheye
-/fisheye/core
-/fisheye/a.out
-/fisheye/*.o
-/fisheye/*.dep
-#
-# for Mac
-#
-/build/
-/DerivedData/
-xcuserdata
-*.pbxuser
-*.mode1v3
-*.mode2v3
-*.perspectivev3
-!default.pbxuser
-!default.mode1v3
-!default.mode2v3
-!default.perspectivev3
-*.moved-aside
-*.xcuserstate
-*.xccheckout
-.DS_Store
-#
-# for Windows
-#
+# Build directory
+build/
+bin/
+lib/
+libs/
+
+# Visual Studio
 .vs/
-/x64/
-/ipch/
-/packages/
-[Dd]ebug/
-[Rr]elease/
-*.com
-*.exe
-*.ncb
+*.user
 *.suo
-*.sdf
-*.opensdf
-*.opendb
-*.userosscache
 *.sln.docstates
-*.VC.VC.opendb
+*.db
+*.opendb
 *.VC.db
-Thumbs.db
-#
-# anothre stuff
-#
-*~
-*.bak
-*.tmp
-*.swp
-/fisheye/*.obj
-/fisheye/*.mtl
-!/fisheye/bunny.obj
-!/fisheye/bunny.mtl
+*.sdf
+Debug/
+Release/
+x64/
+Win32/
+ipch/
+*.ilk
+*.pdb
+*.idb
+*.tlog
+
+# Xcode
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+DerivedData/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+
+# Preserved assets
+!*.obj
+!*.mtl
+!*.tga
+!*.png
+!*.jpg
+!*.bmp
+!*.dat
+!*.csv
+!*.mp4
